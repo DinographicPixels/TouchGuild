@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "declaration": true,
+      "outDir": "./dist",
+      "strict": true,
+      "allowJs": true,
+      "alwaysStrict": true,
+      "pretty": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true
+    },
+    "include": ["./lib"]
+  }
