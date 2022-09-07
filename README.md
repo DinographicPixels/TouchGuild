@@ -5,7 +5,7 @@
 ---
 
 # EARLY ACCESS COMING SOON!
-If you read this, it means it's still not release, we're publishing the library soon, and probably within' the end of the week. See ya!
+If you read this, it means it's still not released, we're publishing the library soon, and probably within' the end of the week. See ya!
 
 # 🌟 Get started
 
