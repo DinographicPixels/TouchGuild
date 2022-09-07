@@ -4,6 +4,9 @@
 
 ---
 
+# EARLY ACCESS COMING SOON!
+If you read this, it means it's still not release, we're publishing the library soon, and probably within' the end of the week. See ya!
+
 # 🌟 Get started
 
 <figure><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FlOPMbaW5t7rQZWQ9C6lG%2Fuploads%2F18hrn4NpcdDAZzNo1Ape%2Ftouchguild-banner.png?alt=media&token=7ccb1380-65eb-44d6-b978-d68fe33048f5" alt=""><figcaption></figcaption></figure>
