@@ -1,12 +1,13 @@
 import { Client } from './Client';
 export declare class User {
-    client: Client;
+    _client: Client;
     id: string;
     type: string | any;
     username: string;
-    avatar: string | any;
-    banner: string | any;
-    createdAt: string;
+    avatarURL: string | any;
+    bannerURL: string | any;
+    _createdAt: number;
     bot: boolean;
     constructor(data: any, client: any);
+    get createdAt(): Date;
 }

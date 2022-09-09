@@ -1,16 +1,18 @@
 {
-  "name": "guilderjs",
-  "version": "1.0.0",
-  "description": "JS & TS Guilded library.",
+  "name": "touchguild",
+  "version": "0.1.0",
+  "description": "TouchGuild is a CommonJS, ESM & Typescript Guilded library that gets you, in touch with the API.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
     "acorn": "^8.8.0",
     "acorn-walk": "^8.2.0",
     "arg": "^4.1.3",
+    "axios": "^0.27.2",
     "create-require": "^1.1.1",
     "diff": "^4.0.2",
     "make-error": "^1.3.6",
+    "node-fetch": "^3.2.10",
     "v8-compile-cache-lib": "^3.0.1",
     "yn": "^3.1.1"
   },
@@ -27,14 +29,16 @@
     "guilded",
     "bot",
     "bots",
-    "guildedapi"
+    "guildedapi",
+    "touchguild",
+    "builtbyyou"
   ],
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/DinographicPixels/guilderJS/issues"
+    "url": "https://github.com/DinographicPixels/TouchGuild/issues"
   },
-  "homepage": "https://github.com/DinographicPixels/guilderJS#readme",
+  "homepage": "https://github.com/DinographicPixels/TouchGuild",
   "devDependencies": {
     "@types/events": "^3.0.0",
     "@types/node": "^18.7.11",

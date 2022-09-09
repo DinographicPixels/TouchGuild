@@ -7,6 +7,7 @@ export declare class WSManager {
     proxyURL: any;
     reconnect?: any;
     reconnectAttemptLimit: any;
+    replayMissedEvents?: any;
     emitter: {
         _events: any;
         options: {
@@ -31,23 +32,74 @@ export declare class WSManager {
     };
     ws: WebSocket;
     firstwsMessage: boolean;
+    lastMessageID: string | null;
+    currReconnectAttempt: number;
+    alive?: boolean;
+    ping: number;
+    lastPingTime: number;
     get identifiers(): {
         Message: {
             ChatMessageCreated: string;
             ChatMessageUpdated: string;
             ChatMessageDeleted: string;
+            ChannelMessageReactionCreated: string;
+            ChannelMessageReactionDeleted: string;
         };
         Channel: {
             TeamChannelCreated: string;
             TeamChannelUpdated: string;
             TeamChannelDeleted: string;
         };
+        ForumTopic: {
+            ForumTopicCreated: string;
+            ForumTopicUpdated: string;
+            ForumTopicDeleted: string;
+            ForumTopicPinned: string;
+            ForumTopicUnpinned: string;
+        };
+        Guild: {
+            TeamMemberBanned: string;
+            TeamMemberUnbanned: string;
+            TeamMemberJoined: string;
+            TeamMemberRemoved: string;
+            TeamMemberUpdated: string;
+            teamRolesUpdated: string;
+        };
+        Webhook: {
+            TeamWebhookCreated: string;
+            TeamWebhookUpdated: string;
+        };
+        Doc: {
+            DocCreated: string;
+            DocUpdated: string;
+            DocDeleted: string;
+        };
+        Calendar: {
+            CalendarEventCreated: string;
+            CalendarEventUpdated: string;
+            CalendarEventDeleted: string;
+            CalendarEventRsvpUpdated: string;
+            CalendarEventRsvpDeleted: string;
+        };
+        List: {
+            ListItemCreated: string;
+            ListItemUpdated: string;
+            ListItemDeleted: string;
+            ListItemCompleted: string;
+            ListItemUncompleted: string;
+        };
     };
     get vAPI(): any;
+    _debug(message: string | any): boolean;
+    get replayEventsCondition(): string | false | null;
     connect(): void;
+    closeAll(): void;
     private onSocketMessage;
     private onSocketOpen;
     private onSocketError;
+    private onSocketClose;
+    private onSocketPing;
+    private onSocketPong;
 }
 export interface WSManagerParams {
     /** Bot's token */
@@ -60,4 +112,6 @@ export interface WSManagerParams {
     reconnect?: boolean | any;
     /** Reconnect limit */
     reconnectAttemptLimit: number | any;
+    /** Replay missed events on connection interruption */
+    replayMissedEvents: boolean | any;
 }
