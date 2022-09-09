@@ -7,6 +7,15 @@
 # Early access library
 The library recently launched and we need to make sure that you do not encounter bugs, that's why, we're realsing it in Early access. When TouchGuild will be stable enough, we'll switch to 'B.E.T.A' since the Guilded API is still in early access.
 
+# Guide, documentation & even more
+Everything's to help you to get started, to create a incredible guilded bot through our Library.
+##Links:
+- [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
+- [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
+- [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
+- [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
+
+
 # 🌟 Get started
 
 <figure><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FlOPMbaW5t7rQZWQ9C6lG%2Fuploads%2F18hrn4NpcdDAZzNo1Ape%2Ftouchguild-banner.png?alt=media&token=7ccb1380-65eb-44d6-b978-d68fe33048f5" alt=""><figcaption></figcaption></figure>
