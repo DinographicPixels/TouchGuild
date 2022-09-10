@@ -10,10 +10,13 @@ The library recently launched and we need to make sure that you do not encounter
 # Guide, documentation & even more
 Everything's to help you to get started, to create a incredible guilded bot through our Library.
 ##Links:
+- [NPM Package](https://www.npmjs.com/package/touchguild)
+- [GitHub](https://github.com/DinographicPixels/TouchGuild)
 - [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
 - [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
 - [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
+- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo);
 
 
 # 🌟 Get started

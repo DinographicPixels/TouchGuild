@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import fetch from 'node-fetch-commonjs'
 import { Message, MessageOptions } from './Message';
 import * as endpoints from '../rest/endpoints';
 

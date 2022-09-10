@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import fetch from 'node-fetch-commonjs'
 import { Channel } from './Channel';
 import { Member } from './Member';
 import { Guild } from './Guild';
