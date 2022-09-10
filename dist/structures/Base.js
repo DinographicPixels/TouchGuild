@@ -7,3 +7,4 @@ class Base {
     }
 }
 exports.Base = Base;
+// deprecated, never used.
