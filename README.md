@@ -8,8 +8,8 @@
 The library recently launched and we need to make sure that you do not encounter bugs, that's why, we're realsing it in Early access. When TouchGuild will be stable enough, we'll switch to 'B.E.T.A' since the Guilded API is still in early access.
 
 # Guide, documentation & even more
-Everything's to help you to get started, to create a incredible guilded bot through our Library.
-##Links:
+Everything's to help you to get started, to create an incredible guilded bot through our Library.
+## Links:
 - [NPM Package](https://www.npmjs.com/package/touchguild)
 - [GitHub](https://github.com/DinographicPixels/TouchGuild)
 - [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
