@@ -17,6 +17,8 @@ Everything's to help you to get started, to create a incredible guilded bot thro
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
 - [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
 - [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo);
+- [Our Discord server](https://discord.gg/UgPRaGRkrQ)
+- [Our Guilded server](https://www.guilded.gg/i/ExPXPrwE)
 
 
 # 🌟 Get started
