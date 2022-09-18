@@ -27,12 +27,17 @@ Everything's to help you to get started, to create an incredible guilded bot thr
 
 ## Get started, it's easy.
 
-You'll need to download Node (npm), sorry yarn users but it's not for now.
+You'll need to download Node (npm).
 
 ### Install the package
 
+Install the package with npm:
 ```bash
 npm install touchguild@latest
+```
+Install the package with yarn:
+```bash
+yarn add touchguild
 ```
 
 ### Basic scripting (ping, pong!)
