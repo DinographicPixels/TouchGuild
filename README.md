@@ -32,7 +32,7 @@ You'll need to download Node (npm), sorry yarn users but it's not for now.
 ### Install the package
 
 ```bash
-npm install touchguild@latest --save-dev
+npm install touchguild@latest
 ```
 
 ### Basic scripting (ping, pong!)
