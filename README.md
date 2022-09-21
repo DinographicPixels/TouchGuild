@@ -67,4 +67,4 @@ Client.on('messageCreate', (message)=> {
 ```
 
 ## Need to get new features, right. Now?
-[Click here for more information about Nightly builds.](https://app.gitbook.com/s/lOPMbaW5t7rQZWQ9C6lG/guide/get-started#need-to-get-new-features-right.-now)
+[Click here for more information about Nightly builds.](https://docs.touchguild.dinographicpixels.com/guide/get-started#need-to-get-new-features-right.-now)
