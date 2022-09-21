@@ -1,5 +1,6 @@
 import { Client } from './Client';
 import { Member } from './Member';
+import { MentionsType, ListItemNoteTypes } from '../Types';
 export declare class ListItem {
     /** Raw data */
     _data: any;
@@ -45,18 +46,3 @@ export declare class ListItem {
     complete(): Promise<void>;
     uncomplete(): Promise<void>;
 }
-export declare type ListItemNoteTypes = {
-    createdAt: number;
-    createdBy: string;
-    updatedAt?: number;
-    updatedBy?: string;
-    mentions?: MentionsType;
-    content: string;
-};
-export declare type MentionsType = {
-    users?: Array<object>;
-    channels?: Array<object>;
-    roles?: Array<object>;
-    everyone?: boolean;
-    here?: boolean;
-};

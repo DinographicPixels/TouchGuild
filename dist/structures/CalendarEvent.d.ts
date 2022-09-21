@@ -1,5 +1,5 @@
 import { Client } from './Client';
-import { MentionsType } from './ListItem';
+import { MentionsType } from '../Types';
 export declare class CalendarEvent {
     /** Raw data */
     data: any;

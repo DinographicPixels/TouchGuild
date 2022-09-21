@@ -5,7 +5,7 @@ import { Guild } from './Guild';
 
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';
-import { MentionsType } from './ListItem';
+import type { MentionsType } from '../Types';
 
 const calls = new call();
 

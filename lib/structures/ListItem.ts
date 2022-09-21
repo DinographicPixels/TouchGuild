@@ -5,6 +5,8 @@ import { call } from '../Utils';
 import { Member } from './Member';
 const calls = new call();
 
+import { MentionsType, ListItemNoteTypes } from '../Types';
+
 export class ListItem {
     /** Raw data */
     _data: any; 
@@ -106,21 +108,4 @@ export class ListItem {
     async uncomplete(): Promise<void>{
         await calls.delete(endpoints.LIST_ITEM_COMPLETE(this.channelID, this.id), this._client.token);
     }
-}
-
-export type ListItemNoteTypes = {
-    createdAt: number,
-    createdBy: string,
-    updatedAt?: number,
-    updatedBy?: string,
-    mentions?: MentionsType,
-    content: string
-}
-
-export type MentionsType = {
-    users?: Array<object>,
-    channels?: Array<object>,
-    roles?: Array<object>,
-    everyone?: boolean,
-    here?: boolean
 }

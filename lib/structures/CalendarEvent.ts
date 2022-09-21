@@ -2,7 +2,7 @@ import { Client } from './Client';
 import * as endpoints from '../rest/endpoints';
 
 import { call } from '../Utils';
-import { MentionsType } from './ListItem';
+import { MentionsType } from '../Types';
 const calls = new call();
 
 export class CalendarEvent {

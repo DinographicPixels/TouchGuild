@@ -1,8 +1,5 @@
-import { GatewayHandler } from "./gateway/GatewayHandler";
 import WebSocket from 'ws'
-import { Client } from "./structures/Client";
 import emitterbuilder from 'emitterbuilder';
-import EventEmitter from "events";
 
 export class WSManager{
     constructor(public readonly params:WSManagerParams){}

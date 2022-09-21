@@ -2,7 +2,7 @@ import { Client } from './Client';
 import { Channel } from './Channel';
 import { Member } from './Member';
 import { Guild } from './Guild';
-import { MentionsType } from './ListItem';
+import { MentionsType } from '../index';
 /** Message component, with all its methods and declarations. */
 export declare class Message {
     /** Raw data. */
