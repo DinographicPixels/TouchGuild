@@ -1,14 +1,9 @@
-import WebSocket from 'ws'
 import { Message, MessageOptions } from './Message';
 import { Channel, ChannelTypes } from './Channel';
 
-import emitterbuilder from 'emitterbuilder'
-import { GatewayEventHandler } from '../gateway/events/GatewayEventHandler';
 import { GatewayHandler } from '../gateway/GatewayHandler';
 import { WSManager } from '../WSManager';
 
-import fetch from 'sync-fetch';
-import { User } from './User';
 import { Member } from './Member';
 import { Guild } from './Guild';
 import { call } from '../Utils';

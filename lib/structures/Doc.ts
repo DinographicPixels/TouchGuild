@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import { Message, MessageOptions } from './Message';
 import * as endpoints from '../rest/endpoints';
 
 import { call } from '../Utils';

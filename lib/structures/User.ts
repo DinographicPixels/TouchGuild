@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import { Channel } from './Channel';
 
 export class User {
     //userdata: any; fulldata: object;

@@ -1,7 +1,4 @@
 import { Client } from './Client';
-import { Channel } from './Channel';
-import { User } from './User';
-import { Guild } from './Guild';
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';
 const calls = new call();

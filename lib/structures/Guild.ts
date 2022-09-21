@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import { Message } from './Message';
 
 export class Guild {
     /** Client */

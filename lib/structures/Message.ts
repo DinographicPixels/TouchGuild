@@ -2,7 +2,6 @@ import { Client } from './Client';
 import { Channel } from './Channel';
 import { Member } from './Member';
 import { Guild } from './Guild';
-import syncFetch from 'sync-fetch';
 
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';

@@ -1,7 +1,5 @@
 import { Client } from './Client';
-import { Channel } from './Channel';
 import { User } from './User';
-import { Member } from './Member';
 import { Guild } from './Guild';
 import { call } from '../Utils';
 const calls = new call()

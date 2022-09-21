@@ -1,5 +1,4 @@
 import { Client } from './Client';
-import { Channel } from './Channel';
 import { User } from './User';
 import { Guild } from './Guild';
 import { call } from '../Utils';
