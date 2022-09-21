@@ -10,6 +10,10 @@ The library recently launched and we need to make sure that you do not encounter
 # NIGHTLY BUILD
 Be aware that Nightly builds aren't stable and can have still have major bugs. If you face issues, feel free to report it by creating an issue on TouchGuild's GitHub, please specify that you're using a Nightly build.
 
+## What's new on Nightly builds?
+For now, we're not having additional feature on Nightly builds.
+We recently reorganized type import/export for a better library developer experience.
+
 # Guide, documentation & even more
 Everything's to help you to get started, to create an incredible guilded bot through our Library.
 ## Links:
@@ -32,15 +36,11 @@ Everything's to help you to get started, to create an incredible guilded bot thr
 
 You'll need to download Node (npm).
 
-### Install the package
+### Install the Nightly build
 
 Install the package with npm:
 ```bash
-npm install touchguild@latest
-```
-Install the package with yarn:
-```bash
-yarn add touchguild
+npm install dinographicpixels/touchguild#nightly
 ```
 
 ### Basic scripting (ping, pong!)
@@ -69,5 +69,12 @@ Client.on('messageCreate', (message)=> {
 });
 ```
 
-## Need to get new features, right. Now?
-[Click here for more information about Nightly builds.](https://docs.touchguild.dinographicpixels.com/guide/get-started#need-to-get-new-features-right.-now)
+## Stable builds
+Install stable builds with npm:
+```bash
+npm install touchguild@latest
+```
+Install stable builds with yarn:
+```bash
+yarn add touchguild
+```
