@@ -8,8 +8,8 @@
 The library recently launched and we need to make sure that you do not encounter bugs, that's why, we're realsing it in Early access. When TouchGuild will be stable enough, we'll switch to 'B.E.T.A' since the Guilded API is still in early access.
 
 # Guide, documentation & even more
-Everything's to help you to get started, to create a incredible guilded bot through our Library.
-##Links:
+Everything's to help you to get started, to create an incredible guilded bot through our Library.
+## Links:
 - [NPM Package](https://www.npmjs.com/package/touchguild)
 - [GitHub](https://github.com/DinographicPixels/TouchGuild)
 - [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
@@ -17,6 +17,8 @@ Everything's to help you to get started, to create a incredible guilded bot thro
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
 - [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
 - [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo);
+- [Our Discord server](https://discord.gg/UgPRaGRkrQ)
+- [Our Guilded server](https://www.guilded.gg/i/ExPXPrwE)
 
 
 # 🌟 Get started
@@ -25,12 +27,17 @@ Everything's to help you to get started, to create a incredible guilded bot thro
 
 ## Get started, it's easy.
 
-You'll need to download Node (npm), sorry yarn users but it's not for now.
+You'll need to download Node (npm).
 
 ### Install the package
 
+Install the package with npm:
 ```bash
-npm install touchguild@latest --save-dev
+npm install touchguild@latest
+```
+Install the package with yarn:
+```bash
+yarn add touchguild
 ```
 
 ### Basic scripting (ping, pong!)
