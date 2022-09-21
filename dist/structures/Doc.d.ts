@@ -1,5 +1,6 @@
 import { Client } from './Client';
 import { Member } from './Member';
+import { MentionsType } from '../Types';
 export declare class Doc {
     /** Raw data */
     data: any;
@@ -18,13 +19,7 @@ export declare class Doc {
     /** Content of the doc */
     content: string;
     /** Doc mentions  */
-    mentions: {
-        users?: object[];
-        channels?: object[];
-        roles?: object[];
-        everyone?: boolean;
-        here?: boolean;
-    };
+    mentions: MentionsType;
     /** Timestamp (unix epoch time) of the doc's creation. */
     _createdAt: number | null;
     /** ID of the member who created the doc. */

@@ -67,7 +67,7 @@ class Client extends events_1.default {
     }
     /** Bot's token. */
     get token() {
-        //console.log("GuilderJS WARN! : Returned token value, do not share this token to anyone.");
+        //console.log("TouchGuild WARN! : Returned token value, do not share this token to anyone.");
         return this.params.token;
     }
     /** Connect to the Guilded API. */

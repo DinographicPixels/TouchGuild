@@ -3,6 +3,7 @@ import * as endpoints from '../rest/endpoints';
 
 import { call } from '../Utils';
 import { Member } from './Member';
+import { MentionsType } from '../Types';
 const calls = new call();
 
 export class Doc {
@@ -23,13 +24,7 @@ export class Doc {
     /** Content of the doc */
     content: string; 
     /** Doc mentions  */
-    mentions: {
-        users?: object[], // id in
-        channels?: object[], // id in
-        roles?: object[],
-        everyone?: boolean,
-        here?: boolean
-    }
+    mentions: MentionsType
     /** Timestamp (unix epoch time) of the doc's creation. */
     _createdAt: number|null; 
     /** ID of the member who created the doc. */

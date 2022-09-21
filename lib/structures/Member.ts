@@ -3,6 +3,7 @@ import { User } from './User';
 import { Guild } from './Guild';
 import { call } from '../Utils';
 import * as endpoints from '../rest/endpoints';
+import { socialLinkTypes } from '../Types';
 
 /** Guild Member component, with all its methods and declarations. */
 export class Member extends User {
@@ -71,11 +72,4 @@ export class Member extends User {
     async removeRole(roleID: number): Promise<void>{
         await new call().delete(endpoints.GUILD_MEMBER_ROLE(this.guildID, this.id, roleID), this._client.token);
     }
-}
-
-/** social link types */
-export type socialLinkTypes = {
-    memberUsername: string,
-    serviceID: string,
-    type: string
 }

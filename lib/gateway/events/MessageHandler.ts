@@ -2,6 +2,7 @@ import { Guild } from "../../structures/Guild";
 import { Member } from "../../structures/Member";
 import { Message } from "../../structures/Message";
 import { User } from "../../structures/User";
+import { messageReactionRawTypes, messageReactionTypes } from "../../Types";
 import { GatewayEventHandler } from "./GatewayEventHandler";
 
 export class MessageHandler extends GatewayEventHandler{
@@ -107,40 +108,4 @@ export class MessageHandler extends GatewayEventHandler{
     // messageReactionRemoveAll(data: object){
     //     //return this.client.emit('messageReactionRemoveAll')
     // }
-}
-
-
-type messageReactionRawTypes = {
-    serverId: string,
-    reaction: {
-        channelId: string,
-        messageId: string,
-        createdBy: string,
-        emote: {
-            id: number|string,
-            name: string,
-            url: string
-        }
-    }
-}
-
-
-export type messageReactionTypes = {
-    message: Message|{
-        id: string,
-        guild: Guild | {
-            id: string
-        },
-        channelID: string
-    }, 
-    emoji: emojiTypes,
-    reactor: Member| {
-        id: string
-    }
-}
-
-export type emojiTypes = {
-    id: number|string,
-    name: string,
-    url: string
 }

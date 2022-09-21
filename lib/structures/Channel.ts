@@ -4,6 +4,7 @@ import { Message, MessageOptions } from './Message';
 import * as endpoints from '../rest/endpoints';
 
 import { call } from '../Utils';
+import { ChannelEditTypes, ChannelCategories } from '../Types';
 
 /** Guild Channel component, with all its methods and declarations */
 export class Channel {
@@ -111,7 +112,7 @@ export class Channel {
     }
 
     /** Edit the channel. */
-    async edit(options:editTypes): Promise<Channel>{
+    async edit(options:ChannelEditTypes): Promise<Channel>{
         // let fetching = await fetch(`https://www.guilded.gg/api/v${this.client.ws.apiversion}/channels/${this.id}`, {
         //     method: 'PATCH',
         //     headers: {
@@ -128,35 +129,4 @@ export class Channel {
     }
 }
 
-/* Channel edit types */
-interface editTypes {
-    name?: string,
-    topic?: string,
-    isPublic?: boolean
-}
-
-/** CHannel create types */
-export type ChannelCreateTypes = {
-    guildID: string,
-    groupID: string,
-    categoryID: string,
-    name: string,
-    type: {
-        announcement: string,
-        chat: string,
-        calendar: string,
-        forums: string,
-        media: string,
-        docs: string,
-        voice: string,
-        list: string,
-        scheduling: string,
-        stream: string
-    },
-    options: {
-        topic: string,
-        isPublic: boolean
-    }
-}
-
-export type ChannelTypes = 'announcement'|'chat'|'calendar'|'forums'|'media'|'docs'|'voice'|'list'|'scheduling'|'stream'
+export { ChannelCategories, ChannelEditTypes };

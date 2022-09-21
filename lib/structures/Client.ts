@@ -1,5 +1,5 @@
 import { Message, MessageOptions } from './Message';
-import { Channel, ChannelTypes } from './Channel';
+import { Channel, ChannelCategories } from './Channel';
 
 import { GatewayHandler } from '../gateway/GatewayHandler';
 import { WSManager } from '../WSManager';
@@ -19,8 +19,8 @@ import * as endpoints from '../rest/endpoints';
 import { Doc } from './Doc';
 import { CalendarEvent } from './CalendarEvent';
 import { CalendarEventRSVP } from './CalendarRSVP';
-import { messageReactionTypes } from '../gateway/events/MessageHandler';
 import { ListItem } from './ListItem';
+import { messageReactionTypes } from '../Types';
 
 const calls = new call();
 
@@ -80,7 +80,7 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
 
     /** Bot's token. */
     get token(){
-        //console.log("GuilderJS WARN! : Returned token value, do not share this token to anyone.");
+        //console.log("TouchGuild WARN! : Returned token value, do not share this token to anyone.");
         return this.params.token;
     }
 
@@ -301,7 +301,7 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
 
     // message
     /** Create a channel in a specified guild. */
-    async createChannel(guildID: string, name: string, type:ChannelTypes, options: {topic?: string, isPublic?: boolean, categoryID?: number, groupID?: string}): Promise<Channel>{
+    async createChannel(guildID: string, name: string, type:ChannelCategories, options: {topic?: string, isPublic?: boolean, categoryID?: number, groupID?: string}): Promise<Channel>{
         var body = {}
         if (!guildID) throw new TypeError('guildID is a required parameter.');
         if (!name) throw new TypeError(`name parameter cannot be empty.`)

@@ -2,6 +2,7 @@ import { Client } from './Client';
 import { Channel } from './Channel';
 import { Guild } from './Guild';
 import { Member } from './Member';
+import { MentionsType } from '../Types';
 export declare class ForumTopic {
     /** Client */
     _client: Client;
@@ -28,7 +29,7 @@ export declare class ForumTopic {
     /** Content of the topic */
     content: string;
     /** Topic mentions */
-    mentions: object;
+    mentions: MentionsType;
     constructor(data: any, client: any);
     /** Guild/server the topic is in */
     get guild(): Guild;

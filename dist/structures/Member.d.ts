@@ -1,6 +1,7 @@
 import { Client } from './Client';
 import { User } from './User';
 import { Guild } from './Guild';
+import { socialLinkTypes } from '../Types';
 /** Guild Member component, with all its methods and declarations. */
 export declare class Member extends User {
     /** Timestamp (unix epoch time) of when the member joined the server. */
@@ -32,9 +33,3 @@ export declare class Member extends User {
     /** Remove a role from member */
     removeRole(roleID: number): Promise<void>;
 }
-/** social link types */
-export declare type socialLinkTypes = {
-    memberUsername: string;
-    serviceID: string;
-    type: string;
-};

@@ -1,5 +1,6 @@
 import { Client } from './Client';
 import { Message, MessageOptions } from './Message';
+import { ChannelEditTypes, ChannelCategories } from '../Types';
 /** Guild Channel component, with all its methods and declarations */
 export declare class Channel {
     /** Raw data */
@@ -43,35 +44,6 @@ export declare class Channel {
     /** Delete the channel. */
     delete(): Promise<void>;
     /** Edit the channel. */
-    edit(options: editTypes): Promise<Channel>;
+    edit(options: ChannelEditTypes): Promise<Channel>;
 }
-interface editTypes {
-    name?: string;
-    topic?: string;
-    isPublic?: boolean;
-}
-/** CHannel create types */
-export declare type ChannelCreateTypes = {
-    guildID: string;
-    groupID: string;
-    categoryID: string;
-    name: string;
-    type: {
-        announcement: string;
-        chat: string;
-        calendar: string;
-        forums: string;
-        media: string;
-        docs: string;
-        voice: string;
-        list: string;
-        scheduling: string;
-        stream: string;
-    };
-    options: {
-        topic: string;
-        isPublic: boolean;
-    };
-};
-export declare type ChannelTypes = 'announcement' | 'chat' | 'calendar' | 'forums' | 'media' | 'docs' | 'voice' | 'list' | 'scheduling' | 'stream';
-export {};
+export { ChannelCategories, ChannelEditTypes };

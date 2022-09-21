@@ -4,6 +4,7 @@ import { Guild } from './Guild';
 import { Member } from './Member';
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';
+import { MentionsType } from '../Types';
 const calls = new call()
 
 export class ForumTopic {
@@ -33,7 +34,7 @@ export class ForumTopic {
     /** Content of the topic */ 
     content: string; 
     /** Topic mentions */
-    mentions: object;
+    mentions: MentionsType;
 
     constructor(data: any, client:any){
         //this.userdata = data.user;  // basically member > user

@@ -12,4 +12,4 @@ export * from './structures/Doc';
 export * from './structures/ForumTopic';
 export * from './structures/ListItem';
 export * from './structures/Webhook';
-export { MentionsType } from './Types';
+export * from './Types';

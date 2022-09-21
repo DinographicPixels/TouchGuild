@@ -28,3 +28,4 @@ __exportStar(require("./structures/Doc"), exports);
 __exportStar(require("./structures/ForumTopic"), exports);
 __exportStar(require("./structures/ListItem"), exports);
 __exportStar(require("./structures/Webhook"), exports);
+__exportStar(require("./Types"), exports);

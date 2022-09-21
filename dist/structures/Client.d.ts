@@ -1,5 +1,5 @@
 import { Message, MessageOptions } from './Message';
-import { Channel, ChannelTypes } from './Channel';
+import { Channel, ChannelCategories } from './Channel';
 import { WSManager } from '../WSManager';
 import { Member } from './Member';
 import { Guild } from './Guild';
@@ -11,8 +11,8 @@ import { Webhook } from './Webhook';
 import { Doc } from './Doc';
 import { CalendarEvent } from './CalendarEvent';
 import { CalendarEventRSVP } from './CalendarRSVP';
-import { messageReactionTypes } from '../gateway/events/MessageHandler';
 import { ListItem } from './ListItem';
+import { messageReactionTypes } from '../Types';
 export declare type EmitterTypes = {
     message: (message: string) => void;
     error: (error: Error) => void;
@@ -198,7 +198,7 @@ export declare class Client extends Client_base {
     /** Array of object containing guild channel webhooks. */
     getChannelWebhooks(guildID: string, channelID: string): Promise<Array<object>>;
     /** Create a channel in a specified guild. */
-    createChannel(guildID: string, name: string, type: ChannelTypes, options: {
+    createChannel(guildID: string, name: string, type: ChannelCategories, options: {
         topic?: string;
         isPublic?: boolean;
         categoryID?: number;
