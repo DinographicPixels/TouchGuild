@@ -26,6 +26,7 @@ export const GUILD_MEMBER_ROLES = (guildID: string, memberID: string) => `/serve
 export const FORUM_TOPICS = (channelID: string) => `/channels/${channelID}/topics`
 export const FORUM_TOPIC = (channelID: string, topicID: number) => `/channels/${channelID}/topics/${topicID}`
 export const FORUM_TOPIC_PIN = (channelID: string, topicID: number) => `/channels/${channelID}/topics/${topicID}/pin`
+export const FORUM_TOPIC_LOCK = (channelID: string, topicID: number) => `/channels/${channelID}/topics/${topicID}/lock`
 
 export const LIST_ITEMS = (channelID: string)=> `/channels/${channelID}/items`
 export const LIST_ITEM = (channelID: string, itemID: string)=> `/channels/${channelID}/items/${itemID}`
