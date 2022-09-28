@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GUILD_WEBHOOK = exports.GUILD_WEBHOOKS = exports.CHANNEL_EVENT_RSVPS = exports.CHANNEL_EVENT_RSVP = exports.CHANNEL_EVENT = exports.CHANNEL_EVENTS = exports.CHANNEL_DOC = exports.CHANNEL_DOCS = exports.LIST_ITEM_COMPLETE = exports.LIST_ITEM = exports.LIST_ITEMS = exports.FORUM_TOPIC_PIN = exports.FORUM_TOPIC = exports.FORUM_TOPICS = exports.GUILD_MEMBER_ROLES = exports.GUILD_MEMBER_ROLE = exports.GUILD_BANS = exports.GUILD_BAN = exports.GUILD_GROUP = exports.GUILD_GROUP_MEMBERS = exports.GUILD_GROUP_MEMBER = exports.GUILD_MEMBER_SOCIALS = exports.GUILD_MEMBERS = exports.GUILD_MEMBER = exports.MEMBER_NICKNAME = exports.CHANNEL_MESSAGE_CONTENT_EMOTE = exports.CHANNEL_MESSAGE = exports.CHANNEL_MESSAGES = exports.GUILD = exports.CHANNEL = exports.CHANNELS = void 0;
+exports.GUILD_WEBHOOK = exports.GUILD_WEBHOOKS = exports.CHANNEL_EVENT_RSVPS = exports.CHANNEL_EVENT_RSVP = exports.CHANNEL_EVENT = exports.CHANNEL_EVENTS = exports.CHANNEL_DOC = exports.CHANNEL_DOCS = exports.LIST_ITEM_COMPLETE = exports.LIST_ITEM = exports.LIST_ITEMS = exports.FORUM_TOPIC_LOCK = exports.FORUM_TOPIC_PIN = exports.FORUM_TOPIC = exports.FORUM_TOPICS = exports.GUILD_MEMBER_ROLES = exports.GUILD_MEMBER_ROLE = exports.GUILD_BANS = exports.GUILD_BAN = exports.GUILD_GROUP = exports.GUILD_GROUP_MEMBERS = exports.GUILD_GROUP_MEMBER = exports.GUILD_MEMBER_SOCIALS = exports.GUILD_MEMBERS = exports.GUILD_MEMBER = exports.MEMBER_NICKNAME = exports.CHANNEL_MESSAGE_CONTENT_EMOTE = exports.CHANNEL_MESSAGE = exports.CHANNEL_MESSAGES = exports.GUILD = exports.CHANNEL = exports.CHANNELS = void 0;
 const CHANNELS = () => `/channels`;
 exports.CHANNELS = CHANNELS;
 const CHANNEL = (channelID) => `/channels/${channelID}`;
@@ -41,6 +41,8 @@ const FORUM_TOPIC = (channelID, topicID) => `/channels/${channelID}/topics/${top
 exports.FORUM_TOPIC = FORUM_TOPIC;
 const FORUM_TOPIC_PIN = (channelID, topicID) => `/channels/${channelID}/topics/${topicID}/pin`;
 exports.FORUM_TOPIC_PIN = FORUM_TOPIC_PIN;
+const FORUM_TOPIC_LOCK = (channelID, topicID) => `/channels/${channelID}/topics/${topicID}/lock`;
+exports.FORUM_TOPIC_LOCK = FORUM_TOPIC_LOCK;
 const LIST_ITEMS = (channelID) => `/channels/${channelID}/items`;
 exports.LIST_ITEMS = LIST_ITEMS;
 const LIST_ITEM = (channelID, itemID) => `/channels/${channelID}/items/${itemID}`;

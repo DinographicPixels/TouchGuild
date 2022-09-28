@@ -5,6 +5,7 @@ import { Member } from './Member';
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';
 import { MentionsType } from '../Types';
+
 const calls = new call()
 
 export class ForumTopic {

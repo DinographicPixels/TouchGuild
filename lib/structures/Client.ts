@@ -390,6 +390,16 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
         await calls.delete(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token);
     }
 
+    /** Locks a forum topic */
+    async lockTopic(channelID: string, topicID: number): Promise<void>{
+        await calls.put(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token, {});
+    }
+
+    /** Unlocks a forum topic */
+    async unlockTopic(channelID: string, topicID: number): Promise<void>{
+        await calls.delete(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token);
+    }
+
     // docs
     /** Create a doc in a specified 'docs' channel. */
     async createDoc(channelID: string, options: {title: string, content: string}): Promise<Doc>{
