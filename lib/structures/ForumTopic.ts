@@ -110,10 +110,12 @@ export class ForumTopic {
         await calls.delete(endpoints.FORUM_TOPIC_PIN(this.channelID, this.id), this._client.token);
     }
 
+    /** Locks the forum topic. */
     async lock(): Promise<void>{
         await calls.put(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token, {});
     }
 
+    /** Unlocks the forum topic. */
     async unlock(): Promise<void>{
         await calls.delete(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token);
     }
