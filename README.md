@@ -7,6 +7,12 @@
 # Early access library
 The library recently launched and we need to make sure that you do not encounter bugs, that's why, we're realsing it in Early access. When TouchGuild will be stable enough, we'll switch to 'B.E.T.A' since the Guilded API is still in early access.
 
+# NIGHTLY BUILD
+Be aware that Nightly builds aren't stable and can have still have major bugs. If you face issues, feel free to report it by creating an issue on TouchGuild's GitHub, please specify that you're using a Nightly build.
+
+## What's new on Nightly builds?
+- **Lock & unlock forum topic methods for both Client and ForumTopic components.**
+
 # Guide, documentation & even more
 Everything's to help you to get started, to create an incredible guilded bot through our Library.
 ## Links:
@@ -16,28 +22,24 @@ Everything's to help you to get started, to create an incredible guilded bot thr
 - [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
 - [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
-- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo);
+- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo)
 - [Our Discord server](https://discord.gg/UgPRaGRkrQ)
 - [Our Guilded server](https://www.guilded.gg/i/ExPXPrwE)
 
 
 # 🌟 Get started
 
-<figure><img src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FlOPMbaW5t7rQZWQ9C6lG%2Fuploads%2F18hrn4NpcdDAZzNo1Ape%2Ftouchguild-banner.png?alt=media&token=7ccb1380-65eb-44d6-b978-d68fe33048f5" alt=""><figcaption></figcaption></figure>
+<figure><img src="https://images-ext-1.discordapp.net/external/hpMY7GrDRdqgDuwOqNmDYEgomOGjf97p4_7QCfenuFs/%3Fw%3D3796%26h%3D1640/https/s3-us-west-2.amazonaws.com/www.guilded.gg/ContentMediaGenericFiles/fd1c2baad81023a365cd510eb2a48fc5-Full.webp?width=2046&height=884" alt=""><figcaption></figcaption></figure>
 
 ## Get started, it's easy.
 
 You'll need to download Node (npm).
 
-### Install the package
+### Install the Nightly build
 
 Install the package with npm:
 ```bash
-npm install touchguild@latest
-```
-Install the package with yarn:
-```bash
-yarn add touchguild
+npm install dinographicpixels/touchguild#nightly
 ```
 
 ### Basic scripting (ping, pong!)
@@ -66,5 +68,12 @@ Client.on('messageCreate', (message)=> {
 });
 ```
 
-## Need to get new features, right. Now?
-[Click here for more information about Nightly builds.](https://docs.touchguild.dinographicpixels.com/guide/get-started#need-to-get-new-features-right.-now)
+## Stable builds
+Install stable builds with npm:
+```bash
+npm install touchguild@latest
+```
+Install stable builds with yarn:
+```bash
+yarn add touchguild
+```
