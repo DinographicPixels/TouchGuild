@@ -13,6 +13,8 @@ Be aware that Nightly builds aren't stable and can have still have major bugs. I
 ## What's new on Nightly builds?
 - **Lock & unlock forum topic methods for both Client and ForumTopic components.**
 
+Check docs/nightly for more details about new features: https://docs.touchguild.dinographicpixels.com/nightly/features
+
 # Guide, documentation & even more
 Everything's to help you to get started, to create an incredible guilded bot through our Library.
 ## Links:
