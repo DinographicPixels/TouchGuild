@@ -1,6 +1,6 @@
 const TouchGuild = require('.')
 
-const client = new TouchGuild.Client({token: 'gapi_G1wf19o6y4xn5YVW9gb2fcaIdQu+dCg7WlhTWF2aTj6/wSBU2Q3PR7RCpi7nrQcqZSwBGjiSr7yfFOyPHO789A=='})
+const client = new TouchGuild.Client({token: ''})
 //console.log(client.params)
 
 client.on('ready', ()=> {

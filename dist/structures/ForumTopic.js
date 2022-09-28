@@ -109,13 +109,13 @@ class ForumTopic {
             yield calls.delete(endpoints.FORUM_TOPIC_PIN(this.channelID, this.id), this._client.token);
         });
     }
-    /** Locks a forum topic */
+    /** Locks the forum topic. */
     lock() {
         return __awaiter(this, void 0, void 0, function* () {
             yield calls.put(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token, {});
         });
     }
-    /** Unlocks a forum topic */
+    /** Unlocks the forum topic. */
     unlock() {
         return __awaiter(this, void 0, void 0, function* () {
             yield calls.delete(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token);

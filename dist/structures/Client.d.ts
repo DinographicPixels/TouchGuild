@@ -121,6 +121,8 @@ export declare class Client extends Client_base {
     get token(): string;
     /** Connect to the Guilded API. */
     connect(...args: any[]): void;
+    /** Disconnect from the Guilded API. */
+    disconnect(crashOnDisconnect?: boolean): void;
     /** RESTChannel is a Channel component with every method, params you need. */
     getRESTChannel(channelID: string): Promise<Channel>;
     /** RESTMember is a Member component with every method, params you need. */
@@ -228,11 +230,11 @@ export declare class Client extends Client_base {
     deleteTopic(channelID: string, topicID: number): Promise<void>;
     /** Pin a forum topic. */
     pinTopic(channelID: string, topicID: number): Promise<void>;
-    /** Unpin a forum topic */
+    /** Unpin a forum topic. */
     unpinTopic(channelID: string, topicID: number): Promise<void>;
-    /** Locks a forum topic */
+    /** Locks a forum topic. */
     lockTopic(channelID: string, topicID: number): Promise<void>;
-    /** Unlocks a forum topic */
+    /** Unlocks a forum topic. */
     unlockTopic(channelID: string, topicID: number): Promise<void>;
     /** Create a doc in a specified 'docs' channel. */
     createDoc(channelID: string, options: {
