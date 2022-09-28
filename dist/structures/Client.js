@@ -429,6 +429,18 @@ class Client extends events_1.default {
             yield calls.delete(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token);
         });
     }
+    /** Locks a forum topic */
+    lockTopic(channelID, topicID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield calls.put(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token, {});
+        });
+    }
+    /** Unlocks a forum topic */
+    unlockTopic(channelID, topicID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield calls.delete(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token);
+        });
+    }
     // docs
     /** Create a doc in a specified 'docs' channel. */
     createDoc(channelID, options) {

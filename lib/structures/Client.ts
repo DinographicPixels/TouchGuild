@@ -385,9 +385,19 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
     async pinTopic(channelID: string, topicID: number): Promise<void>{
         await calls.put(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token, {});
     }
-    /** Unpin a forum topic */
+    /** Unpin a forum topic. */
     async unpinTopic(channelID: string, topicID: number): Promise<void>{
         await calls.delete(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token);
+    }
+
+    /** Locks a forum topic. */
+    async lockTopic(channelID: string, topicID: number): Promise<void>{
+        await calls.put(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token, {});
+    }
+
+    /** Unlocks a forum topic. */
+    async unlockTopic(channelID: string, topicID: number): Promise<void>{
+        await calls.delete(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token);
     }
 
     // docs

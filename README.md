@@ -11,8 +11,7 @@ The library recently launched and we need to make sure that you do not encounter
 Be aware that Nightly builds aren't stable and can have still have major bugs. If you face issues, feel free to report it by creating an issue on TouchGuild's GitHub, please specify that you're using a Nightly build.
 
 ## What's new on Nightly builds?
-For now, we're not having additional feature on Nightly builds.
-We recently reorganized type import/export for a better library developer experience.
+- **Lock & unlock forum topic methods for both Client and ForumTopic components.**
 
 # Guide, documentation & even more
 Everything's to help you to get started, to create an incredible guilded bot through our Library.
@@ -23,7 +22,7 @@ Everything's to help you to get started, to create an incredible guilded bot thr
 - [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
 - [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
-- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo);
+- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo)
 - [Our Discord server](https://discord.gg/UgPRaGRkrQ)
 - [Our Guilded server](https://www.guilded.gg/i/ExPXPrwE)
 

@@ -18,6 +18,7 @@ export declare const GUILD_MEMBER_ROLES: (guildID: string, memberID: string) => 
 export declare const FORUM_TOPICS: (channelID: string) => string;
 export declare const FORUM_TOPIC: (channelID: string, topicID: number) => string;
 export declare const FORUM_TOPIC_PIN: (channelID: string, topicID: number) => string;
+export declare const FORUM_TOPIC_LOCK: (channelID: string, topicID: number) => string;
 export declare const LIST_ITEMS: (channelID: string) => string;
 export declare const LIST_ITEM: (channelID: string, itemID: string) => string;
 export declare const LIST_ITEM_COMPLETE: (channelID: string, itemID: string) => string;

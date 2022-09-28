@@ -230,6 +230,10 @@ export declare class Client extends Client_base {
     pinTopic(channelID: string, topicID: number): Promise<void>;
     /** Unpin a forum topic */
     unpinTopic(channelID: string, topicID: number): Promise<void>;
+    /** Locks a forum topic */
+    lockTopic(channelID: string, topicID: number): Promise<void>;
+    /** Unlocks a forum topic */
+    unlockTopic(channelID: string, topicID: number): Promise<void>;
     /** Create a doc in a specified 'docs' channel. */
     createDoc(channelID: string, options: {
         title: string;

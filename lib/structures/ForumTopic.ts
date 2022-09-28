@@ -5,6 +5,7 @@ import { Member } from './Member';
 import * as endpoints from '../rest/endpoints';
 import { call } from '../Utils';
 import { MentionsType } from '../Types';
+
 const calls = new call()
 
 export class ForumTopic {
@@ -107,5 +108,15 @@ export class ForumTopic {
     /** Unpin the forum topic. */
     async unpin(): Promise<void>{
         await calls.delete(endpoints.FORUM_TOPIC_PIN(this.channelID, this.id), this._client.token);
+    }
+
+    /** Locks the forum topic. */
+    async lock(): Promise<void>{
+        await calls.put(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token, {});
+    }
+
+    /** Unlocks the forum topic. */
+    async unlock(): Promise<void>{
+        await calls.delete(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token);
     }
 }
