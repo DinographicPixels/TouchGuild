@@ -18,7 +18,6 @@ __exportStar(require("./structures/Client"), exports);
 __exportStar(require("./structures/Message"), exports);
 __exportStar(require("./structures/Channel"), exports);
 __exportStar(require("./structures/Member"), exports);
-__exportStar(require("./structures/Message"), exports);
 __exportStar(require("./structures/Guild"), exports);
 __exportStar(require("./structures/User"), exports);
 __exportStar(require("./structures/BannedMember"), exports);
