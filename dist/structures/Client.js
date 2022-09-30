@@ -82,6 +82,13 @@ class Client extends events_1.default {
             new GatewayHandler_1.GatewayHandler(this).handleMessage(eventType, eventData);
         });
     }
+    /** Disconnect from the Guilded API. */
+    disconnect(crashOnDisconnect) {
+        this.ws.closeAll(); // closing all connections.
+        console.log("The connection has been terminated.");
+        if (crashOnDisconnect)
+            throw 'Connection closed.';
+    }
     // REST
     /** RESTChannel is a Channel component with every method, params you need. */
     getRESTChannel(channelID) {
@@ -423,19 +430,19 @@ class Client extends events_1.default {
             yield calls.put(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token, {});
         });
     }
-    /** Unpin a forum topic */
+    /** Unpin a forum topic. */
     unpinTopic(channelID, topicID) {
         return __awaiter(this, void 0, void 0, function* () {
             yield calls.delete(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token);
         });
     }
-    /** Locks a forum topic */
+    /** Locks a forum topic. */
     lockTopic(channelID, topicID) {
         return __awaiter(this, void 0, void 0, function* () {
             yield calls.put(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token, {});
         });
     }
-    /** Unlocks a forum topic */
+    /** Unlocks a forum topic. */
     unlockTopic(channelID, topicID) {
         return __awaiter(this, void 0, void 0, function* () {
             yield calls.delete(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token);

@@ -98,6 +98,13 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
         })
     }
 
+    /** Disconnect from the Guilded API. */
+    disconnect(crashOnDisconnect?: boolean): void{
+        this.ws.closeAll(); // closing all connections.
+        console.log("The connection has been terminated.");
+        if (crashOnDisconnect) throw 'Connection closed.';
+    }
+
     // REST
     /** RESTChannel is a Channel component with every method, params you need. */
     async getRESTChannel(channelID:string): Promise<Channel>{

@@ -54,8 +54,8 @@ export declare class ForumTopic {
     pin(): Promise<void>;
     /** Unpin the forum topic. */
     unpin(): Promise<void>;
-    /** Locks a forum topic */
+    /** Locks the forum topic. */
     lock(): Promise<void>;
-    /** Unlocks a forum topic */
+    /** Unlocks the forum topic. */
     unlock(): Promise<void>;
 }
