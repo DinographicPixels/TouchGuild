@@ -54,7 +54,7 @@ Javascript & Typescript:
 
 ```javascript
 const TouchGuild = require('TouchGuild') // import for CommonJS
-// import TouchGuild from 'TouchGuild' // import for ESM & TS
+// import * as TouchGuild from 'TouchGuild' // import for ESM & TS
 
 const Client = new TouchGuild.Client({token: 'insert token here'}) // create client
 
