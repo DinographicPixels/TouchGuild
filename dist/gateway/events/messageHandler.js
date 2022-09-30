@@ -32,7 +32,7 @@ class MessageHandler extends GatewayEventHandler_1.GatewayEventHandler {
     }
     messageDelete(data) {
         var MessageComponent = new Message_1.Message(data['message'], this.client);
-        var cacheHasMessage = this.client.cache.has(`messageContent_${MessageComponent['id']}`);
+        var cacheHasMessage = this.client.cache.has(`messageComponent_${MessageComponent['id']}`);
         if (cacheHasMessage) {
             MessageComponent = new Message_1.Message(data['message'], this.client, { oldMessage: this.client.cache.get(`messageComponent_${MessageComponent['id']}`) });
             this.client.cache.delete(`messageComponent_${MessageComponent['id']}`);
