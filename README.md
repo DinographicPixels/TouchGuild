@@ -13,9 +13,10 @@ Be aware that Nightly builds aren't stable and can have still have major bugs. I
 ## What's new on Nightly builds?
 - **Lock & unlock forum topic methods for both Client and ForumTopic components.**
 - disconnect() method for Client
-- Fixed: 'messageDelete's oldContent is null (couldn't get oldContent from cache)'
+- Fixed: ['messageDelete's oldContent is null (couldn't get oldContent from cache)'](https://github.com/DinographicPixels/TouchGuild/issues/10)
 - Deleted unused importations
 - Types are now in one file
+- Fixed: [Issue while importing TouchGuild on repl.it](https://github.com/DinographicPixels/TouchGuild/issues/12)
 
 Check docs/nightly for more details about new features: https://docs.touchguild.dinographicpixels.com/nightly/features
 
