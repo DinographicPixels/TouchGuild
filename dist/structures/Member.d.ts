@@ -32,4 +32,8 @@ export declare class Member extends User {
     addRole(roleID: number): Promise<void>;
     /** Remove a role from member */
     removeRole(roleID: number): Promise<void>;
+    /** Awards member using the built-in EXP system. */
+    award(xpAmount: number): Promise<Number>;
+    /** Sets member's xp using the built-in EXP system. */
+    setXP(xp: number): Promise<Number>;
 }

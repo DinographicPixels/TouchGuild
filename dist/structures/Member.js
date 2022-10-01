@@ -95,5 +95,21 @@ class Member extends User_1.User {
             yield new Utils_1.call().delete(endpoints.GUILD_MEMBER_ROLE(this.guildID, this.id, roleID), this._client.token);
         });
     }
+    /** Awards member using the built-in EXP system. */
+    award(xpAmount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (typeof xpAmount !== 'number')
+                throw new TypeError("xpAmount needs to be an integer/number.");
+            let response = yield new Utils_1.call().post(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { amount: xpAmount });
+            return response['total'];
+        });
+    }
+    /** Sets member's xp using the built-in EXP system. */
+    setXP(xp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = yield new Utils_1.call().put(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { total: xp });
+            return response['total'];
+        });
+    }
 }
 exports.Member = Member;

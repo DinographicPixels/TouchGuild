@@ -72,4 +72,18 @@ export class Member extends User {
     async removeRole(roleID: number): Promise<void>{
         await new call().delete(endpoints.GUILD_MEMBER_ROLE(this.guildID, this.id, roleID), this._client.token);
     }
+
+    /** Awards member using the built-in EXP system. */
+    async award(xpAmount: number): Promise<Number>{
+        if (typeof xpAmount !== 'number') throw new TypeError("xpAmount needs to be an integer/number.");
+        let response = await new call().post(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, {amount: xpAmount});
+        return response['total' as keyof object] as Number;
+    }
+
+    /** Sets member's xp using the built-in EXP system. */
+    async setXP(xpAmount: number): Promise<Number>{
+        let response = await new call().put(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, {total: xpAmount});
+        return response['total' as keyof object] as Number;
+    }
+    
 }
