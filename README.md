@@ -17,6 +17,7 @@ Be aware that Nightly builds aren't stable and can have still have major bugs. I
 - Deleted unused importations
 - Types are now in one file
 - Fixed: [Issue while importing TouchGuild on repl.it](https://github.com/DinographicPixels/TouchGuild/issues/12)
+- Improved websocket & moved packet parsing.
 
 Check docs/nightly for more details about new features: https://docs.touchguild.dinographicpixels.com/nightly/features
 
