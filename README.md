@@ -12,6 +12,7 @@ Be aware that Nightly builds aren't stable and can have still have major bugs. I
 
 ## What's new on Nightly builds?
 - **Lock & unlock forum topic methods for both Client and ForumTopic components.**
+- [Guild XP Management including set/award xp.](https://github.com/DinographicPixels/TouchGuild/pull/14)
 - disconnect() method for Client
 - Fixed: ['messageDelete's oldContent is null (couldn't get oldContent from cache)'](https://github.com/DinographicPixels/TouchGuild/issues/10)
 - Deleted unused importations
