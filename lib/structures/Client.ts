@@ -92,9 +92,8 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
             this.emit('ready');
         })
 
-        this.ws.emitter.on('message', (args:string)=> {
-            const {t: eventType, d: eventData} = JSON.parse(args);
-            new GatewayHandler(this).handleMessage(eventType, eventData);
+        this.ws.emitter.on('gatewayEvent', (type:string, data:object)=> {
+            new GatewayHandler(this).handleMessage(type, data);
         })
     }
 

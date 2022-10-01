@@ -138,11 +138,9 @@ export class WSManager{
 
     private onSocketMessage(rawData: string){
         const packet = rawData;
-        var eventTYPE; var eventDATA; var eventMSGID; var opCODE;
         // s: Message ID used for replaying events after a disconnect.
         try{ 
-            var {t: eventType, d: eventData, s: messageID, op: opcode} = JSON.parse(packet); 
-            eventTYPE = eventType; eventDATA = eventData; eventMSGID = messageID; opCODE = opcode;
+            var {t: eventTYPE, d: eventDATA, s: eventMSGID, op: opCODE} = JSON.parse(packet); 
         }catch(err){ this.emitter.emit("exit", "Error while parsing data."); return void 0; }
 
         const OPCODES_REG = {
@@ -150,20 +148,11 @@ export class WSManager{
             WELCOME: 1,
             RESUME: 2
         }
-
-        // if (eventDATA.heartbeatIntervalMs !== undefined){
-        //     setInterval(() => {
-        //         console.log('pinged')
-        //         this.ws.ping()
-        //     }, eventDATA.heartbeatIntervalMs);
-        // }
-
-        // console.log(eventDATA.heartbeatIntervalMs)
-
         // opcodes are listed in order.
         switch (opCODE) {
             case OPCODES_REG.SUCCESS:
-                this.emitter.emit("gatewayEvent");
+                this.emitter.emit("gatewayEvent", eventTYPE, eventDATA);
+                this.emitter.emit("gatewayEventPacket", packet);
                 break;
             case OPCODES_REG.WELCOME:
                 this.emitter.emit("ready");
@@ -175,8 +164,7 @@ export class WSManager{
                 this.emitter.emit("unknown", "??UNKNOWN OPCODE??", packet);
             break;
         }
-
-        this.emitter.emit('message', rawData);
+        //this.emitter.emit('message', rawData); deprecated.
     }
 
     private onSocketOpen(){
@@ -190,7 +178,7 @@ export class WSManager{
     }
 
     private onSocketClose(){
-
+        
     }
 
     private onSocketPing(){
@@ -219,3 +207,14 @@ export interface WSManagerParams {
     /** Replay missed events on connection interruption */
     replayMissedEvents: boolean | any
 }
+
+
+//// PINGING TESTS
+/* if (eventDATA.heartbeatIntervalMs !== undefined){
+     setInterval(() => {
+         console.log('pinged')
+         this.ws.ping()
+     }, eventDATA.heartbeatIntervalMs);
+ }
+ console.log(eventDATA.heartbeatIntervalMs)
+*/
