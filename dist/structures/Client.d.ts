@@ -311,5 +311,11 @@ export declare class Client extends Client_base {
     }): Promise<Webhook>;
     /** Delete a guild webhook */
     deleteGuildWebhook(guildID: string, webhookID: string): Promise<void>;
+    /** Awards a member using the built-in EXP system. */
+    awardMember(guildID: string, memberID: string, xpAmount: number): Promise<Number>;
+    /** Sets a member's xp using the built-in EXP system. */
+    setMemberXP(guildID: string, memberID: string, xp: number): Promise<Number>;
+    /** Awards all members having a role using the built-in EXP system. */
+    awardRole(guildID: string, roleID: number, amount: number): Promise<void>;
 }
 export {};

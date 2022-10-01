@@ -10,6 +10,7 @@ export const CHANNEL_MESSAGE_CONTENT_EMOTE = (channelID: string, messageID: stri
 export const MEMBER_NICKNAME = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/nickname`
 
 export const GUILD_MEMBER = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}`
+export const GUILD_MEMBER_XP = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/xp`
 export const GUILD_MEMBERS = (guildID: string) => `/servers/${guildID}/members`
 export const GUILD_MEMBER_SOCIALS = (guildID: string, memberID: string, type: string) => `/servers/${guildID}/members/${memberID}/social-links/${type}`
 
@@ -21,6 +22,7 @@ export const GUILD_BAN = (guildID: string, memberID: string) => `/servers/${guil
 export const GUILD_BANS = (guildID: string) => `/servers/${guildID}/bans`
 
 export const GUILD_MEMBER_ROLE = (guildID: string, memberID: string, roleID: number) => `/servers/${guildID}/members/${memberID}/roles/${roleID}`
+export const GUILD_MEMBER_ROLE_XP = (guildID: string, roleID: number) => `/servers/${guildID}/roles/${roleID}/xp`
 export const GUILD_MEMBER_ROLES = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/roles`
 
 export const FORUM_TOPICS = (channelID: string) => `/channels/${channelID}/topics`

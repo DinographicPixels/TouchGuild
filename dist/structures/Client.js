@@ -591,5 +591,28 @@ class Client extends events_1.default {
             yield calls.delete(endpoints.GUILD_WEBHOOK(guildID, webhookID), this.token);
         });
     }
+    // MISC
+    /** Awards a member using the built-in EXP system. */
+    awardMember(guildID, memberID, xpAmount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (typeof xpAmount !== 'number')
+                throw new TypeError("xpAmount needs to be an integer/number.");
+            let response = yield calls.post(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { amount: xpAmount });
+            return response['total'];
+        });
+    }
+    /** Sets a member's xp using the built-in EXP system. */
+    setMemberXP(guildID, memberID, xp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = yield calls.put(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { total: xp });
+            return response['total'];
+        });
+    }
+    /** Awards all members having a role using the built-in EXP system. */
+    awardRole(guildID, roleID, amount) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield calls.post(endpoints.GUILD_MEMBER_ROLE_XP(guildID, roleID), this.token, { amount: amount });
+        });
+    }
 }
 exports.Client = Client;

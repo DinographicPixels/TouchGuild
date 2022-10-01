@@ -525,4 +525,23 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
         await calls.delete(endpoints.GUILD_WEBHOOK(guildID, webhookID), this.token);
     }
 
+    // MISC
+
+    /** Awards a member using the built-in EXP system. */
+    async awardMember(guildID: string, memberID: string, xpAmount: number): Promise<Number>{
+        if (typeof xpAmount !== 'number') throw new TypeError("xpAmount needs to be an integer/number.");
+        let response = await calls.post(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, {amount: xpAmount});
+        return response['total' as keyof object] as Number;
+    }
+
+    /** Sets a member's xp using the built-in EXP system. */
+    async setMemberXP(guildID: string, memberID: string, xpAmount: number): Promise<Number>{
+        let response = await calls.put(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, {total: xpAmount});
+        return response['total' as keyof object] as Number;
+    }
+
+    /** Awards all members having a role using the built-in EXP system. */
+    async awardRole(guildID: string, roleID: number, xpAmount: number): Promise<void>{
+        await calls.post(endpoints.GUILD_MEMBER_ROLE_XP(guildID, roleID), this.token, {amount: xpAmount});
+    }
 }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GUILD_WEBHOOK = exports.GUILD_WEBHOOKS = exports.CHANNEL_EVENT_RSVPS = exports.CHANNEL_EVENT_RSVP = exports.CHANNEL_EVENT = exports.CHANNEL_EVENTS = exports.CHANNEL_DOC = exports.CHANNEL_DOCS = exports.LIST_ITEM_COMPLETE = exports.LIST_ITEM = exports.LIST_ITEMS = exports.FORUM_TOPIC_LOCK = exports.FORUM_TOPIC_PIN = exports.FORUM_TOPIC = exports.FORUM_TOPICS = exports.GUILD_MEMBER_ROLES = exports.GUILD_MEMBER_ROLE = exports.GUILD_BANS = exports.GUILD_BAN = exports.GUILD_GROUP = exports.GUILD_GROUP_MEMBERS = exports.GUILD_GROUP_MEMBER = exports.GUILD_MEMBER_SOCIALS = exports.GUILD_MEMBERS = exports.GUILD_MEMBER = exports.MEMBER_NICKNAME = exports.CHANNEL_MESSAGE_CONTENT_EMOTE = exports.CHANNEL_MESSAGE = exports.CHANNEL_MESSAGES = exports.GUILD = exports.CHANNEL = exports.CHANNELS = void 0;
+exports.GUILD_WEBHOOK = exports.GUILD_WEBHOOKS = exports.CHANNEL_EVENT_RSVPS = exports.CHANNEL_EVENT_RSVP = exports.CHANNEL_EVENT = exports.CHANNEL_EVENTS = exports.CHANNEL_DOC = exports.CHANNEL_DOCS = exports.LIST_ITEM_COMPLETE = exports.LIST_ITEM = exports.LIST_ITEMS = exports.FORUM_TOPIC_LOCK = exports.FORUM_TOPIC_PIN = exports.FORUM_TOPIC = exports.FORUM_TOPICS = exports.GUILD_MEMBER_ROLES = exports.GUILD_MEMBER_ROLE_XP = exports.GUILD_MEMBER_ROLE = exports.GUILD_BANS = exports.GUILD_BAN = exports.GUILD_GROUP = exports.GUILD_GROUP_MEMBERS = exports.GUILD_GROUP_MEMBER = exports.GUILD_MEMBER_SOCIALS = exports.GUILD_MEMBERS = exports.GUILD_MEMBER_XP = exports.GUILD_MEMBER = exports.MEMBER_NICKNAME = exports.CHANNEL_MESSAGE_CONTENT_EMOTE = exports.CHANNEL_MESSAGE = exports.CHANNEL_MESSAGES = exports.GUILD = exports.CHANNEL = exports.CHANNELS = void 0;
 const CHANNELS = () => `/channels`;
 exports.CHANNELS = CHANNELS;
 const CHANNEL = (channelID) => `/channels/${channelID}`;
@@ -17,6 +17,8 @@ const MEMBER_NICKNAME = (guildID, memberID) => `/servers/${guildID}/members/${me
 exports.MEMBER_NICKNAME = MEMBER_NICKNAME;
 const GUILD_MEMBER = (guildID, memberID) => `/servers/${guildID}/members/${memberID}`;
 exports.GUILD_MEMBER = GUILD_MEMBER;
+const GUILD_MEMBER_XP = (guildID, memberID) => `/servers/${guildID}/members/${memberID}/xp`;
+exports.GUILD_MEMBER_XP = GUILD_MEMBER_XP;
 const GUILD_MEMBERS = (guildID) => `/servers/${guildID}/members`;
 exports.GUILD_MEMBERS = GUILD_MEMBERS;
 const GUILD_MEMBER_SOCIALS = (guildID, memberID, type) => `/servers/${guildID}/members/${memberID}/social-links/${type}`;
@@ -33,6 +35,8 @@ const GUILD_BANS = (guildID) => `/servers/${guildID}/bans`;
 exports.GUILD_BANS = GUILD_BANS;
 const GUILD_MEMBER_ROLE = (guildID, memberID, roleID) => `/servers/${guildID}/members/${memberID}/roles/${roleID}`;
 exports.GUILD_MEMBER_ROLE = GUILD_MEMBER_ROLE;
+const GUILD_MEMBER_ROLE_XP = (guildID, roleID) => `/servers/${guildID}/roles/${roleID}/xp`;
+exports.GUILD_MEMBER_ROLE_XP = GUILD_MEMBER_ROLE_XP;
 const GUILD_MEMBER_ROLES = (guildID, memberID) => `/servers/${guildID}/members/${memberID}/roles`;
 exports.GUILD_MEMBER_ROLES = GUILD_MEMBER_ROLES;
 const FORUM_TOPICS = (channelID) => `/channels/${channelID}/topics`;
