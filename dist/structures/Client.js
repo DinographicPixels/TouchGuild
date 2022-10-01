@@ -77,9 +77,8 @@ class Client extends events_1.default {
             console.log('Connected to Guilded!');
             this.emit('ready');
         });
-        this.ws.emitter.on('message', (args) => {
-            const { t: eventType, d: eventData } = JSON.parse(args);
-            new GatewayHandler_1.GatewayHandler(this).handleMessage(eventType, eventData);
+        this.ws.emitter.on('gatewayEvent', (type, data) => {
+            new GatewayHandler_1.GatewayHandler(this).handleMessage(type, data);
         });
     }
     /** Disconnect from the Guilded API. */

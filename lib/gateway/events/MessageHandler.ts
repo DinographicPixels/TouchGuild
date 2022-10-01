@@ -1,7 +1,6 @@
 import { Guild } from "../../structures/Guild";
 import { Member } from "../../structures/Member";
 import { Message } from "../../structures/Message";
-import { User } from "../../structures/User";
 import { messageReactionRawTypes, messageReactionTypes } from "../../Types";
 import { GatewayEventHandler } from "./GatewayEventHandler";
 
