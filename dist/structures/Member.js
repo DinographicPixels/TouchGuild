@@ -105,9 +105,9 @@ class Member extends User_1.User {
         });
     }
     /** Sets member's xp using the built-in EXP system. */
-    setXP(xp) {
+    setXP(xpAmount) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield new Utils_1.call().put(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { total: xp });
+            let response = yield new Utils_1.call().put(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { total: xpAmount });
             return response['total'];
         });
     }

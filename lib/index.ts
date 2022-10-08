@@ -13,4 +13,6 @@ export * from './structures/ForumTopic'
 export * from './structures/ListItem'
 export * from './structures/Webhook'
 
+export * as DevTools from './Utils'
+
 export * from './Types'
