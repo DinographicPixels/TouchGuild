@@ -19,6 +19,7 @@ Be aware that Nightly builds aren't stable and can have still have major bugs. I
 - Types are now in one file
 - Fixed: [Issue while importing TouchGuild on repl.it](https://github.com/DinographicPixels/TouchGuild/issues/12)
 - Improved [websocket & moved packet parsing.](https://github.com/DinographicPixels/TouchGuild/pull/13)
+- [Added DevTools to the TouchGuild's index.](https://github.com/DinographicPixels/TouchGuild/pull/15)
 
 Check docs/nightly for more details about new features: https://docs.touchguild.dinographicpixels.com/nightly/features
 
