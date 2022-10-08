@@ -602,16 +602,16 @@ class Client extends events_1.default {
         });
     }
     /** Sets a member's xp using the built-in EXP system. */
-    setMemberXP(guildID, memberID, xp) {
+    setMemberXP(guildID, memberID, xpAmount) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield calls.put(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { total: xp });
+            let response = yield calls.put(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { total: xpAmount });
             return response['total'];
         });
     }
     /** Awards all members having a role using the built-in EXP system. */
-    awardRole(guildID, roleID, amount) {
+    awardRole(guildID, roleID, xpAmount) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield calls.post(endpoints.GUILD_MEMBER_ROLE_XP(guildID, roleID), this.token, { amount: amount });
+            yield calls.post(endpoints.GUILD_MEMBER_ROLE_XP(guildID, roleID), this.token, { amount: xpAmount });
         });
     }
 }

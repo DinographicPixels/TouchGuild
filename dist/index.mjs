@@ -6,6 +6,7 @@ export const CalendarEvent = mod.CalendarEvent;
 export const CalendarEventRSVP = mod.CalendarEventRSVP;
 export const Channel = mod.Channel;
 export const Client = mod.Client;
+export const DevTools = mod.DevTools;
 export const Doc = mod.Doc;
 export const ForumTopic = mod.ForumTopic;
 export const Guild = mod.Guild;

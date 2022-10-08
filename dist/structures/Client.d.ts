@@ -314,8 +314,8 @@ export declare class Client extends Client_base {
     /** Awards a member using the built-in EXP system. */
     awardMember(guildID: string, memberID: string, xpAmount: number): Promise<Number>;
     /** Sets a member's xp using the built-in EXP system. */
-    setMemberXP(guildID: string, memberID: string, xp: number): Promise<Number>;
+    setMemberXP(guildID: string, memberID: string, xpAmount: number): Promise<Number>;
     /** Awards all members having a role using the built-in EXP system. */
-    awardRole(guildID: string, roleID: number, amount: number): Promise<void>;
+    awardRole(guildID: string, roleID: number, xpAmount: number): Promise<void>;
 }
 export {};

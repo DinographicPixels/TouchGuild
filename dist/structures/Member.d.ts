@@ -35,5 +35,5 @@ export declare class Member extends User {
     /** Awards member using the built-in EXP system. */
     award(xpAmount: number): Promise<Number>;
     /** Sets member's xp using the built-in EXP system. */
-    setXP(xp: number): Promise<Number>;
+    setXP(xpAmount: number): Promise<Number>;
 }
