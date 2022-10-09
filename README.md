@@ -14,7 +14,7 @@ const TouchGuild = require('TouchGuild'); // import for CommonJS
 const client = new TouchGuild.Client({token: 'insert token here'});
 
 client.on('ready', ()=> {
-   console.log('I'm ready!')
+   console.log("I'm ready!")
 });
 
 client.on('error', ()=> {
