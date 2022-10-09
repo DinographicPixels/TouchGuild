@@ -36,7 +36,10 @@
     "library",
     "guilded-api"
   ],
-  "author": "",
+  "author": "PakkoGraphic",
+  "contributors": [
+    "PakkoGraphic (https://github.com/PakkoGraphic)"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/DinographicPixels/TouchGuild/issues"
