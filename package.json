@@ -1,7 +1,7 @@
 {
   "name": "touchguild",
-  "version": "0.1.6",
-  "description": "TouchGuild is a CommonJS, ESM & Typescript Guilded library that gets you, in touch with the API.",
+  "version": "0.1.6-nightly.0",
+  "description": "TouchGuild is a NodeJS library for interfacing with Guilded.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
@@ -32,13 +32,9 @@
     "url": "git+https://github.com/DinographicPixels/guilderJS.git"
   },
   "keywords": [
-    "library",
     "guilded",
-    "bot",
-    "bots",
-    "guildedapi",
-    "touchguild",
-    "builtbyyou"
+    "library",
+    "guilded-api"
   ],
   "author": "",
   "license": "Apache-2.0",
