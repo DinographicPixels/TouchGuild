@@ -43,13 +43,18 @@ Everything's to help you to get started, to create an incredible guilded bot thr
 
 ## Get started, it's easy.
 
-You'll need to download Node (npm).
+NodeJS **16.16.0** or higher is required.
 
-### Install the Nightly build
+### Installation (Nightly)
 
-Install the package with npm:
+Install the package with NPM through GitHub:
 ```bash
 npm install dinographicpixels/touchguild#nightly
+```
+
+Install the package through NPM:
+```bash
+npm install touchguild@nightly
 ```
 
 ### Basic scripting (ping, pong!)
@@ -78,7 +83,7 @@ Client.on('messageCreate', (message)=> {
 });
 ```
 
-## Stable builds
+## Install stable builds
 Install stable builds with npm:
 ```bash
 npm install touchguild@latest
