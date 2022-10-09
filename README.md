@@ -18,7 +18,7 @@ client.on('ready', ()=> {
 });
 
 client.on('error', ()=> {
-   console.log('Whoops, somethin' went wrong..')
+   console.error("Whoops, somethin' went wrong..")
 });
 
 client.connect();
