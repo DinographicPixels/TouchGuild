@@ -1,15 +1,15 @@
 <p align="center">
   <img width=80% src="https://images-ext-1.discordapp.net/external/hpMY7GrDRdqgDuwOqNmDYEgomOGjf97p4_7QCfenuFs/%3Fw%3D3796%26h%3D1640/https/s3-us-west-2.amazonaws.com/www.guilded.gg/ContentMediaGenericFiles/fd1c2baad81023a365cd510eb2a48fc5-Full.webp?width=2046&height=884">
   <br>
-  <a href="https://npmjs.com/package/oceanic.js"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
+  <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
   <img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square">
   <img src="https://img.shields.io/npm/dw/touchguild?color=red&style=flat-square">
 </p>
 
 
 ```javascript
-const TouchGuild = require('TouchGuild'); // import for CommonJS
-// import * as TouchGuild from 'TouchGuild' // import for ESM & TS
+const TouchGuild = require('touchguild'); // import for CommonJS
+// import * as TouchGuild from 'touchguild' // import for ESM & TS
 
 const client = new TouchGuild.Client({token: 'insert token here'});
 
