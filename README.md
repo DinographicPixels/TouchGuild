@@ -1,5 +1,5 @@
 <p align="center">
-  <img width=70% src="https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FlOPMbaW5t7rQZWQ9C6lG%2Fuploads%2F18hrn4NpcdDAZzNo1Ape%2Ftouchguild-banner.png?alt=media&token=7ccb1380-65eb-44d6-b978-d68fe33048f5">
+  <img width=80% src="https://cdn.glitch.global/bc68313e-6abb-488c-a1e3-e6d10817c2bd/touchguild-cradius.png?v=1665311272247">
   <br>
   <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
   <img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square">
