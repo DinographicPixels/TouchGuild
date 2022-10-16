@@ -33,8 +33,8 @@ export class Guild {
         this.url = data.url
         this.about = data.about // same but with
         this.description = data.about //   two types.
-        this.iconURL = data.avatar
-        this.bannerURL = data.banner
+        this.iconURL = data.avatar ?? null
+        this.bannerURL = data.banner ?? null
         this.timezone = data.timezone
         this.defaultChannelID = data.defaultChannelId
         this._createdAt = Date.parse(data.createdAt)
