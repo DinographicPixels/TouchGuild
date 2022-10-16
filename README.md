@@ -17,8 +17,8 @@ client.on('ready', ()=> {
    console.log(`Logged as ${client.user.username}`);
 });
 
-client.on('error', ()=> {
-   console.error("Whoops, somethin' went wrong..");
+client.on('error', (err)=> {
+   console.error("Whoops, somethin' went wrong..", err);
 });
 
 client.connect();
