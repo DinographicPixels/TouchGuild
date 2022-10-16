@@ -1,6 +1,6 @@
 {
   "name": "touchguild",
-  "version": "0.1.6-nightly.0",
+  "version": "0.1.6-nightly.1",
   "description": "TouchGuild is a NodeJS library for interfacing with Guilded.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
