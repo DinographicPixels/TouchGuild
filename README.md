@@ -14,7 +14,7 @@ const TouchGuild = require('touchguild'); // import for CommonJS
 const client = new TouchGuild.Client({token: 'insert token here'});
 
 client.on('ready', ()=> {
-   console.log("I'm ready!");
+   console.log(`Logged as ${client.user.username}`);
 });
 
 client.on('error', ()=> {
@@ -55,6 +55,7 @@ npm install touchguild@nightly
 - Fixed: [Issue while importing TouchGuild on repl.it](https://github.com/DinographicPixels/TouchGuild/issues/12)
 - Improved [websocket & moved packet parsing.](https://github.com/DinographicPixels/TouchGuild/pull/13)
 - [Added DevTools to the TouchGuild's index.](https://github.com/DinographicPixels/TouchGuild/pull/15)
+- [Updated gateway events (WebSocket) & Added Client.user to get more information about the logged bot.](https://github.com/DinographicPixels/TouchGuild/pull/18)
 
 [Check new practical features you can use.](https://docs.touchguild.dinographicpixels.com/nightly/features)
 
