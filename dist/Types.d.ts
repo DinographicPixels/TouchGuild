@@ -61,3 +61,10 @@ export declare type socialLinkTypes = {
     serviceID: string;
     type: string;
 };
+export declare type UserClientTypes = {
+    id: string;
+    botID: string;
+    username: string;
+    createdAt: Number;
+    createdBy: string;
+};

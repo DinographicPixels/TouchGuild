@@ -151,11 +151,12 @@ export class WSManager{
         // opcodes are listed in order.
         switch (opCODE) {
             case OPCODES_REG.SUCCESS:
-                this.emitter.emit("gatewayEvent", eventTYPE, eventDATA);
-                this.emitter.emit("gatewayEventPacket", packet);
+                this.emitter.emit("GATEWAY_EVENT", eventTYPE, eventDATA);
+                this.emitter.emit("GATEWAY_EVENT_PACKET", packet);
                 break;
             case OPCODES_REG.WELCOME:
-                this.emitter.emit("ready");
+                this.emitter.emit("GATEWAY_WELCOME", eventDATA);
+                this.emitter.emit("GATEWAY_WELCOME_PACKET", packet);
                 break;
             case OPCODES_REG.RESUME:
                 this.lastMessageID = null;

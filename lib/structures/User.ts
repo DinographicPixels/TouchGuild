@@ -14,8 +14,8 @@ export class User {
         this.type = data.type
         this.username = data.name
         this._createdAt = Date.parse(data.createdAt)
-        this.avatarURL = data.avatar
-        this.bannerURL = data.banner
+        this.avatarURL = data.avatar ?? null
+        this.bannerURL = data.banner ?? null
 
         if (!this.type) this.type = 'user' // since it's only defined when it's a bot..
         if (this.type == 'bot'){this.bot = true }else{this.bot = false}

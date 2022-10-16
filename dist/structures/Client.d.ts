@@ -12,7 +12,7 @@ import { Doc } from './Doc';
 import { CalendarEvent } from './CalendarEvent';
 import { CalendarEventRSVP } from './CalendarRSVP';
 import { ListItem } from './ListItem';
-import { messageReactionTypes } from '../Types';
+import { messageReactionTypes, UserClientTypes } from '../Types';
 export declare type EmitterTypes = {
     message: (message: string) => void;
     error: (error: Error) => void;
@@ -113,6 +113,7 @@ export declare class Client extends Client_base {
             ListItemUncompleted: string;
         };
     };
+    user?: UserClientTypes;
     constructor(params: {
         token: string;
         REST?: boolean;

@@ -73,11 +73,18 @@ class Client extends events_1.default {
     /** Connect to the Guilded API. */
     connect(...args) {
         this.ws.connect();
-        this.ws.emitter.on('ready', () => {
-            console.log('Connected to Guilded!');
+        this.ws.emitter.on('GATEWAY_WELCOME', (data) => {
+            this.user = {
+                id: data.user.id,
+                botID: data.user.botId,
+                username: data.user.name,
+                createdAt: data.user.createdAt,
+                createdBy: data.user.createdBy
+            };
+            console.log('> Connection established.');
             this.emit('ready');
         });
-        this.ws.emitter.on('gatewayEvent', (type, data) => {
+        this.ws.emitter.on('GATEWAY_EVENT', (type, data) => {
             new GatewayHandler_1.GatewayHandler(this).handleMessage(type, data);
         });
     }

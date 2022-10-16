@@ -20,7 +20,8 @@ import { Doc } from './Doc';
 import { CalendarEvent } from './CalendarEvent';
 import { CalendarEventRSVP } from './CalendarRSVP';
 import { ListItem } from './ListItem';
-import { messageReactionTypes } from '../Types';
+import { messageReactionTypes, UserClientTypes } from '../Types';
+import { User } from './User';
 
 const calls = new call();
 
@@ -68,6 +69,7 @@ export type EmitterTypes = {
 export class Client extends (EventEmitter as unknown as new () => TypedEmitter<EmitterTypes>) {
     // types
     params: {token: string, REST?: boolean}; ws: WSManager; cache: any; identifiers;
+    user?: UserClientTypes;
     constructor(params: {token: string, REST?: boolean}){
         if (typeof params !== "object") throw new Error("The token isn't provided in an object.");
         if (typeof params?.token == "undefined") throw new Error("Cannot create client without token, no token is provided.");
@@ -87,12 +89,19 @@ export class Client extends (EventEmitter as unknown as new () => TypedEmitter<E
     /** Connect to the Guilded API. */
     connect(...args:any[]): void{
         this.ws.connect();
-        this.ws.emitter.on('ready', ()=> {
-            console.log('Connected to Guilded!');
+        this.ws.emitter.on('GATEWAY_WELCOME', (data: any)=> {
+            this.user = {
+                id: data.user.id,
+                botID: data.user.botId,
+                username: data.user.name,
+                createdAt: data.user.createdAt,
+                createdBy: data.user.createdBy
+            };
+            console.log('> Connection established.');
             this.emit('ready');
         })
 
-        this.ws.emitter.on('gatewayEvent', (type:string, data:object)=> {
+        this.ws.emitter.on('GATEWAY_EVENT', (type:string, data:object)=> {
             new GatewayHandler(this).handleMessage(type, data);
         })
     }
