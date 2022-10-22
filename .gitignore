@@ -2,6 +2,7 @@ node_modules/
 dist/
 tests/
 
+README.md
 .DS_Store
 *.env
 CHANGELOG.md
