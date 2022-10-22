@@ -5,3 +5,4 @@ tests/
 .DS_Store
 *.env
 CHANGELOG.md
+package-lock.json
