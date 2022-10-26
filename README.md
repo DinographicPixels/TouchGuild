@@ -33,15 +33,22 @@ Nightly builds are in development builds and features are constantly added & we 
 # Installation
 NodeJS **16.16.0** or higher is required.
 
-Install the package with NPM through GitHub:
+Install the package automatically:
+```bash
+npm install touchguild@nightly
+```
+
+Install the package manually:
 ```bash
 npm install dinographicpixels/touchguild#nightly
 ```
 
-Install the package through NPM:
-```bash
-npm install touchguild@nightly
-```
+1. Run the command
+2. Go to node_modules/touchguild
+3. Run: npm run build in the touchguild folder
+4. Now, it's ready.
+
+You need to reproduce those steps everytime you update to a newer nightly build.
 
 ----------------
 
