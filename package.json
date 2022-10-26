@@ -25,9 +25,9 @@
   "scripts": {
     "init": "npm install",
     "build": "npm install && tsc && gen-esm-wrapper dist/index.js dist/index.mjs",
-    "compile": "tsc --build --clean && gen-esm-wrapper dist/index.js dist/index.mjs",
-    "compileNoClean": "tsc && gen-esm-wrapper dist/index.js dist/index.mjs",
-    "prepublishOnly": "npm install && tsc --build --clean && gen-esm-wrapper dist/index.js dist/index.mjs",
+    "compile": "tsc && gen-esm-wrapper dist/index.js dist/index.mjs",
+    "compileClean": "tsc --build --clean && gen-esm-wrapper dist/index.js dist/index.mjs",
+    "prepublishOnly": "npm run build",
     "test": "node ./tests/main.js"
   },
   "repository": {
