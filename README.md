@@ -54,7 +54,7 @@ You need to reproduce those steps everytime you update to a newer nightly build.
 
 # What's new on Nightly builds?
 
-- [Check out what's new](hhttps://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
+- [Check out what's new](https://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
 - [Check out new features](https://docs.touchguild.dinographicpixels.com/nightly/features)
 
 --------------
