@@ -42,6 +42,7 @@ npm install touchguild@latest
 # What's new?
 
 - [MAJOR CHANGES: Check out what's new](https://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
+- Brand new [guide](https://guide.touchguild.dinographicpixels.com/) & [documentation](https://docs.touchguild.dinographicpixels.com/)
 
 --------------
 
