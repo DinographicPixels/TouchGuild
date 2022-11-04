@@ -1,50 +1,49 @@
-import { Client } from './Client';
-import { Message, MessageOptions } from './Message';
-import * as endpoints from '../rest/endpoints';
+import { Client } from "./Client";
+import { Member } from "./Member";
+import * as endpoints from "../rest/endpoints";
 
-import { call } from '../Utils';
-import { MentionsType } from './ListItem';
+import { call } from "../Utils";
+import { APICalendarEvent, APIMentions, PATCHCalendarEventResponse } from "guildedapi-types.ts/v1";
 const calls = new call();
 
 export class CalendarEvent {
     /** Raw data */
-    data: any; 
+    data: APICalendarEvent;
     /** Client */
     client: Client;
     /** Calendar Event ID */
-    id: number; 
+    id: number;
     /** Guild/server ID */
-    guildID: string; 
+    guildID: string;
     /** ID of the channel the event was created on. */
-    channelID: string; 
+    channelID: string;
     /** Name of the event */
     name: string;
     /** Event's description */
-    description: string; 
+    description: string | null;
     /** Event user-specified location */
-    location: string; 
+    location: string | null;
     /** Event user-specified url */
-    url: string; 
+    url: string | null;
     /** Event color in calendar. */
-    color: number; 
+    color: number | null;
     /** Limit of event entry. */
-    rsvpLimit: number;
+    rsvpLimit: number | null;
     /** Timestamp (unix epoch time) of the event starting time.*/
-    _startsAt: number|null; 
+    _startsAt: number|null;
     /** Duration in *ms* of the event. */
-    duration: number; 
+    duration: number;
     /** */
     isPrivate: boolean;
-    /**  */
-    mentions: MentionsType
+    mentions: APIMentions | null;
     /** Timestamp (unix epoch time) of the event's creation. */
-    _createdAt: number|null; 
+    _createdAt: number|null;
     /** ID of the member that created the event. */
     memberID: string;
     /** Details about event cancelation (if canceled) */
-    cancelation: { description: string, createdBy: string}
+    cancelation: APICalendarEvent["cancellation"] | null;
 
-    constructor(data: any, client:any){
+    constructor(data: APICalendarEvent, client: Client){
         this.data = data;
         this.client = client;
 
@@ -57,29 +56,29 @@ export class CalendarEvent {
         this.url = data.url ?? null;
         this.color = data.color ?? null;
         this.rsvpLimit = data.rsvpLimit ?? null;
-        this._startsAt = data.startsAt ? Date.parse(data.startsAt): null;
-        this.duration = data.duration*60000 ?? null; // in ms.
+        this._startsAt = data.startsAt ? Date.parse(data.startsAt) : null;
+        this.duration = (data.duration as number) * 60000 ?? null; // in ms.
         this.isPrivate = data.isPrivate ?? false;
         this.mentions = data.mentions ?? null;
-        this._createdAt = data.createdAt ? Date.parse(data.createdAt): null;
+        this._createdAt = data.createdAt ? Date.parse(data.createdAt) : null;
         this.memberID = data.createdBy;
-        this.cancelation = data.cancellation ?? null
+        this.cancelation = data.cancellation ?? null;
     }
 
     /** Member component. */
-    get member(){
+    get member(): Member {
         return calls.syncGetMember(this.guildID, this.memberID, this.client);
     }
 
     /** string representation of the _createdAt timestamp */
     get createdAt(): Date|number|null{
-        return this._createdAt ? new Date(this._createdAt): null;
+        return this._createdAt ? new Date(this._createdAt) : null;
     }
 
     /** Edit the calendar event */
-    async edit(options: {name?: string, description?: string, location?: string, startsAt?: string; url?: string; color?: number; rsvpLimit?: number; duration?: number; isPrivate?: boolean}): Promise<CalendarEvent>{
-        let response:any = await calls.patch(endpoints.CHANNEL_EVENT(this.channelID, this.id), this.client.token, options);
-        return new CalendarEvent(response.data.calendarEvent, this.client);
+    async edit(options: {name?: string; description?: string; location?: string; startsAt?: string; url?: string; color?: number; rsvpLimit?: number; duration?: number; isPrivate?: boolean;}): Promise<CalendarEvent>{
+        const response = await calls.patch(endpoints.CHANNEL_EVENT(this.channelID, this.id), this.client.token, options);
+        return new CalendarEvent((response["data" as keyof object] as PATCHCalendarEventResponse).calendarEvent, this.client);
     }
 
     /** Delete the calendar event */

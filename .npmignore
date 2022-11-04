@@ -1,0 +1,6 @@
+tests/
+deprecated/
+.DS_Store
+*.env
+.env
+package-lock.json

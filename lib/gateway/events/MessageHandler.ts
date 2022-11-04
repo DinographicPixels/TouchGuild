@@ -1,50 +1,57 @@
+import { GatewayEventHandler } from "./GatewayEventHandler";
 import { Guild } from "../../structures/Guild";
 import { Member } from "../../structures/Member";
 import { Message } from "../../structures/Message";
-import { User } from "../../structures/User";
-import { GatewayEventHandler } from "./GatewayEventHandler";
+import { messageReactionInfo } from "../../tg-types/types";
+import {
+    GatewayEvent_ChannelMessageReactionAdded,
+    GatewayEvent_ChannelMessageReactionDeleted,
+    GatewayEvent_ChatMessageCreated,
+    GatewayEvent_ChatMessageDeleted,
+    GatewayEvent_ChatMessageUpdated
+} from "guildedapi-types.ts/v1";
 
 export class MessageHandler extends GatewayEventHandler{
-    async messageCreate(data: object){
-        var MessageComponent = new Message(data['message' as keyof object], this.client)
+    messageCreate(data: GatewayEvent_ChatMessageCreated): boolean {
+        const MessageComponent = new Message(data.message, this.client);
         // this.client.cache.set(`messageContent_${MessageComponent['id' as keyof object]}`, MessageComponent['content' as keyof object])
-        await this.client.cache.set(`messageComponent_${MessageComponent['id' as keyof object]}`, MessageComponent)
-        return this.client.emit('messageCreate', MessageComponent)
+        this.client.cache.set(`messageComponent_${MessageComponent.id}`, MessageComponent);
+        return this.client.emit("messageCreate", MessageComponent);
     }
 
-    messageUpdate(data: object){
-        var MessageComponent = new Message(data['message' as keyof object], this.client)
-        var cacheHasOldMessage = this.client.cache.has(`messageComponent_${MessageComponent['id' as keyof object]}`)
+    messageUpdate(data: GatewayEvent_ChatMessageUpdated): boolean {
+        let MessageComponent = new Message(data.message, this.client);
+        const cacheHasOldMessage = this.client.cache.has(`messageComponent_${MessageComponent.id}`);
         if (cacheHasOldMessage){
-            MessageComponent = new Message(data['message' as keyof object], this.client, {oldMessage: this.client.cache.get(`messageComponent_${MessageComponent['id' as keyof object]}`)})
-            this.client.cache.set(`messageComponent_${MessageComponent['id' as keyof object]}`, MessageComponent)
+            MessageComponent = new Message(data.message, this.client, { oldMessage: this.client.cache.get(`messageComponent_${MessageComponent.id}`) as object|undefined });
+            this.client.cache.set(`messageComponent_${MessageComponent.id}`, MessageComponent);
         }
-        return this.client.emit('messageUpdate', MessageComponent)
+        return this.client.emit("messageUpdate", MessageComponent);
     }
 
-    messageDelete(data: object){
-        var MessageComponent = new Message(data['message' as keyof object], this.client);
-        var cacheHasMessage = this.client.cache.has(`messageContent_${MessageComponent['id' as keyof object]}`)
+    messageDelete(data: GatewayEvent_ChatMessageDeleted): boolean {
+        let MessageComponent = new Message(data.message as keyof object, this.client);
+        const cacheHasMessage = this.client.cache.has(`messageComponent_${MessageComponent.id}`);
         if (cacheHasMessage){
-            MessageComponent = new Message(data['message' as keyof object], this.client, {oldMessage: this.client.cache.get(`messageComponent_${MessageComponent['id' as keyof object]}`)})
-            this.client.cache.delete(`messageComponent_${MessageComponent['id' as keyof object]}`);
+            MessageComponent = new Message(data.message as keyof object, this.client, { oldMessage: this.client.cache.get(`messageComponent_${MessageComponent.id}`) as object|undefined });
+            this.client.cache.delete(`messageComponent_${MessageComponent.id}`);
         }
-        return this.client.emit('messageDelete', MessageComponent)
+        return this.client.emit("messageDelete", MessageComponent);
     }
 
-    messageReactionAdd(data: messageReactionRawTypes|any){
-        var output = {
+    messageReactionAdd(data: GatewayEvent_ChannelMessageReactionAdded): boolean {
+        const output = {
             message: {
-                id: data.reaction.messageId,
+                id:    data.reaction.messageId,
                 guild: {
                     id: data.serverId
                 },
                 channelID: data.reaction.channelId
             },
             emoji: {
-                id: data.reaction.emote.id,
+                id:   data.reaction.emote.id,
                 name: data.reaction.emote.name,
-                url: data.reaction.emote.url
+                url:  data.reaction.emote.url
             },
             reactor: {
                 id: data.reaction.createdBy
@@ -53,33 +60,33 @@ export class MessageHandler extends GatewayEventHandler{
 
 
         if (this.client.cache.has(`messageComponent_${data.reaction.messageId}`)){
-            //Object.assign(output, {message: this.client.cache.get(`messageComponent_${data.reaction.messageId}`)})
+            // Object.assign(output, {message: this.client.cache.get(`messageComponent_${data.reaction.messageId}`)})
             output.message = this.client.cache.get(`messageComponent_${data.reaction.messageId}`) as Message;
-        }else if (this.client.cache.has(`guildComponent_${data.serverId}`)){
-            //Object.assign(output.message, {guild: this.client.cache.get(`guildComponent_${data.serverId}`)})
-            output.message.guild = this.client.cache.get(`guildComponent_${data.serverId}`) as Guild;
+        } else if (this.client.cache.has(`guildComponent_${data.serverId as string}`)){
+            // Object.assign(output.message, {guild: this.client.cache.get(`guildComponent_${data.serverId}`)})
+            output.message.guild = this.client.cache.get(`guildComponent_${data.serverId as string}`) as Guild;
         }
 
         if (this.client.cache.has(`guildMember_${data.reaction.createdBy}`)){
-            //Object.assign(output.reactor, this.client.cache.get(`guildMember_${data.reaction.createdBy}`))
+            // Object.assign(output.reactor, this.client.cache.get(`guildMember_${data.reaction.createdBy}`))
             output.reactor = this.client.cache.get(`guildMember_${data.reaction.createdBy}`) as Member;
         }
-        return this.client.emit('messageReactionAdd', output as messageReactionTypes);
+        return this.client.emit("messageReactionAdd", output as messageReactionInfo);
     }
 
-    messageReactionRemove(data: messageReactionRawTypes|any){
-        var output = {
+    messageReactionRemove(data: GatewayEvent_ChannelMessageReactionDeleted): boolean {
+        const output = {
             message: {
-                id: data.reaction.messageId,
+                id:    data.reaction.messageId,
                 guild: {
                     id: data.serverId
                 },
                 channelID: data.reaction.channelId
             },
             emoji: {
-                id: data.reaction.emote.id,
+                id:   data.reaction.emote.id,
                 name: data.reaction.emote.name,
-                url: data.reaction.emote.url
+                url:  data.reaction.emote.url
             },
             reactor: {
                 id: data.reaction.createdBy
@@ -88,59 +95,23 @@ export class MessageHandler extends GatewayEventHandler{
 
 
         if (this.client.cache.has(`messageComponent_${data.reaction.messageId}`)){
-            //Object.assign(output, {message: this.client.cache.get(`messageComponent_${data.reaction.messageId}`)})
+            // Object.assign(output, {message: this.client.cache.get(`messageComponent_${data.reaction.messageId}`)})
             output.message = this.client.cache.get(`messageComponent_${data.reaction.messageId}`) as Message;
-        }else if (this.client.cache.has(`guildComponent_${data.serverId}`)){
-            //Object.assign(output.message, {guild: this.client.cache.get(`guildComponent_${data.serverId}`)})
-            output.message.guild = this.client.cache.get(`guildComponent_${data.serverId}`) as Guild;
+        } else if (this.client.cache.has(`guildComponent_${data.serverId as string}`)){
+            // Object.assign(output.message, {guild: this.client.cache.get(`guildComponent_${data.serverId}`)})
+            output.message.guild = this.client.cache.get(`guildComponent_${data.serverId as string}`) as Guild;
         }
 
         if (this.client.cache.has(`guildMember_${data.reaction.createdBy}`)){
-            //Object.assign(output.reactor, this.client.cache.get(`guildMember_${data.reaction.createdBy}`))
+            // Object.assign(output.reactor, this.client.cache.get(`guildMember_${data.reaction.createdBy}`))
             output.reactor = this.client.cache.get(`guildMember_${data.reaction.createdBy}`) as Member;
         }
 
-        return this.client.emit('messageReactionRemove', output as messageReactionTypes);
+        return this.client.emit("messageReactionRemove", output as messageReactionInfo);
     }
 
     // Unfortunately, Guilded doesn't have endpoint to get that information :.(
     // messageReactionRemoveAll(data: object){
     //     //return this.client.emit('messageReactionRemoveAll')
     // }
-}
-
-
-type messageReactionRawTypes = {
-    serverId: string,
-    reaction: {
-        channelId: string,
-        messageId: string,
-        createdBy: string,
-        emote: {
-            id: number|string,
-            name: string,
-            url: string
-        }
-    }
-}
-
-
-export type messageReactionTypes = {
-    message: Message|{
-        id: string,
-        guild: Guild | {
-            id: string
-        },
-        channelID: string
-    }, 
-    emoji: emojiTypes,
-    reactor: Member| {
-        id: string
-    }
-}
-
-export type emojiTypes = {
-    id: number|string,
-    name: string,
-    url: string
 }

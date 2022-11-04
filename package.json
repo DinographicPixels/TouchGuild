@@ -1,46 +1,39 @@
 {
   "name": "touchguild",
-  "version": "0.1.6",
-  "description": "TouchGuild is a CommonJS, ESM & Typescript Guilded library that gets you, in touch with the API.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "dependencies": {
-    "acorn": "^8.8.0",
-    "acorn-walk": "^8.2.0",
-    "arg": "^4.1.3",
-    "axios": "^0.27.2",
-    "create-require": "^1.1.1",
-    "node-fetch-commonjs": "^3.1.1",
-    "diff": "^4.0.2",
-    "make-error": "^1.3.6",
-    "node-fetch": "^3.2.10",
-    "sync-fetch": "^0.4.1",
-    "typed-emitter": "^2.1.0",
-    "v8-compile-cache-lib": "^3.0.1",
-    "yn": "^3.1.1",
-    "ws": "^8.8.1",
-    "emitterbuilder": "^1.0.3",
-    "events": "^3.3.0",
-    "gen-esm-wrapper": "^1.1.3"
-  },
+  "version": "0.1.7-nightly",
+  "description": "TouchGuild is a NodeJS library for interfacing with Guilded.",
+  "main": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "module": "./dist/lib/index.mjs",
+  "exports": {
+    ".": {
+        "types": "./dist/lib/index.d.ts",
+        "require": "./dist/lib/index.js",
+        "import": "./dist/lib/index.mjs"
+    }
+},
   "scripts": {
-    "build": "tsc && gen-esm-wrapper dist/index.js dist/index.mjs",
-    "test": "node test.js"
+    "init": "npm install",
+    "build": "npm install && tsc && gen-esm-wrapper dist/lib/index.js dist/lib/index.mjs",
+    "compile": "tsc && gen-esm-wrapper dist/lib/index.js dist/lib/index.mjs",
+    "compileClean": "tsc --build --clean && gen-esm-wrapper dist/lib/index.js dist/lib/index.mjs",
+    "prepublishOnly": "npm run build",
+    "test": "node ./tests/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DinographicPixels/guilderJS.git"
+    "url": "git+https://github.com/DinographicPixels/TouchGuild.git"
   },
   "keywords": [
-    "library",
     "guilded",
-    "bot",
-    "bots",
-    "guildedapi",
-    "touchguild",
-    "builtbyyou"
+    "library",
+    "guilded-api",
+    "api"
   ],
-  "author": "",
+  "author": "DinographicPixels [PakkoGraphic]",
+  "contributors": [
+    "PakkoGraphic (https://github.com/PakkoGraphic)"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/DinographicPixels/TouchGuild/issues"
@@ -51,10 +44,29 @@
     "@types/node": "^18.7.11",
     "@types/sync-fetch": "^0.4.0",
     "@types/ws": "^8.5.3",
-    "i": "^0.3.7",
-    "npm": "^8.18.0",
-    "ts-node": "^10.9.1",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
+    "eslint": "^8.26.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-import-newlines": "^1.2.3",
+    "eslint-plugin-jsdoc": "^39.4.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-unicorn": "^44.0.2",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "gen-esm-wrapper": "^1.1.3",
     "typed-emitter": "^2.1.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "emitterbuilder": "^1.0.3",
+    "guildedapi-types.ts": "^0.1.8",
+    "node-fetch-commonjs": "^3.1.1",
+    "sync-fetch": "^0.4.1",
+    "typed-emitter": "^2.1.0",
+    "ws": "^8.8.1"
+  },
+  "engines": {
+    "node": ">= 16.16.0"
   }
 }

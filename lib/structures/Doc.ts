@@ -1,47 +1,42 @@
-import { Client } from './Client';
-import { Message, MessageOptions } from './Message';
-import * as endpoints from '../rest/endpoints';
+import { Client } from "./Client";
+import { Member } from "./Member";
+import * as endpoints from "../rest/endpoints";
 
-import { call } from '../Utils';
-import { Member } from './Member';
+import { call } from "../Utils";
+import { APIDoc, APIMentions, PUTDocResponse } from "guildedapi-types.ts/v1";
+
 const calls = new call();
 
 export class Doc {
     /** Raw data */
-    data: any; 
+    // data: any;
     /** Client */
     client: Client;
     /** ID of the doc */
-    id: number; 
+    id: number;
     /** Guild/server id */
-    guildID: string; 
+    guildID: string;
     /** ID of the 'docs' channel. */
     channelID: string;
-    /** Doc title/name */ 
-    title: string; 
+    /** Doc title/name */
+    title: string;
     /** Doc title/name */
     name: string;
     /** Content of the doc */
-    content: string; 
+    content: string;
     /** Doc mentions  */
-    mentions: {
-        users?: object[], // id in
-        channels?: object[], // id in
-        roles?: object[],
-        everyone?: boolean,
-        here?: boolean
-    }
+    mentions: APIMentions;
     /** Timestamp (unix epoch time) of the doc's creation. */
-    _createdAt: number|null; 
+    _createdAt: number|null;
     /** ID of the member who created the doc. */
-    memberID: string; 
+    memberID: string;
     /** Timestamp (unix epoch time) of when the doc was updated. (if updated) */
-    _updatedAt: number|null; 
+    _updatedAt?: number | null;
     /** ID of the member who updated the doc. (if updated) */
-    updatedBy: string;
+    updatedBy?: string | null;
 
-    constructor(data: any, client:any){
-        this.data = data.channel;
+    constructor(data: APIDoc, client: Client){
+        // this.data = data.channel;
         this.client = client;
 
         this.id = data.id;
@@ -51,31 +46,27 @@ export class Doc {
         this.title = data.title ?? null; // same as name, different type.
         this.content = data.content ?? null;
         this.mentions = data.mentions ?? {};
-        this._createdAt = data.createdAt ? Date.parse(data.createdAt): null;
+        this._createdAt = data.createdAt ? Date.parse(data.createdAt) : null;
         this.memberID = data.createdBy;
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt): null;
+        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
         this.updatedBy = data.updatedBy ?? null;
     }
 
     get member(): Member{
-        if (this.updatedBy){
-            return calls.syncGetMember(this.guildID, this.updatedBy, this.client) as Member;
-        }else{
-            return calls.syncGetMember(this.guildID, this.memberID, this.client) as Member;
-        }
+        return this.updatedBy ? calls.syncGetMember(this.guildID, this.updatedBy, this.client) as Member : calls.syncGetMember(this.guildID, this.memberID, this.client) as Member;
     }
 
     get createdAt(): Date|null{
-        return this._createdAt ? new Date(this._createdAt): null;
+        return this._createdAt ? new Date(this._createdAt) : null;
     }
 
     get updatedAt(): Date|null{
-        return this._updatedAt ? new Date(this._updatedAt): null;
+        return this._updatedAt ? new Date(this._updatedAt) : null;
     }
 
-    async edit(options: {title?: string, content?: string}): Promise<Doc>{
-        let response:any = await calls.put(endpoints.CHANNEL_DOC(this.channelID, this.id), this.client.token, options);
-        return new Doc(response.data.doc, this.client);
+    async edit(options: {title?: string; content?: string;}): Promise<Doc>{
+        const response = await calls.put(endpoints.CHANNEL_DOC(this.channelID, this.id), this.client.token, options);
+        return new Doc((response["data" as keyof object] as PUTDocResponse).doc, this.client);
     }
 
     async delete(): Promise<void>{

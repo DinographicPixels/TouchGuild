@@ -1,0 +1,11 @@
+node_modules/
+dist/
+tests/
+deprecated/
+
+README.md
+.DS_Store
+*.env
+.env
+CHANGELOG.md
+package-lock.json

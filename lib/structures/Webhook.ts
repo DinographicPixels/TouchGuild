@@ -1,9 +1,7 @@
-import { Client } from './Client';
-import { Channel } from './Channel';
-import { User } from './User';
-import { Guild } from './Guild';
-import * as endpoints from '../rest/endpoints';
-import { call } from '../Utils';
+import { Client } from "./Client";
+import * as endpoints from "../rest/endpoints";
+import { call } from "../Utils";
+import { APIWebhook, PUTGuildWebhookResponse } from "guildedapi-types.ts/v1";
 const calls = new call();
 
 export class Webhook {
@@ -11,14 +9,14 @@ export class Webhook {
     id: string; guildID: string; channelID: string; username: string; _createdAt: number; createdBy: string;
     _deletedAt: number|null; token: string|null;
 
-    constructor(data: any, client:Client){
+    constructor(data: APIWebhook, client: Client){
         this._client = client;
         this.id = data.id;
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.username = data.name;
         this._createdAt = Date.parse(data.createdAt);
-        this._deletedAt = data.deletedAt ? Date.parse(data.deletedAt):null;
+        this._deletedAt = data.deletedAt ? Date.parse(data.deletedAt) : null;
         this.createdBy = data.createdBy;
         this.token = data.token ?? null;
     }
@@ -28,13 +26,13 @@ export class Webhook {
     }
 
     get deletedAt(): Date|null{
-        return this._deletedAt ? new Date(this._deletedAt): null;
+        return this._deletedAt ? new Date(this._deletedAt) : null;
     }
 
     /** Update webhook */
-    async edit(options: {name: string, channelID?:string}): Promise<Webhook>{
-        let response:any = await calls.put(endpoints.GUILD_WEBHOOK(this.guildID, this.id), this._client.token, {name: options.name, channelId: options.channelID});
-        return new Webhook(response.data.webhook, this._client); 
+    async edit(options: {name: string; channelID?: string;}): Promise<Webhook>{
+        const response = await calls.put(endpoints.GUILD_WEBHOOK(this.guildID, this.id), this._client.token, { name: options.name, channelId: options.channelID });
+        return new Webhook((response["data" as keyof object] as PUTGuildWebhookResponse).webhook, this._client);
     }
 
     /** Delete webhook */

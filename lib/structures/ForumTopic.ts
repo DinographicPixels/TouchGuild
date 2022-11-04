@@ -1,56 +1,59 @@
-import { Client } from './Client';
-import { Channel } from './Channel';
-import { Guild } from './Guild';
-import { Member } from './Member';
-import * as endpoints from '../rest/endpoints';
-import { call } from '../Utils';
-const calls = new call()
+import { Client } from "./Client";
+import { Channel } from "./Channel";
+import { Guild } from "./Guild";
+import { Member } from "./Member";
+import * as endpoints from "../rest/endpoints";
+import { call } from "../Utils";
+import { APIForumTopic, APIMentions } from "guildedapi-types.ts/v1";
+
+const calls = new call();
 
 export class ForumTopic {
-    //userdata: any; fulldata: object;
+    // userdata: any; fulldata: object;
     /** Client */
     _client: Client;
     /** Forum topic id */
-    id: number; 
+    id: number;
     /** Guild/server id */
-    guildID: string; 
+    guildID: string;
     /** Forum channel id */
-    channelID: string; 
+    channelID: string;
     /** Topic name/title */
-    name: string; 
+    name: string;
     /** Topic name/title */
-    title: string; 
+    title: string;
     /** Timestamp (unix epoch time) of the topic's creation. */
-    _createdAt: number; 
+    _createdAt: number;
     /** ID of the member who created the topic */
     memberID: string;
     /** ID of the webhook that created the topic (if created by webhook) */
-    webhookID: string; 
+    webhookID: string | null;
     /** Timestamp (unix epoch time) of when the topic got updated. (if updated) */
-    _updatedAt: number|null; 
+    _updatedAt: number| null;
     /** Timestamp (unix epoch time) that the forum topic was bumped at. */
-    bumpedAt: string;
-    /** Content of the topic */ 
-    content: string; 
+    bumpedAt: string | null;
+    /** Content of the topic */
+    content: string;
     /** Topic mentions */
-    mentions: object;
+    mentions: APIMentions | null;
 
-    constructor(data: any, client:any){
-        //this.userdata = data.user;  // basically member > user
-        //this.fulldata = data // basically the whole data
+    constructor(data: APIForumTopic, client: Client){
+        // this.userdata = data.user;  // basically member > user
+        // this.fulldata = data // basically the whole data
+
         this._client = client;
-        this.id = data.id // topic ID
-        this.guildID = data.serverId
-        this.channelID = data.channelId // forum channel id
-        this.name = data.title
+        this.id = data.id; // topic ID
+        this.guildID = data.serverId;
+        this.channelID = data.channelId; // forum channel id
+        this.name = data.title;
         this.title = data.title;
-        this._createdAt = Date.parse(data.createdAt)
-        this.memberID = data.createdBy
+        this._createdAt = Date.parse(data.createdAt);
+        this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt): null;
-        this.bumpedAt = data.bumpedAt ?? null
-        this.content = data.content
-        this.mentions = data.mentions ?? null
+        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
+        this.bumpedAt = data.bumpedAt ?? null;
+        this.content = data.content;
+        this.mentions = data.mentions ?? null;
     }
 
     /** Guild/server the topic is in */
@@ -75,22 +78,18 @@ export class ForumTopic {
 
     /** string representation of the _updatedAt timestamp */
     get updatedAt(): Date|null{
-        return this._updatedAt ? new Date(this._updatedAt):null;
+        return this._updatedAt ? new Date(this._updatedAt) : null;
     }
 
     /** Boolean that tells you if the forum topic was created by a webhook or not. */
     get createdByWebhook(): boolean{
-        if (this.webhookID){
-            return true;
-        }else{
-            return false;
-        }
+        return this.webhookID ? true : false;
     }
 
     /** Edit the forum topic. */
-    async edit(options: {title?: string, content?: string}): Promise<ForumTopic>{
-        let response:any = await calls.patch(endpoints.FORUM_TOPIC(this.channelID, this.id), this._client.token, options);
-        return new ForumTopic(response.data.forumTopic, this);
+    async edit(options: {title?: string; content?: string;}): Promise<ForumTopic>{
+        const response = await calls.patch(endpoints.FORUM_TOPIC(this.channelID, this.id), this._client.token, options);
+        return new ForumTopic(response["data" as keyof object]["forumTopic" as keyof object], this._client);
     }
 
     /** Delete the forum topic. */
@@ -106,5 +105,25 @@ export class ForumTopic {
     /** Unpin the forum topic. */
     async unpin(): Promise<void>{
         await calls.delete(endpoints.FORUM_TOPIC_PIN(this.channelID, this.id), this._client.token);
+    }
+
+    /** Locks the forum topic. */
+    async lock(): Promise<void>{
+        await calls.put(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token, {});
+    }
+
+    /** Unlocks the forum topic. */
+    async unlock(): Promise<void>{
+        await calls.delete(endpoints.FORUM_TOPIC_LOCK(this.channelID, this.id), this._client.token);
+    }
+
+    /** Add a reaction to the forum topic. */
+    async addReaction(emoteID: number): Promise<void>{
+        await calls.put(endpoints.FORUM_TOPIC_EMOTE(this.channelID, this.id, emoteID), this._client.token, {});
+    }
+
+    /** Remove a reaction from the forum topic. */
+    async removeReaction(emoteID: number): Promise<void>{
+        await calls.delete(endpoints.FORUM_TOPIC_EMOTE(this.channelID, this.id, emoteID), this._client.token);
     }
 }

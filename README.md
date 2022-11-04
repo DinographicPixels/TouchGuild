@@ -14,7 +14,7 @@ const TouchGuild = require('touchguild'); // import for CommonJS
 const client = new TouchGuild.Client({token: 'insert token here'});
 
 client.on('ready', ()=> {
-   console.log("I'm ready!");
+   console.log(`Logged as ${client.user.username}`);
 });
 
 client.on('error', (err)=> {
@@ -40,7 +40,8 @@ npm install touchguild@latest
 ----------------
 
 # What's new?
-- Fixed import issues.
+
+[MAJOR CHANGES: Check out what's new](hhttps://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
 
 --------------
 
@@ -50,8 +51,8 @@ npm install touchguild@latest
 - [GitHub](https://github.com/DinographicPixels/TouchGuild)
 
 ### Guide & documentation
-- [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
-- [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
+- [Guide](https://guide.touchguild.dinographicpixels.com/)
+- [Documentation](https://docs.touchguild.dinographicpixels.com/)
 
 ### Additional links
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
