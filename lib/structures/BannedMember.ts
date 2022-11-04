@@ -1,43 +1,30 @@
-import { Client } from './Client';
-import { User } from './User';
-import { Guild } from './Guild';
-import { call } from '../Utils';
-const calls = new call()
+import { Client } from "./Client";
+import { User } from "./User";
+import { Guild } from "./Guild";
+import { call } from "../Utils";
+import { APIGuildMemberBan, APIUser } from "guildedapi-types.ts/v1";
+const calls = new call();
 
 export class BannedMember extends User {
     /** Server ID. */
-    guildID: string; 
+    guildID: string;
     /** Information about the banned member (object) */
-    ban:{
+    ban: {
         /** Reason of the ban */
-        reason: string,
+        reason?: string;
         /** Timestamp (unix epoch time) of when the member has been banned. */
-        createdAt: number|null,
+        createdAt: number|null;
         /** ID of the member that banned the user. */
-        createdBy: string
-    }
-    /** Basic user information about the banned member */
-    user: {
-        /** User ID */
-        id: string,
-        /** Type of the user (user or bot) */
-        type: string,
-        /** User name. */
-        username: string
-    }
-    constructor(data: any, client:Client){
-        super(data.serverMemberBan, client);
-        this.guildID = data.serverId
+        createdBy: string;
+    };
+    constructor(guildID: string, data: APIGuildMemberBan, client: Client){
+        super(data.user as APIUser, client);
+        this.guildID = guildID;
         this.ban = {
-            reason: data.serverMemberBan.reason,
-            createdAt: data.serverMemberBan.createdAt ? Date.parse(data.serverMemberBan.createdAt): null,
-            createdBy: data.serverMemberBan.createdBy
-        }
-        this.user = {
-            id: data.serverMemberBan.user.id,
-            type: data.serverMemberBan.user.type,
-            username: data.serverMemberBan.user.name
-        }
+            reason:    data.reason,
+            createdAt: data.createdAt ? Date.parse(data.createdAt) : null,
+            createdBy: data.createdBy
+        };
     }
 
     /** Guild/server component */

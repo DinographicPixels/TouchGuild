@@ -1,4 +1,5 @@
-import { Client } from './Client';
+import { Client } from "./Client";
+import { APIGuild } from "guildedapi-types.ts/v1";
 
 export class Guild {
     /** Client */
@@ -6,38 +7,38 @@ export class Guild {
     /** Guild/server id */
     id: string;
     /** ID of the sever owner */
-    ownerID: string; 
+    ownerID: string;
     /** Guild type */
-    type: string; 
+    type?: string;
     /** Guild name */
-    name: string; 
+    name: string;
     /** Guild url */
-    url: string; 
+    url?: string;
     /** Guild's about/description */
-    about: string; 
+    about?: string;
     /** Guild's about/description */
-    description: string; 
+    description?: string;
     /** Guild icon */
-    iconURL: string; 
-    bannerURL: string; 
-    timezone: string; 
-    defaultChannelID: string; 
+    iconURL?: string | null;
+    bannerURL?: string | null;
+    timezone?: string;
+    defaultChannelID?: string;
     _createdAt: number;
 
-    constructor(data: {id: string, ownerId: string,type: string,name: string,url: string, about: string, avatar: string, banner: string, timezone: string, defaultChannelId: string, createdAt: string}, client:Client){
+    constructor(data: APIGuild, client: Client){
         this.client = client;
-        this.id = data.id
-        this.ownerID = data.ownerId
-        this.type = data.type
-        this.name = data.name
-        this.url = data.url
-        this.about = data.about // same but with
-        this.description = data.about //   two types.
-        this.iconURL = data.avatar ?? null
-        this.bannerURL = data.banner ?? null
-        this.timezone = data.timezone
-        this.defaultChannelID = data.defaultChannelId
-        this._createdAt = Date.parse(data.createdAt)
+        this.id = data.id;
+        this.ownerID = data.ownerId;
+        this.type = data.type;
+        this.name = data.name;
+        this.url = data.url;
+        this.about = data.about; // same but with
+        this.description = data.about; //   two types.
+        this.iconURL = data.avatar ?? null;
+        this.bannerURL = data.banner ?? null;
+        this.timezone = data.timezone;
+        this.defaultChannelID = data.defaultChannelId;
+        this._createdAt = Date.parse(data.createdAt);
     }
 
     get createdAt(): Date{

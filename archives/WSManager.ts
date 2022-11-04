@@ -4,6 +4,8 @@ import emitterbuilder from "emitterbuilder";
 
 import { GatewayOPCodes } from "guildedapi-types.ts/v1";
 
+// Supported on ES2021 or lower.
+
 export class WSManager {
     constructor(readonly params: WSManagerParams){}
     token = this.params.token;
@@ -43,25 +45,19 @@ export class WSManager {
                 TeamChannelDeleted: "channelDelete"
             },
             ForumTopic: {
-                ForumTopicCreated:         "forumTopicCreate",
-                ForumTopicUpdated:         "forumTopicUpdate",
-                ForumTopicDeleted:         "forumTopicDelete",
-                ForumTopicPinned:          "forumTopicPin",
-                ForumTopicUnpinned:        "forumTopicUnpin",
-                ForumTopicReactionCreated: "forumTopicReactionAdd",
-                ForumTopicReactionDeleted: "forumTopicReactionRemove",
-                ForumTopicCommentCreated:  "forumTopicCommentCreate",
-                ForumTopicCommentUpdated:  "forumTopicCommentUpdate",
-                ForumTopicCommentDeleted:  "forumTopicCommentDelete"
+                ForumTopicCreated:  "topicCreate",
+                ForumTopicUpdated:  "topicUpdate",
+                ForumTopicDeleted:  "topicDelete",
+                ForumTopicPinned:   "forumTopicPin",
+                ForumTopicUnpinned: "forumTopicUnpin"
             },
             Guild: {
-                BotTeamMembershipCreated: "guildCreate",
-                TeamMemberBanned:         "guildBanAdd",
-                TeamMemberUnbanned:       "guildBanRemove",
-                TeamMemberJoined:         "guildMemberAdd",
-                TeamMemberRemoved:        "guildMemberRemove",
-                TeamMemberUpdated:        "guildMemberUpdate",
-                teamRolesUpdated:         "guildMemberRoleUpdate"
+                TeamMemberBanned:   "guildBanAdd",
+                TeamMemberUnbanned: "guildBanRemove",
+                TeamMemberJoined:   "guildMemberAdd",
+                TeamMemberRemoved:  "guildMemberRemove",
+                TeamMemberUpdated:  "guildMemberUpdate",
+                teamRolesUpdated:   "guildMemberRoleUpdate"
             },
             Webhook: {
                 TeamWebhookCreated: "webhooksCreate",
@@ -78,7 +74,6 @@ export class WSManager {
                 CalendarEventDeleted:     "calendarEventDelete",
                 CalendarEventRsvpUpdated: "calendarRsvpUpdate",
                 CalendarEventRsvpDeleted: "calendarRsvpDelete"
-                // CalendarEventRsvpManyUpdated
             },
             List: {
                 ListItemCreated:     "listItemCreate",
