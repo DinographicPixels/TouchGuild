@@ -1,4 +1,5 @@
 tests/
+deprecated/
 .DS_Store
 *.env
 .env

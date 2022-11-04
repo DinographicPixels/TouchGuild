@@ -33,31 +33,29 @@ Nightly builds are in development builds and features are constantly added & we 
 # Installation
 NodeJS **16.16.0** or higher is required.
 
-Install the package with NPM through GitHub:
-```bash
-npm install dinographicpixels/touchguild#nightly
-```
-
-Install the package through NPM:
+Install the package automatically:
 ```bash
 npm install touchguild@nightly
 ```
 
+Install the package manually:
+```bash
+npm install dinographicpixels/touchguild#nightly
+```
+
+1. Run the command
+2. Go to node_modules/touchguild
+3. Run: npm run build in the touchguild folder
+4. Now, it's ready.
+
+You need to reproduce those steps everytime you update to a newer nightly build.
+
 ----------------
 
 # What's new on Nightly builds?
-- **Lock & unlock forum topic methods for both Client and ForumTopic components.**
-- [Guild XP Management including set/award xp.](https://github.com/DinographicPixels/TouchGuild/pull/14)
-- disconnect() method for Client
-- Fixed: ['messageDelete's oldContent is null (couldn't get oldContent from cache)'](https://github.com/DinographicPixels/TouchGuild/issues/10)
-- Deleted unused importations
-- Types are now in one file
-- Fixed: [Issue while importing TouchGuild on repl.it](https://github.com/DinographicPixels/TouchGuild/issues/12)
-- Improved [websocket & moved packet parsing.](https://github.com/DinographicPixels/TouchGuild/pull/13)
-- [Added DevTools to the TouchGuild's index.](https://github.com/DinographicPixels/TouchGuild/pull/15)
-- [Updated gateway events (WebSocket) & Added Client.user to get more information about the logged bot.](https://github.com/DinographicPixels/TouchGuild/pull/18)
 
-[Check new practical features you can use.](https://docs.touchguild.dinographicpixels.com/nightly/features)
+[Check out what's new](hhttps://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
+[Check out new features](https://docs.touchguild.dinographicpixels.com/nightly/features)
 
 --------------
 
@@ -67,8 +65,8 @@ npm install touchguild@nightly
 - [GitHub](https://github.com/DinographicPixels/TouchGuild)
 
 ### Guide & documentation
-- [Guide](https://docs.touchguild.dinographicpixels.com/guide/get-started)
-- [Documentation](https://docs.touchguild.dinographicpixels.com/documentation/home)
+- [Guide](https://guide.touchguild.dinographicpixels.com/)
+- [Documentation](https://docs.touchguild.dinographicpixels.com/)
 
 ### Additional links
 - [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)

@@ -5,17 +5,23 @@ import emitterbuilder from "emitterbuilder";
 import { GatewayOPCodes } from "guildedapi-types.ts/v1";
 
 export class WSManager {
-    constructor(readonly params: WSManagerParams){}
-    token = this.params.token;
-    apiversion = this.params.apiversion ?? pkgconfig.GuildedAPI.GatewayVersion ?? 1;
-    proxyURL = this.params.proxyURL ?? pkgconfig.GuildedAPI.GatewayURL ?? `wss://www.guilded.gg/websocket/v${this.apiversion}`;
-    reconnect? = this.params.reconnect ?? true;
-    reconnectAttemptLimit = this.params.reconnectAttemptLimit ?? 1;
-    replayMissedEvents? = this.params.replayMissedEvents ?? true;
-
-    emitter = new emitterbuilder({ ignoreWarns: true });
-
-    ws = new WebSocket(this.proxyURL, { headers: { Authorization: `Bearer ${this.params.token}` }, protocol: "HTTPS" });
+    token: WSManagerParams["token"];
+    apiversion: WSManagerParams["apiversion"];
+    proxyURL: WSManagerParams["proxyURL"];
+    reconnect: WSManagerParams["reconnect"];
+    reconnectAttemptLimit: WSManagerParams["reconnectAttemptLimit"];
+    replayMissedEvents: WSManagerParams["replayMissedEvents"];
+    emitter; ws;
+    constructor(params: WSManagerParams){
+        this.token = params.token;
+        this.apiversion = params.apiversion as number ?? pkgconfig.GuildedAPI.GatewayVersion ?? 1;
+        this.proxyURL = params.proxyURL ?? pkgconfig.GuildedAPI.GatewayURL ?? `wss://www.guilded.gg/websocket/v${this.apiversion}`;
+        this.reconnect = params.reconnect ?? true;
+        this.reconnectAttemptLimit = params.reconnectAttemptLimit ?? 1;
+        this.replayMissedEvents = params.replayMissedEvents ?? true;
+        this.emitter = new emitterbuilder({ ignoreWarns: true });
+        this.ws = new WebSocket(this.proxyURL, { headers: { Authorization: `Bearer ${this.token}` }, protocol: "HTTPS" });
+    }
 
     firstwsMessage = true;
     lastMessageID: string|null = null;
@@ -43,25 +49,19 @@ export class WSManager {
                 TeamChannelDeleted: "channelDelete"
             },
             ForumTopic: {
-                ForumTopicCreated:         "forumTopicCreate",
-                ForumTopicUpdated:         "forumTopicUpdate",
-                ForumTopicDeleted:         "forumTopicDelete",
-                ForumTopicPinned:          "forumTopicPin",
-                ForumTopicUnpinned:        "forumTopicUnpin",
-                ForumTopicReactionCreated: "forumTopicReactionAdd",
-                ForumTopicReactionDeleted: "forumTopicReactionRemove",
-                ForumTopicCommentCreated:  "forumTopicCommentCreate",
-                ForumTopicCommentUpdated:  "forumTopicCommentUpdate",
-                ForumTopicCommentDeleted:  "forumTopicCommentDelete"
+                ForumTopicCreated:  "topicCreate",
+                ForumTopicUpdated:  "topicUpdate",
+                ForumTopicDeleted:  "topicDelete",
+                ForumTopicPinned:   "forumTopicPin",
+                ForumTopicUnpinned: "forumTopicUnpin"
             },
             Guild: {
-                BotTeamMembershipCreated: "guildCreate",
-                TeamMemberBanned:         "guildBanAdd",
-                TeamMemberUnbanned:       "guildBanRemove",
-                TeamMemberJoined:         "guildMemberAdd",
-                TeamMemberRemoved:        "guildMemberRemove",
-                TeamMemberUpdated:        "guildMemberUpdate",
-                teamRolesUpdated:         "guildMemberRoleUpdate"
+                TeamMemberBanned:   "guildBanAdd",
+                TeamMemberUnbanned: "guildBanRemove",
+                TeamMemberJoined:   "guildMemberAdd",
+                TeamMemberRemoved:  "guildMemberRemove",
+                TeamMemberUpdated:  "guildMemberUpdate",
+                teamRolesUpdated:   "guildMemberRoleUpdate"
             },
             Webhook: {
                 TeamWebhookCreated: "webhooksCreate",
@@ -78,7 +78,6 @@ export class WSManager {
                 CalendarEventDeleted:     "calendarEventDelete",
                 CalendarEventRsvpUpdated: "calendarRsvpUpdate",
                 CalendarEventRsvpDeleted: "calendarRsvpDelete"
-                // CalendarEventRsvpManyUpdated
             },
             List: {
                 ListItemCreated:     "listItemCreate",
@@ -103,11 +102,11 @@ export class WSManager {
     }
 
     connect(): void {
-        const wsoptions = { headers: { Authorization: `Bearer ${this.params.token}` }, protocol: "HTTPS" };
+        const wsoptions = { headers: { Authorization: `Bearer ${this.token}` }, protocol: "HTTPS" };
         if (this.replayEventsCondition) Object.assign(wsoptions.headers, { "guilded-last-message-id": this.lastMessageID });
 
         try {
-            this.ws = new WebSocket(this.proxyURL, wsoptions);
+            this.ws = new WebSocket(this.proxyURL as string, wsoptions);
         } catch (err){
             if (!this.replayEventsCondition) throw err;
             this.lastMessageID = null;
@@ -132,7 +131,7 @@ export class WSManager {
         this.ws.on("error", (err: unknown) => {
             this.onSocketError(err as string);
             console.error("GATEWAY ERR: Couldn't connect to the Guilded API.");
-            if (this.reconnect === true || this.reconnectAttemptLimit < this.currReconnectAttempt){
+            if (this.reconnect === true || this.reconnectAttemptLimit as number < this.currReconnectAttempt){
                 this.currReconnectAttempt++; return this.connect();
             }
             this.closeAll();
@@ -240,3 +239,5 @@ export interface WSManagerParams {
  }
  console.log(eventDATA.heartbeatIntervalMs)
 */
+
+// The old version of WSManager isn't supported by ES2022. It only works on ES2021 or lower.

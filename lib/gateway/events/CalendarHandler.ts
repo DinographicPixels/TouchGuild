@@ -1,30 +1,37 @@
+import { GatewayEventHandler } from "./GatewayEventHandler";
 import { CalendarEvent } from "../../structures/CalendarEvent";
 import { CalendarEventRSVP } from "../../structures/CalendarRSVP";
-import { GatewayEventHandler } from "./GatewayEventHandler";
+import {
+    GatewayEvent_CalendarEventCreated,
+    GatewayEvent_CalendarEventDeleted,
+    GatewayEvent_CalendarEventRsvpDeleted,
+    GatewayEvent_CalendarEventRsvpUpdated,
+    GatewayEvent_CalendarEventUpdated
+} from "guildedapi-types.ts/v1";
 
 export class CalendarHandler extends GatewayEventHandler{
-    calendarEventCreate(data: object){
-        var CalendarEventComponent = new CalendarEvent(data['calendarEvent' as keyof object], this.client)
-        this.client.emit('calendarEventCreate', CalendarEventComponent)
+    calendarEventCreate(data: GatewayEvent_CalendarEventCreated): void {
+        const CalendarEventComponent = new CalendarEvent(data.calendarEvent, this.client);
+        this.client.emit("calendarEventCreate", CalendarEventComponent);
     }
 
-    calendarEventUpdate(data: object){
-        var CalendarEventComponent = new CalendarEvent(data['calendarEvent' as keyof object], this.client)
-        this.client.emit('calendarEventUpdate', CalendarEventComponent)
+    calendarEventUpdate(data: GatewayEvent_CalendarEventUpdated): void {
+        const CalendarEventComponent = new CalendarEvent(data.calendarEvent, this.client);
+        this.client.emit("calendarEventUpdate", CalendarEventComponent);
     }
 
-    calendarEventDelete(data: object){
-        var CalendarEventComponent = new CalendarEvent(data['calendarEventRsvp' as keyof object], this.client)
-        this.client.emit('calendarEventDelete', CalendarEventComponent)
+    calendarEventDelete(data: GatewayEvent_CalendarEventDeleted): void {
+        const CalendarEventComponent = new CalendarEvent(data.calendarEvent, this.client);
+        this.client.emit("calendarEventDelete", CalendarEventComponent);
     }
 
-    calendarRsvpUpdate(data: object){
-        var CalendarERSVPComponent = new CalendarEventRSVP(data['calendarEventRsvp' as keyof object], this.client)
-        this.client.emit('calendarEventRsvpUpdate', CalendarERSVPComponent)
+    calendarRsvpUpdate(data: GatewayEvent_CalendarEventRsvpUpdated): void {
+        const CalendarERSVPComponent = new CalendarEventRSVP(data.calendarEventRsvp, this.client);
+        this.client.emit("calendarEventRsvpUpdate", CalendarERSVPComponent);
     }
 
-    calendarRsvpDelete(data: object){
-        var CalendarERSVPComponent = new CalendarEventRSVP(data['calendarEventRsvp' as keyof object], this.client)
-        this.client.emit('calendarEventRsvpDelete', CalendarERSVPComponent)
+    calendarRsvpDelete(data: GatewayEvent_CalendarEventRsvpDeleted): void {
+        const CalendarERSVPComponent = new CalendarEventRSVP(data.calendarEventRsvp, this.client);
+        this.client.emit("calendarEventRsvpDelete", CalendarERSVPComponent);
     }
 }

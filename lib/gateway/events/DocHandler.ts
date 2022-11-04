@@ -1,19 +1,20 @@
-import { Doc } from "../../structures/Doc";
 import { GatewayEventHandler } from "./GatewayEventHandler";
+import { Doc } from "../../structures/Doc";
+import { GatewayEvent_DocCreated, GatewayEvent_DocDeleted, GatewayEvent_DocUpdated } from "guildedapi-types.ts/v1";
 
 export class DocHandler extends GatewayEventHandler{
-    docCreate(data: object){
-        var DocComponent = new Doc(data['docs' as keyof object], this.client)
-        this.client.emit('docCreate', DocComponent)
+    docCreate(data: GatewayEvent_DocCreated): void {
+        const DocComponent = new Doc(data.doc, this.client);
+        this.client.emit("docCreate", DocComponent);
     }
 
-    docUpdate(data: object){
-        var DocComponent = new Doc(data['docs' as keyof object], this.client)
-        this.client.emit('docUpdate', DocComponent)
+    docUpdate(data: GatewayEvent_DocUpdated): void {
+        const DocComponent = new Doc(data.doc, this.client);
+        this.client.emit("docUpdate", DocComponent);
     }
 
-    docDelete(data: object){
-        var DocComponent = new Doc(data['docs' as keyof object], this.client)
-        this.client.emit('docDelete', DocComponent)
+    docDelete(data: GatewayEvent_DocDeleted): void {
+        const DocComponent = new Doc(data.doc, this.client);
+        this.client.emit("docDelete", DocComponent);
     }
 }
