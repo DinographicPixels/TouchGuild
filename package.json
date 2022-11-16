@@ -18,6 +18,7 @@
     "compile": "tsc && gen-esm-wrapper dist/lib/index.js dist/lib/index.mjs",
     "compileClean": "tsc --build --clean && gen-esm-wrapper dist/lib/index.js dist/lib/index.mjs",
     "prepublishOnly": "npm run build",
+    "lint": "lint": "eslint lib --ext .ts",
     "test": "node ./tests/main.js"
   },
   "repository": {
