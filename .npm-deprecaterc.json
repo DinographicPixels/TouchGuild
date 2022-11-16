@@ -1,0 +1,10 @@
+{
+    "$schema": "https://raw.githubusercontent.com/favware/npm-deprecate/main/assets/npm-deprecate.schema.json",
+    "name": "*dev*",
+    "deprecateDistTag": false,
+    "verbose": true,
+    "package": [
+      "touchguild"
+    ],
+    "message": "This version has been deprecated, you'll need to upgrade to a newer version."
+  }
