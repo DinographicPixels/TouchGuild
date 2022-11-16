@@ -1,5 +1,5 @@
 <p align="center">
-  <img width=80% src="https://images-ext-1.discordapp.net/external/hpMY7GrDRdqgDuwOqNmDYEgomOGjf97p4_7QCfenuFs/%3Fw%3D3796%26h%3D1640/https/s3-us-west-2.amazonaws.com/www.guilded.gg/ContentMediaGenericFiles/fd1c2baad81023a365cd510eb2a48fc5-Full.webp?width=2046&height=884">
+  <img width=80% src="https://cdn.glitch.global/bc68313e-6abb-488c-a1e3-e6d10817c2bd/touchguild-cradius.png?v=1665311272247">
   <br>
   <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
   <img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square">
@@ -25,37 +25,24 @@ client.connect();
 
 ```
 
-## This build is a development build. (Nightly)
-Nightly builds are in development builds and features are constantly added & we also note that those builds can have bugs.
+## Early access note:
+The Guilded API is in Early access, the access is limited to a group of people & things changes quickly, so that is why TouchGuild is in Early access. Not everyone can use TouchGuild for now, please wait for the Guilded API's public release or apply to the Guilded API server to give it a try.
 
 ----
 
 # Installation
 NodeJS **16.16.0** or higher is required.
 
-Install the package automatically:
 ```bash
-npm install touchguild@nightly
+npm install touchguild@latest
 ```
-
-Install the package manually:
-```bash
-npm install dinographicpixels/touchguild#nightly
-```
-
-1. Run the command
-2. Go to node_modules/touchguild
-3. Run: npm run build in the touchguild folder
-4. Now, it's ready.
-
-You need to reproduce those steps everytime you update to a newer nightly build.
 
 ----------------
 
-# What's new on Nightly builds?
+# What's new?
 
-- [Check out what's new](https://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
-- [Check out new features](https://docs.touchguild.dinographicpixels.com/nightly/features)
+- [MAJOR CHANGES: Check out what's new](https://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
+- Brand new [guide](https://guide.touchguild.dinographicpixels.com/) & [documentation](https://docs.touchguild.dinographicpixels.com/)
 
 --------------
 
