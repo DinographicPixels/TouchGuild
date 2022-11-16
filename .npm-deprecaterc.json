@@ -6,5 +6,5 @@
     "package": [
       "touchguild"
     ],
-    "message": "This version has been deprecated, you'll need to upgrade to a newer version."
+    "message": "This version has been automatically deprecated, you'll need to upgrade to a newer build."
   }
