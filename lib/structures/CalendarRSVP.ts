@@ -1,18 +1,17 @@
+/** @module CalendarRSVP */
 import { Client } from "./Client";
 import { Member } from "./Member";
-import * as endpoints from "../rest/endpoints";
+import { Base } from "./Base";
 
-import { call } from "../Utils";
-import { APICalendarEventRSVP, APICalendarEventRSVPStatuses, PUTCalendarEventRSVPResponse } from "guildedapi-types.ts/v1";
-const calls = new call();
+import { User } from "./User";
+import { APICalendarEventRSVP, APICalendarEventRSVPStatuses, PUTCalendarEventRSVPBody } from "../Constants";
 
-export class CalendarEventRSVP {
+/** CalendarEventRSVP represents a guild member's event RSVP.
+ * It gives information about a member's set presence to an event.
+ */
+export class CalendarEventRSVP extends Base {
     /** Raw data */
     data: APICalendarEventRSVP;
-    /** Client */
-    client: Client;
-    /** Calendar Event RSVP ID */
-    id: number;
     /** Guild/server ID. */
     guildID: string;
     /** Calendar channel id. */
@@ -28,11 +27,13 @@ export class CalendarEventRSVP {
     /** ID of the member that updated the rsvp (if updated) */
     updatedBy?: string | null;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APICalendarEventRSVP, client: Client){
+        super(data.calendarEventId, client);
         this.data = data;
-        this.client = client;
-
-        this.id = data.calendarEventId;
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.memberID = data.userId;
@@ -42,25 +43,32 @@ export class CalendarEventRSVP {
         this._createdAt = data.createdAt ? Date.parse(data.createdAt) : null;
     }
 
-    /** Member component from REST (sync). */
-    get member(): Member {
-        return calls.syncGetMember(this.guildID, this.createdBy, this.client);
+    /** Retrieve message's member, if cached.
+     *
+     * Note: this getter can output: Member, User, Promise<Member> or undefined.
+     */
+    get member(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.memberID) && this.memberID){
+            return this.client.cache.members.get(this.memberID);
+        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
+            return this.client.cache.users.get(this.memberID);
+        } else if (this.memberID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
+        }
     }
 
-    /** string representation of the _createdAt timestamp */
+    /** String representation of the _createdAt timestamp. */
     get createdAt(): Date|null{
         return this._createdAt ? new Date(this._createdAt) : null;
     }
 
-    /** Edit the calendar rsvp */
-    async edit(options: {status: "going"|"maybe"|"declined"|"invited"|"waitlisted"|"not responded";}): Promise<CalendarEventRSVP>{
-        if (typeof options !== "object") throw new TypeError("options should be an object.");
-        const response = await calls.put(endpoints.CHANNEL_EVENT_RSVP(this.channelID, this.id, this.memberID), this.client.token, options);
-        return new CalendarEventRSVP((response["data" as keyof object] as PUTCalendarEventRSVPResponse).calendarEventRsvp, this.client);
+    /** Edit this RSVP. */
+    async edit(options: PUTCalendarEventRSVPBody): Promise<CalendarEventRSVP>{
+        return this.client.rest.channels.editCalendarRsvp(this.channelID, this.id as number, this.memberID, options);
     }
 
-    /** Delete the calendar rsvp */
+    /** Delete this RSVP. */
     async delete(): Promise<void>{
-        await calls.delete(endpoints.CHANNEL_EVENT_RSVP(this.channelID, this.id, this.memberID), this.client.token);
+        return this.client.rest.channels.deleteCalendarRsvp(this.channelID, this.id as number, this.memberID);
     }
 }

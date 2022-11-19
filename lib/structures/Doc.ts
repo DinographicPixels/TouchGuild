@@ -1,19 +1,14 @@
+/** @module Doc */
 import { Client } from "./Client";
 import { Member } from "./Member";
-import * as endpoints from "../rest/endpoints";
+import { Base } from "./Base";
 
-import { call } from "../Utils";
-import { APIDoc, APIMentions, PUTDocResponse } from "guildedapi-types.ts/v1";
+import { User } from "./User";
+import { APIDoc, APIMentions } from "../Constants";
+import { EditDocOptions } from "../types/doc";
 
-const calls = new call();
-
-export class Doc {
-    /** Raw data */
-    // data: any;
-    /** Client */
-    client: Client;
-    /** ID of the doc */
-    id: number;
+/** Doc represents an item of a "Docs" channel. */
+export class Doc extends Base {
     /** Guild/server id */
     guildID: string;
     /** ID of the 'docs' channel. */
@@ -35,11 +30,12 @@ export class Doc {
     /** ID of the member who updated the doc. (if updated) */
     updatedBy?: string | null;
 
-    constructor(data: APIDoc, client: Client){
-        // this.data = data.channel;
-        this.client = client;
-
-        this.id = data.id;
+    /**
+     * @param data raw data
+     * @param client client
+     */
+    constructor(data: APIDoc, client: Client) {
+        super(data.id, client);
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.name = data.title ?? null;
@@ -52,24 +48,38 @@ export class Doc {
         this.updatedBy = data.updatedBy ?? null;
     }
 
-    get member(): Member{
-        return this.updatedBy ? calls.syncGetMember(this.guildID, this.updatedBy, this.client) as Member : calls.syncGetMember(this.guildID, this.memberID, this.client) as Member;
+    /** Retrieve the member who executed this action.
+     * Note: If this doc has been edited, the updatedAt id will be used to get you the member.
+     */
+    get member(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
+            return this.client.cache.members.get(this.updatedBy ?? this.memberID);
+        } else if (this.client.cache.users.get(this.updatedBy ?? this.memberID)){
+            return this.client.cache.users.get(this.updatedBy ?? this.memberID);
+        } else if (this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
+        } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
     }
 
-    get createdAt(): Date|null{
+    /** Date of this doc's creation. */
+    get createdAt(): Date | null {
         return this._createdAt ? new Date(this._createdAt) : null;
     }
 
-    get updatedAt(): Date|null{
+    /** Date of this last doc's edition, if updated. */
+    get updatedAt(): Date | null {
         return this._updatedAt ? new Date(this._updatedAt) : null;
     }
 
-    async edit(options: {title?: string; content?: string;}): Promise<Doc>{
-        const response = await calls.put(endpoints.CHANNEL_DOC(this.channelID, this.id), this.client.token, options);
-        return new Doc((response["data" as keyof object] as PUTDocResponse).doc, this.client);
+    /** Edit this doc.
+     * @param options Edit options.
+     */
+    async edit(options: EditDocOptions): Promise<Doc> {
+        return this.client.rest.channels.editDoc(this.channelID, this.id as number, options);
     }
 
-    async delete(): Promise<void>{
-        await calls.delete(endpoints.CHANNEL_DOC(this.channelID, this.id), this.client.token);
+    /** Delete this doc. */
+    async delete(): Promise<void> {
+        return this.client.rest.channels.deleteDoc(this.channelID, this.id as number);
     }
 }

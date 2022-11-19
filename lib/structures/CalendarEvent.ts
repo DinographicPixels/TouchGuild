@@ -1,18 +1,16 @@
+/** @module CalendarEvent */
 import { Client } from "./Client";
 import { Member } from "./Member";
-import * as endpoints from "../rest/endpoints";
+import { Base } from "./Base";
 
-import { call } from "../Utils";
-import { APICalendarEvent, APIMentions, PATCHCalendarEventResponse } from "guildedapi-types.ts/v1";
-const calls = new call();
+import { User } from "./User";
+import { APICalendarEvent, APIMentions } from "../Constants";
+import { EditCalendarEventOptions } from "../types/calendarEvent";
 
-export class CalendarEvent {
+/** CalendarEvent represents an event coming from a calendar channel. */
+export class CalendarEvent extends Base {
     /** Raw data */
     data: APICalendarEvent;
-    /** Client */
-    client: Client;
-    /** Calendar Event ID */
-    id: number;
     /** Guild/server ID */
     guildID: string;
     /** ID of the channel the event was created on. */
@@ -43,10 +41,13 @@ export class CalendarEvent {
     /** Details about event cancelation (if canceled) */
     cancelation: APICalendarEvent["cancellation"] | null;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APICalendarEvent, client: Client){
+        super(data.id, client);
         this.data = data;
-        this.client = client;
-
         this.id = data.id;
         this.guildID = data.serverId;
         this.channelID = data.channelId;
@@ -65,9 +66,18 @@ export class CalendarEvent {
         this.cancelation = data.cancellation ?? null;
     }
 
-    /** Member component. */
-    get member(): Member {
-        return calls.syncGetMember(this.guildID, this.memberID, this.client);
+    /** Retrieve message's member, if cached.
+     *
+     * Note: this getter can output: Member, User, Promise<Member> or undefined.
+     */
+    get member(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.memberID) && this.memberID){
+            return this.client.cache.members.get(this.memberID);
+        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
+            return this.client.cache.users.get(this.memberID);
+        } else if (this.memberID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
+        }
     }
 
     /** string representation of the _createdAt timestamp */
@@ -75,14 +85,13 @@ export class CalendarEvent {
         return this._createdAt ? new Date(this._createdAt) : null;
     }
 
-    /** Edit the calendar event */
-    async edit(options: {name?: string; description?: string; location?: string; startsAt?: string; url?: string; color?: number; rsvpLimit?: number; duration?: number; isPrivate?: boolean;}): Promise<CalendarEvent>{
-        const response = await calls.patch(endpoints.CHANNEL_EVENT(this.channelID, this.id), this.client.token, options);
-        return new CalendarEvent((response["data" as keyof object] as PATCHCalendarEventResponse).calendarEvent, this.client);
+    /** Edit this event */
+    async edit(options: EditCalendarEventOptions): Promise<CalendarEvent>{
+        return this.client.rest.channels.editCalendarEvent(this.channelID, this.id as number, options);
     }
 
-    /** Delete the calendar event */
+    /** Delete this event */
     async delete(): Promise<void>{
-        await calls.delete(endpoints.CHANNEL_EVENT(this.channelID, this.id), this.client.token);
+        return this.client.rest.channels.deleteCalendarEvent(this.channelID, this.id as number);
     }
 }

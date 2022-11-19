@@ -21,6 +21,7 @@ const Webhook = (await import("./dist/lib/structures/Webhook.js")).default.Webho
 const DevTools = (await import("./dist/lib/Utils.js")).default;
 
 export * as APITypes from "guildedapi-types.ts/v1.mjs";
+// add constants
 
 export {
     Channel,

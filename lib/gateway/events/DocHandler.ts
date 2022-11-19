@@ -1,7 +1,9 @@
+/** @module DocHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 import { Doc } from "../../structures/Doc";
-import { GatewayEvent_DocCreated, GatewayEvent_DocDeleted, GatewayEvent_DocUpdated } from "guildedapi-types.ts/v1";
+import { GatewayEvent_DocCreated, GatewayEvent_DocDeleted, GatewayEvent_DocUpdated } from "../../Constants";
 
+// Internal component, emitting doc events.
 export class DocHandler extends GatewayEventHandler{
     docCreate(data: GatewayEvent_DocCreated): void {
         const DocComponent = new Doc(data.doc, this.client);

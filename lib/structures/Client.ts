@@ -1,3 +1,4 @@
+/** @module Client */
 /* eslint-disable @typescript-eslint/method-signature-style */
 
 import { Message } from "./Message";
@@ -6,8 +7,7 @@ import { Channel } from "./Channel";
 import { Member } from "./Member";
 import { Guild } from "./Guild";
 
-import { ForumTopic } from "./ForumTopic";
-import { BannedMember } from "./BannedMember";
+import { ForumThread } from "./ForumThread";
 import { Webhook } from "./Webhook";
 
 import { Doc } from "./Doc";
@@ -15,648 +15,627 @@ import { CalendarEvent } from "./CalendarEvent";
 import { CalendarEventRSVP } from "./CalendarRSVP";
 import { ListItem } from "./ListItem";
 import { UserClient } from "./UserClient";
-import { ForumTopicComment } from "./ForumTopicComment";
-import { WSManager } from "../WSManager";
+import { ForumThreadComment } from "./ForumThreadComment";
+import { User } from "./User";
+import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
-import { call } from "../Utils";
-import * as endpoints from "../rest/endpoints";
-import { MemberRemoveInfo, MemberRoleUpdateInfo, MemberUpdateInfo } from "../gateway/events/GuildHandler";
-import { forumTopicReactionInfo, GuildCreateInfo, messageReactionInfo } from "../tg-types/types";
-import type TypedEmitter from "typed-emitter";
+import { RESTManager } from "../rest/RESTManager";
+import TypedCollection from "../util/TypedCollection";
+import TypedEmitter from "../types/TypedEmitter";
+import { ClientEvents } from "../types/events";
+import { ClientOptions, RESTOptions } from "../types/client";
 import {
-    APIMessageOptions,
     APIChannelCategories,
-    APIBotUser,
-    GETChannelResponse,
-    GETGuildMemberResponse,
-    GETGuildResponse,
-    GETChannelMessagesResponse,
-    GETDocsResponse,
-    GETDocResponse,
-    GETForumTopicsResponse,
-    GETForumTopicResponse,
-    GETCalendarEventsResponse,
-    GETCalendarEventResponse,
-    GETCalendarEventRSVPResponse,
-    GETCalendarEventRSVPSResponse,
-    GETListItemResponse,
-    GETChannelListItemsResponse,
-    GETGuildWebhookResponse,
-    GETGuildWebhooksResponse,
-    APIForumTopicSummary,
-    APIDoc,
-    APIChatMessage,
-    APICalendarEvent,
-    APICalendarEventRSVP,
-    APIListItem,
-    APIListItemSummary,
-    GETGuildMemberRolesResponse,
-    APIWebhook,
-    POSTChannelResponse,
-    POSTChannelMessageResponse,
-    PUTChannelMessageResponse,
-    APIForumTopic,
-    POSTForumTopicResponse,
-    PATCHForumTopicResponse,
-    POSTDocResponse,
-    PUTDocResponse,
-    POSTCalendarEventResponse,
-    PATCHCalendarEventResponse,
-    PUTCalendarEventRSVPResponse,
-    POSTListItemResponse,
-    PUTListItemResponse,
-    POSTGuildWebhookResponse,
-    PUTGuildWebhookResponse,
-    POSTGuildMemberXPResponse,
-    PUTGuildMemberXPResponse,
-    POSTForumTopicCommentResponse,
-    PATCHForumTopicCommentResponse,
-    APIForumTopicComment,
-    GETForumTopicCommentsResponse,
-    GETForumTopicCommentResponse
-} from "guildedapi-types.ts/v1";
-import EventEmitter from "node:events";
+    PUTGuildWebhookBody,
+    PUTListItemBody,
+    POSTListItemBody,
+    GATEWAY_EVENTS,
+    ChannelReactionTypes
+} from "../Constants";
+import { CreateChannelOptions, CreateMessageOptions, EditChannelOptions, GetChannelMessagesFilter } from "../types/channel";
+import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
+import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
+import { CreateDocOptions, EditDocOptions, GetDocsFilter } from "../types/doc";
+import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type EmitterTypes = ({
-    message: (message: string) => void;
-    error: (error: Error) => void;
-    ready: () => void;
-    messageCreate: (message: Message) => void;
-    messageUpdate: (message: Message) => void;
-    messageDelete: (message: Message) => void;
-    messageReactionAdd: (reactionInfo: messageReactionInfo) => void;
-    messageReactionRemove: (reactionInfo: messageReactionInfo) => void;
-    channelCreate: (channel: Channel) => void;
-    channelUpdate: (channel: Channel) => void;
-    channelDelete: (channel: Channel) => void;
-    forumTopicCreate: (topic: ForumTopic) => void;
-    forumTopicUpdate: (topic: ForumTopic) => void;
-    forumTopicDelete: (topic: ForumTopic) => void;
-    forumTopicPin: (topic: ForumTopic) => void;
-    forumTopicUnpin: (topic: ForumTopic) => void;
-    forumTopicReactionAdd: (reactionInfo: forumTopicReactionInfo) => void;
-    forumTopicReactionRemove: (reactionInfo: forumTopicReactionInfo) => void;
-    forumTopicCommentCreate: (comment: ForumTopicComment) => void;
-    forumTopicCommentUpdate: (comment: ForumTopicComment) => void;
-    forumTopicCommentDelete: (comment: ForumTopicComment) => void;
-    guildBanAdd: (BannedMember: BannedMember) => void;
-    guildBanRemove: (BannedMember: BannedMember) => void;
-    guildMemberAdd: (Member: Member) => void;
-    guildMemberRemove: (MemberRemoveInfo: MemberRemoveInfo) => void;
-    guildMemberUpdate: (MemberUpdateInfo: MemberUpdateInfo) => void;
-    guildMemberRoleUpdate: (MemberRoleUpdateInfo: MemberRoleUpdateInfo) => void;
-    guildCreate: (GuildCreateInfo: GuildCreateInfo) => void;
-    docCreate: (Doc: Doc) => void;
-    docUpdate: (Doc: Doc) => void;
-    docDelete: (DeletedDoc: Doc) => void;
-    calendarEventCreate: (CalendarEvent: CalendarEvent) => void;
-    calendarEventUpdate: (CalendarEvent: CalendarEvent) => void;
-    calendarEventDelete: (CalendarEvent: CalendarEvent) => void;
-    calendarEventRsvpUpdate: (CalendarRSVP: CalendarEventRSVP) => void;
-    calendarEventRsvpDelete: (CalendarRSVP: CalendarEventRSVP) => void;
-    listItemCreate: (ListItem: ListItem) => void;
-    listItemUpdate: (ListItem: ListItem) => void;
-    listItemDelete: (ListItem: ListItem) => void;
-    listItemComplete: (ListItem: ListItem) => void;
-    listItemUncomplete: (ListItem: ListItem) => void;
-    webhooksCreate: (Webhook: Webhook) => void;
-    webhooksUpdate: (Webhook: Webhook) => void;
-    exit: (message: string) => void;
-});
-
-export class Client extends (EventEmitter as unknown as new () => TypedEmitter<EmitterTypes>) {
-    // types
-    params: {token: string; REST?: boolean;}; ws: WSManager; cache: Map<string, unknown>; identifiers; calls;
+/** Represents the bot's client. */
+export class Client extends TypedEmitter<ClientEvents> {
+    /** Client's params, including bot's token & rest options. */
+    params: { token: string; REST?: boolean; RESTOptions?: RESTOptions; };
+    /** Websocket Manager. */
+    ws: WSManager;
+    /** Client's cache. */
+    cache;
+    /** Default event names to TouchGuild event names. */
+    identifiers;
+    /** Client's user. */
     user?: UserClient;
-    constructor(params: {token: string; REST?: boolean;}){
+    /** REST methods. */
+    rest: RESTManager;
+    /** Gateway Handler. */
+    #gateway: GatewayHandler;
+    /** @param params Client's parameters, this includes bot's token & rest options. */
+    constructor(params: ClientOptions){
         if (typeof params !== "object") throw new Error("The token isn't provided in an object.");
         if (typeof params?.token === "undefined") throw new Error("Cannot create client without token, no token is provided.");
         super();
-        this.params = { token: params.token, REST: params.REST ?? true };
-        this.ws = new WSManager({ token: this.token });
-        this.cache = new Map();
+        this.params = { token: params.token, REST: params.REST ?? true, RESTOptions: params.RESTOptions };
+        this.ws = new WSManager(this, { token: this.token, client: this });
+        this.cache = {
+            guilds:       new TypedCollection(Guild, this),
+            users:        new TypedCollection(User, this),
+            members:      new TypedCollection(Member, this, 15),
+            messages:     new TypedCollection(Message, this, 15),
+            forumThreads: new TypedCollection(ForumThread, this, 20)
+        };
         this.identifiers = this.ws.identifiers;
-        this.calls = new call();
+        this.rest = new RESTManager(this, params.RESTOptions);
+        this.#gateway = new GatewayHandler(this);
     }
 
     /** Bot's token. */
     get token(): string {
-        // console.log("TouchGuild WARN! : Returned token value, do not share this token to anyone.");
         return this.params.token;
     }
 
-    /** Connect to the Guilded API. */
-    connect(): void{
+    /** Connect to Guilded. */
+    connect(): void {
         this.ws.connect();
-        this.ws.emitter.on("GATEWAY_WELCOME", (data: APIBotUser)=> {
+        this.ws.on("GATEWAY_WELCOME", data => {
             this.user = new UserClient(data.user, this);
             console.log("> Connection established.");
             this.emit("ready");
         });
 
-        this.ws.emitter.on("GATEWAY_EVENT", (type: string, data: object)=> {
-            new GatewayHandler(this).handleMessage(type, data);
+        this.ws.on("GATEWAY_PARSED_PACKET", (type, data)=> {
+            this.#gateway.handleMessage(type as keyof GATEWAY_EVENTS, data);
         });
     }
 
-    /** Disconnect from the Guilded API. */
+    /** Disconnect from Guilded.
+     * @param crashOnDisconnect If set, throws an error to stop the process.
+     */
     disconnect(crashOnDisconnect?: boolean): void{
         if (this.ws.alive === false) return console.warn("There is no open connection.");
-        this.ws.closeAll(); // closing all connections.
+        this.ws.disconnect(false); // closing all connections.
         console.log("The connection has been terminated.");
         if (crashOnDisconnect) throw new Error("Connection closed.");
     }
 
     // REST
-    /** RESTChannel is a Channel component with every method, params you need. */
-    async getRESTChannel(channelID: string): Promise<Channel>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL(channelID), this.token);
-        // let response = SYNCFETCH('GET', `/channels/${channelID}`, this.token, null) [deprecated]
-        return new Channel((response["data" as keyof object] as GETChannelResponse).channel, this);
+    /** This method is used to get a specific guild channel.
+     *
+     * Note: You do not need a guildID to get a channel, only the channelID is needed.
+     * @param channelID The ID of the channel you'd like to get.
+     */
+    async getChannel(channelID: string): Promise<Channel>{
+        return this.rest.channels.getChannel(channelID);
     }
 
-    /** RESTMember is a Member component with every method, params you need. */
-    async getRESTMember(guildID: string, memberID: string): Promise<Member>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.GUILD_MEMBER(guildID, memberID), this.token);
-        // let response = SYNCFETCH('GET', `/servers/${guildID}/members/${memberID}`, this.token, null) [deprecated]
-        return new Member((response["data" as keyof object] as GETGuildMemberResponse).member, this, guildID);
+    /** This method is used to get a specific guild member.
+     * @param guildID The ID of the Guild.
+     * @param memberID The ID of the Guild Member you'd like to get.
+     */
+    async getMember(guildID: string, memberID: string): Promise<Member>{
+        const rMember = this.rest.guilds.getMember(guildID, memberID);
+        this.cache.members.add(await rMember);
+        return rMember;
     }
 
-    /** RESTGuild is basically a Guild Component with everything you need. */
-    async getRESTGuild(guildID: string): Promise<Guild>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.GUILD(guildID), this.token);
-        // let response = SYNCFETCH('GET', `/servers/${guildID}`, this.token, null) [deprecated]
-        return new Guild((response["data" as keyof object] as GETGuildResponse).server, this);
+    /** This method is used to get a specific Guild.
+     *
+     * Note: Guild = Server
+     * @param guildID The ID of the guild you'd like to get.
+     */
+    async getGuild(guildID: string): Promise<Guild> {
+        return this.rest.guilds.getGuild(guildID);
     }
 
-    /** Getting RESTChannelMessages will return you an Array of multiple Message component, this process can take some time. */
-    async getRESTChannelMessages(channelID: string, filter?: {before?: string; after?: string; limit?: number; includePrivate?: boolean;}): Promise<Array<Message>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_MESSAGES(channelID), this.token, filter);
-        const channelMSGs: Array<Message> = [];
-        for (const message of (response["data" as keyof object] as GETChannelMessagesResponse).messages){
-            if (message.type !== "system"){
-                channelMSGs.push(new Message(message, this));
-            }
-        }
-        return channelMSGs;
+    /** This method is used to get a specific channel message
+     * @param channelID ID of the channel containing the message.
+     * @param messageID ID of the message you'd like to get.
+     */
+    async getChannelMessage(channelID: string, messageID: string): Promise<Message> {
+        return this.rest.channels.getMessage(channelID, messageID);
+    }
+
+    /** This method is used to get a list of Message
+     * @param channelID ID of a "Chat" channel.
+     * @param filter Object to filter the output.
+     */
+    async getChannelMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message>>{
+        return this.rest.channels.getMessages(channelID, filter);
     }
 
     // docs
-    /** Getting RESTChannelDocs will return you an Array of multiple Doc component, this process can take some time. */
-    async getRESTChannelDocs(channelID: string, filter?: {before?: string; limit?: number;}): Promise<Array<Doc>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_DOCS(channelID), this.token, filter);
-        const docsARRAY: Array<Doc> = [];
-        for (const doc of (response["data" as keyof object] as GETDocsResponse).docs){
-            docsARRAY.push(new Doc(doc, this));
-        }
-        return docsARRAY;
+    /** This method is used to get a list of "Channel" Doc.
+     * @param channelID ID of a "Docs" channel.
+     * @param filter Object to filter the output.
+     */
+    async getDocs(channelID: string, filter?: GetDocsFilter): Promise<Array<Doc>>{
+        return this.rest.channels.getDocs(channelID, filter);
     }
 
-    /** RESTChannelDoc is a Doc component. */
-    async getRESTChannelDoc(channelID: string, docID: number): Promise<Doc>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_DOC(channelID, docID), this.token);
-        return new Doc((response["data" as keyof object] as GETDocResponse).doc, this);
+    /** This method is used to get a channel doc.
+     *
+     * Note: This method requires a "Docs" channel.
+     * @param channelID ID of the Docs channel.
+     * @param docID ID of the channel doc.
+     */
+    async getDoc(channelID: string, docID: number): Promise<Doc>{
+        return this.rest.channels.getDoc(channelID, docID);
     }
 
-    //  topics
-    /** Getting RESTForumTopics will return you an Array of ForumTopic, this process can take some time. */
-    async getRESTForumTopics(channelID: string, filter?: {before?: string; limit?: number;}): Promise<Array<ForumTopic>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.FORUM_TOPICS(channelID), this.token, filter);
-        const topicARRAY: Array<ForumTopic> = [];
-        for (const topic of (response["data" as keyof object] as GETForumTopicsResponse).forumTopics){
-            topicARRAY.push(new ForumTopic(topic as APIForumTopic, this));
-        }
-        return topicARRAY;
+    //  ForumThread
+
+    /** This method is used to get a list of ForumThread.
+     * @param channelID ID of a "Forum" channel.
+     * @param filter Object to filter the output.
+     */
+    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread>>{
+        return this.rest.channels.getForumThreads(channelID, filter);
     }
 
-    /** RESTForumTopic is a ForumTopic component. */
-    async getRESTForumTopic(channelID: string, topicID: number): Promise<ForumTopic>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.FORUM_TOPIC(channelID, topicID), this.token);
-        return new ForumTopic((response["data" as keyof object] as GETForumTopicResponse).forumTopic, this);
+    /** This method is used to get a specific forum thread.
+     *
+     * Note: This method requires a "Forum" channel.
+     * @param channelID ID of a speific Forum channel.
+     * @param threadID ID of the specific Forum Thread.
+     */
+    async getForumThread(channelID: string, threadID: number): Promise<ForumThread>{
+        return this.rest.channels.getForumThread(channelID, threadID);
     }
 
-    /** Getting getRESTTopicComments will return you an Array of ForumTopicComment, this process can take some time.  */
-    async getRESTTopicComments(channelID: string, topicID: number): Promise<Array<ForumTopicComment>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.FORUM_TOPIC_COMMENTS(channelID, topicID), this.token);
-        const arr: Array<ForumTopicComment> = [];
-        for (const comment of (response["data" as keyof object] as GETForumTopicCommentsResponse).forumTopicComments){
-            arr.push(new ForumTopicComment(comment, this, { channelID }));
-        }
-        return arr;
+    /** This method is used to get a list of ForumThreadComment.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a Forum Thread.
+     */
+    async getForumComments(channelID: string, threadID: number): Promise<Array<ForumThreadComment>>{
+        return this.rest.channels.getForumComments(channelID, threadID);
     }
 
-    /** RESTTopicComment is a ForumTopicComment component. */
-    async getRESTTopicComment(channelID: string, topicID: number, commentID: number): Promise<ForumTopicComment>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.FORUM_TOPIC_COMMENT(channelID, topicID, commentID), this.token);
-        return new ForumTopicComment((response["data" as keyof object] as GETForumTopicCommentResponse).forumTopicComment, this, { channelID });
+    /** This method is used to get a specific forum thread comment.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a Forum thread.
+     * @param commentID ID of a Forum thread comment.
+     */
+    async getForumComment(channelID: string, threadID: number, commentID: number): Promise<ForumThreadComment>{
+        return this.rest.channels.getForumComment(channelID, threadID, commentID);
     }
 
     // Calendar
-    /** Getting RESTCalendarEvents returns you an Array of multiple CalendarEvent component, this process can take time depending on the number of calendar event. */
-    async getRESTCalendarEvents(channelID: string, filter?: {before?: string; after?: string; limit?: number;}): Promise<Array<CalendarEvent>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_EVENTS(channelID), this.token, filter);
-        const cEventArray: Array<CalendarEvent> = [];
-        for (const event of (response["data" as keyof object] as GETCalendarEventsResponse).calendarEvents){
-            cEventArray.push(new CalendarEvent(event, this));
-        }
-        return cEventArray;
+    /** This method is used to get a list of CalendarEvent
+     * @param channelID ID of a "Calendar" channel.
+     * @param filter Object to filter the output.
+     */
+    async getCalendarEvents(channelID: string, filter?: GetCalendarEventsFilter): Promise<Array<CalendarEvent>> {
+        return this.rest.channels.getCalendarEvents(channelID, filter);
     }
 
-    /** RESTCalendarEvent is a CalendarEvent component. */
-    async getRESTCalendarEvent(channelID: string, eventID: number): Promise<CalendarEvent>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_EVENT(channelID, eventID), this.token);
-        return new CalendarEvent((response["data" as keyof object] as GETCalendarEventResponse).calendarEvent, this);
+    /** This method is used to get a specific calendar event.
+     *
+     * Note: this method requires a "Calendar" channel.
+     * @param channelID ID of a Calendar channel.
+     * @param eventID ID of a Calendar event.
+     */
+    async getCalendarEvent(channelID: string, eventID: number): Promise<CalendarEvent>  {
+        return this.rest.channels.getCalendarEvent(channelID, eventID);
     }
 
-    /** RESTCalendarRsvp is a CalendarEventRSVP component. */
-    async getRESTCalendarRsvp(channelID: string, eventID: number, memberID: string): Promise<CalendarEventRSVP>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_EVENT_RSVP(channelID, eventID, memberID), this.token);
-        return new CalendarEventRSVP((response["data" as keyof object] as GETCalendarEventRSVPResponse).calendarEventRsvp, this);
+    /** This method is used to get a specific CalendarEventRSVP.
+     *
+     * Note: this method requires a Calendar channel.
+     * @param channelID ID of a Calendar channel
+     * @param eventID ID of a Calendar Event
+     * @param memberID ID of a Guild Member
+     */
+    async getCalendarRsvp(channelID: string, eventID: number, memberID: string): Promise<CalendarEventRSVP> {
+        return this.rest.channels.getCalendarRsvp(channelID, eventID, memberID);
     }
 
-    /** Getting RESTCalendarRsvps will return you an Array of CalendarEventRSVP, this process can take time.*/
-    async getRESTCalendarRsvps(channelID: string, eventID: number): Promise<Array<CalendarEventRSVP>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.CHANNEL_EVENT_RSVPS(channelID, eventID), this.token);
-        const array: Array<CalendarEventRSVP> = [];
-        for (const eventRsvp of (response["data" as keyof object] as GETCalendarEventRSVPSResponse).calendarEventRsvps){
-            array.push(new CalendarEventRSVP(eventRsvp, this));
-        }
-        return array;
+    /** This method is used to get a list of CalendarEventRSVP.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of a calendar event.
+     */
+    async getCalendarRsvps(channelID: string, eventID: number): Promise<Array<CalendarEventRSVP>>{
+        return this.rest.channels.getCalendarRsvps(channelID, eventID);
     }
 
     // list item
-    /** RESTListItem is a ListItem component. */
-    async getRESTListItem(channelID: string, itemID: string): Promise<ListItem>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.LIST_ITEM(channelID, itemID), this.token);
-        return new ListItem((response["data" as keyof object] as GETListItemResponse).listItem, this);
+    /** This method is used to get a specific list item.
+     * @param channelID ID of a "List" channel.
+     * @param itemID ID of a list item.
+     */
+    async getListItem(channelID: string, itemID: string): Promise<ListItem>{
+        return this.rest.channels.getListItem(channelID, itemID);
     }
 
-    /** Getting RESTListItems will return you an Array of ListItems, this process can take time.*/
-    async getRESTListItems(channelID: string): Promise<Array<ListItem>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.LIST_ITEMS(channelID), this.token);
-        const array: Array<ListItem> = [];
-        for (const item of (response["data" as keyof object] as GETChannelListItemsResponse).listItems){
-            array.push(new ListItem(item as APIListItem, this));
-        }
-        return array;
+    /** This method is used to get a list of ListItem.
+     * @param channelID ID of a "List" channel.
+     */
+    async getListItems(channelID: string): Promise<Array<ListItem>>{
+        return this.rest.channels.getListItems(channelID);
     }
 
-    async getRESTGuildWebhook(guildID: string, webhookID: string): Promise<Webhook>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.GUILD_WEBHOOK(guildID, webhookID), this.token);
-        return new Webhook((response["data" as keyof object] as GETGuildWebhookResponse).webhook, this);
+    /** This method is used to get a specific webhook.
+     * @param guildID ID of a guild.
+     * @param webhookID ID of a webhook.
+     */
+    async getWebhook(guildID: string, webhookID: string): Promise<Webhook>{
+        return this.rest.guilds.getWebhook(guildID, webhookID);
     }
 
-    async getRESTChannelWebhooks(guildID: string, channelID: string): Promise<Array<Webhook>>{
-        if (this.params.REST === false) throw new TypeError("REST has been manually disabled, you can't use REST methods.");
-        const response = await this.calls.get(endpoints.GUILD_WEBHOOKS(guildID), this.token, { channelId: channelID });
-        const array: Array<Webhook> = [];
-        for (const item of (response["data" as keyof object] as GETGuildWebhooksResponse).webhooks){
-            array.push(new Webhook(item, this));
-        }
-        return array;
-    }
-
-    // RAW DATA (produces less lag, low latency response, and less information are given & they aren't given as components, great for read only)
-    // Note: REST takes time to treat Arrays due to creating a high amount of components, the methods below are here to replace them by only giving info without component.
-
-    /** Array of object containing channel messages */
-    async getChannelMessages(channelID: string, filter?: {before?: string; after?: string; limit?: number; includePrivate?: boolean;}): Promise<Array<APIChatMessage>>{
-        const response = await this.calls.get(endpoints.CHANNEL_MESSAGES(channelID), this.token, filter);
-        return (response["data" as keyof object] as GETChannelMessagesResponse).messages;
-    }
-
-    /** Array of object containing channel docs */
-    async getChannelDocs(channelID: string, filter?: {before?: string; limit?: number;}): Promise<Array<APIDoc>>{
-        const response = await this.calls.get(endpoints.CHANNEL_DOCS(channelID), this.token, filter);
-        return (response["data" as keyof object] as GETDocsResponse).docs;
-    }
-
-    /** Array of object containing forum topics */
-    async getForumTopics(channelID: string, filter?: {before?: string; limit?: number;}): Promise<Array<APIForumTopicSummary>>{
-        const response = await this.calls.get(endpoints.FORUM_TOPICS(channelID), this.token, filter);
-        return (response["data" as keyof object] as GETForumTopicsResponse).forumTopics;
-    }
-
-    /** Array of object containing forum topic comments */
-    async getTopicComments(channelID: string, topicID: number): Promise<Array<APIForumTopicComment>>{
-        const response = await this.calls.get(endpoints.FORUM_TOPIC_COMMENTS(channelID, topicID), this.token);
-        return (response["data" as keyof object] as GETForumTopicCommentsResponse).forumTopicComments;
-    }
-
-    /** Array of object containing calendar events */
-    async getCalendarEvents(channelID: string, filter?: {before?: string; after?: string; limit?: number;}): Promise<Array<APICalendarEvent>>{
-        const response = await this.calls.get(endpoints.CHANNEL_EVENTS(channelID), this.token, filter);
-        return (response["data" as keyof object] as GETCalendarEventsResponse).calendarEvents;
-    }
-
-    /** Array of object containing calendar rsvps */
-    async getCalendarRsvps(channelID: string, eventID: number): Promise<Array<APICalendarEventRSVP>>{
-        const response = await this.calls.get(endpoints.CHANNEL_EVENT_RSVPS(channelID, eventID), this.token);
-        return (response["data" as keyof object] as GETCalendarEventRSVPSResponse).calendarEventRsvps;
-    }
-
-    /** Array of object containing list items */
-    async getListItems(channelID: string): Promise<Array<APIListItemSummary>>{
-        const response = await this.calls.get(endpoints.LIST_ITEMS(channelID), this.token);
-        return (response["data" as keyof object] as GETChannelListItemsResponse).listItems;
-    }
-
-    /** Will return an array containing every roles the member has. */
-    async getMemberRoles(guildID: string, memberID: string): Promise<Array<number>>{
-        const response = await this.calls.get(endpoints.GUILD_MEMBER_ROLES(guildID, memberID), this.token);
-        return (response["data" as keyof object] as GETGuildMemberRolesResponse).roleIds;
-    }
-
-    /** Array of object containing guild channel webhooks. */
-    async getChannelWebhooks(guildID: string, channelID: string): Promise<Array<APIWebhook>>{
-        const response = await this.calls.get(endpoints.GUILD_WEBHOOKS(guildID), this.token, { channelId: channelID });
-        return (response["data" as keyof object] as GETGuildWebhooksResponse).webhooks;
+    /** This method is used to get a list of Webhook.
+     * @param guildID ID of a guild.
+     * @param channelID ID of a channel.
+     */
+    async getWebhooks(guildID: string, channelID: string): Promise<Array<Webhook>>{
+        return this.rest.guilds.getWebhooks(guildID, channelID);
     }
 
     // CREATE, EDIT, DELETE.
 
     // message
-    /** Create a channel in a specified guild. */
-    async createChannel(guildID: string, name: string, type: APIChannelCategories, options: {topic?: string; isPublic?: boolean; categoryID?: number; groupID?: string;}): Promise<Channel>{
-        const body = {};
-        if (!guildID) throw new TypeError("guildID is a required parameter.");
-        if (!name) throw new TypeError("name parameter cannot be empty.");
-        if (!type) type = "chat";
-        Object.assign(body, { name, type });
-
-        if (!options) options = {};
-        if (options.categoryID && options.groupID) throw new TypeError("Two channel location id can't be defined at the same time. (categoryID & groupID)");
-
-        Object.assign(body, { serverId: guildID });
-
-        if (options.groupID){
-            Object.assign(body, { groupId: options.groupID });
-        } else if (options.categoryID){
-            Object.assign(body, { categoryId: options.categoryID });
-        }
-
-        if (options){
-            if (options.topic) Object.assign(body, { topic: options.topic });
-            if (options.isPublic) Object.assign(body, { isPublic: options.isPublic });
-        }
-
-        // let response = SYNCFETCH('POST', '/channels', this.token, JSON.stringify(body))
-        const response = await this.calls.post(endpoints.CHANNELS(), this.token, body);
-        return new Channel((response["data" as keyof object] as POSTChannelResponse).channel, this);
+    /** Create a channel in a specified guild.
+     * @param guildID ID of a guild.
+     * @param name Name of the new channel.
+     * @param type Type of the new channel. (e.g: chat)
+     * @param options New channel's additional options.
+     */
+    async createChannel(guildID: string, name: string, type: APIChannelCategories, options?: CreateChannelOptions): Promise<Channel> {
+        return this.rest.guilds.createChannel(guildID, name, type, options);
     }
 
-    /** Create a message in a specified channel ID */
-    async createMessage(channelID: string, options: APIMessageOptions): Promise<Message>{
-        if (typeof options !== "object") throw new TypeError("message options should be an object.");
-        // const bodyContent = JSON.stringify(options);
-        // let response = await FETCH('POST', `/channels/${channelID}/messages`, this.token, bodyContent)
-        const response = await this.calls.post(endpoints.CHANNEL_MESSAGES(channelID), this.token, options);
-        return new Message((response["data" as keyof object] as POSTChannelMessageResponse).message, this);
+    /** Edit a channel.
+     * @param channelID ID of the channel you'd like to edit.
+     * @param options Channel edit options.
+     */
+    async editChannel(channelID: string, options: EditChannelOptions): Promise<Channel> {
+        return this.rest.guilds.editChannel(channelID, options);
     }
 
-    /** Edit a specific message in a specified channel ID. */
-    async editMessage(channelID: string, messageID: string, newMessage: object): Promise<Message>{
-        if (typeof newMessage !== "object") throw new TypeError("newMessage should be an Object. (example: {content: 'heyo!'})");
-        // let response = await FETCH('PUT', `/channels/${channelID}/messages/${messageID}`, this.token, JSON.stringify(newMessage))
-        const response = await this.calls.put(endpoints.CHANNEL_MESSAGE(channelID, messageID), this.token, newMessage);
-        return new Message((response["data" as keyof object] as PUTChannelMessageResponse).message as APIChatMessage, this);
+    /** Delete a channel.
+     * @param channelID ID of the channel you'd like to delete.
+     */
+    async deleteChannel(channelID: string): Promise<void> {
+        return this.rest.guilds.deleteChannel(channelID);
     }
 
-    /** Delete a specific message. */
+    /** Send a message in a specified channel.
+     * @param channelID ID of the channel.
+     * @param options Message options
+     */
+    async createMessage(channelID: string, options: CreateMessageOptions): Promise<Message> {
+        return this.rest.channels.createMessage(channelID, options);
+    }
+
+    /** Edit a specific message coming from a specified channel.
+     * @param channelID The ID of the channel.
+     * @param messageID The ID of the message you'd like to edit.
+     * @param newMessage object containing new message's options.
+     */
+    async editMessage(channelID: string, messageID: string, newMessage: object): Promise<Message> {
+        return this.rest.channels.editMessage(channelID, messageID, newMessage);
+    }
+
+    /** Delete a specific message.
+     * @param channelID ID of the channel containing the message.
+     * @param messageID ID of the message you'd like to delete.
+     */
     async deleteMessage(channelID: string, messageID: string): Promise<void>{
-        // await FETCH('DELETE', `/channels/${channelID}/messages/${messageID}`, this.token, null);
-        await this.calls.delete(endpoints.CHANNEL_MESSAGE(channelID, messageID), this.token);
+        return this.rest.channels.deleteMessage(channelID, messageID);
     }
 
-    /** Add a reaction to a specified message */
-    async addMessageReaction(channelID: string, messageID: string, reaction: number): Promise<void>{
-        await this.calls.put(endpoints.CHANNEL_MESSAGE_CONTENT_EMOTE(channelID, messageID, reaction), this.token, {});
+    /** Add a reaction to a specified object.
+     * @param channelID ID of a channel that supports reaction.
+     * @param channelType Type of the selected channel. (e.g: "ChannelMessage")
+     * @param objectID ID of the object you'd like to add the reaction to. (e.g: a message id)
+     * @param reaction ID of the reaction.
+     */
+    async createReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
+        return this.rest.channels.createReaction(channelID, channelType, objectID, reaction);
     }
 
-    /** Remove a specific reaction from a message. */
-    async removeMessageReaction(channelID: string, messageID: string, reaction: number): Promise<void>{
-        await this.calls.delete(endpoints.CHANNEL_MESSAGE_CONTENT_EMOTE(channelID, messageID, reaction), this.token);
+    /** Remove a reaction from a specified message.
+     * @param channelID ID of a channel that supports reaction.
+     * @param channelType Type of the selected channel. (e.g: "ChannelMessage")
+     * @param objectID ID of the object you'd like to add the reaction to. (e.g: a message id)
+     * @param reaction ID of the reaction.
+     */
+    async removeReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void>{
+        return this.rest.channels.deleteReaction(channelID, channelType, objectID, reaction);
     }
 
-    // topic
-    /** Create a topic in a specified forum channel. */
-    async createTopic(channelID: string, options: {title: string; content: string;}): Promise<ForumTopic>{
-        // let response = await FETCH('POST', `/channels/${channelID}/topics`, this.token, JSON.stringify(options))
-        const response = await this.calls.post(endpoints.FORUM_TOPICS(channelID), this.token, options);
-        return new ForumTopic((response["data" as keyof object] as POSTForumTopicResponse).forumTopic, this);
+    // ForumThread
+
+    /** Create a forum thread in a specified forum channel.
+     * @param channelID ID of a "Forums" channel.
+     * @param options Thread's options including title & content.
+     */
+    async createForumThread(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread> {
+        return this.rest.channels.createForumThread(channelID, options);
     }
 
-    /** Edit a topic from a specified forum channel. */
-    async editTopic(channelID: string, topicID: number, options: {title?: string; content?: string;}): Promise<ForumTopic>{
-        const response = await this.calls.patch(endpoints.FORUM_TOPIC(channelID, topicID), this.token, options);
-        return new ForumTopic((response["data" as keyof object] as PATCHForumTopicResponse).forumTopic, this);
+    /** Edit a forum thread from a specified forum channel.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     * @param options Edit options.
+     */
+    async editForumThread(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread>{
+        return this.rest.channels.editForumThread(channelID, threadID, options);
     }
 
-    /** Delete a topic from a specific forum channel */
-    async deleteTopic(channelID: string, topicID: number): Promise<void>{
-        await this.calls.delete(endpoints.FORUM_TOPIC(channelID, topicID), this.token);
+    /** Delete a forum thread from a specific forum channel
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     */
+    async deleteForumThread(channelID: string, threadID: number): Promise<void>{
+        return this.rest.channels.deleteForumThread(channelID, threadID);
     }
 
-    /** Pin a forum topic. */
-    async pinTopic(channelID: string, topicID: number): Promise<void>{
-        await this.calls.put(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token, {});
-    }
-    /** Unpin a forum topic. */
-    async unpinTopic(channelID: string, topicID: number): Promise<void>{
-        await this.calls.delete(endpoints.FORUM_TOPIC_PIN(channelID, topicID), this.token);
-    }
-
-    /** Locks a forum topic. */
-    async lockTopic(channelID: string, topicID: number): Promise<void>{
-        await this.calls.put(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token, {});
+    /** Pin a forum thread.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     */
+    async pinForumThread(channelID: string, threadID: number): Promise<void>{
+        return this.rest.channels.pinForumThread(channelID, threadID);
     }
 
-    /** Unlocks a forum topic. */
-    async unlockTopic(channelID: string, topicID: number): Promise<void>{
-        await this.calls.delete(endpoints.FORUM_TOPIC_LOCK(channelID, topicID), this.token);
+    /** Unpin a forum thread.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     */
+    async unpinForumThread(channelID: string, threadID: number): Promise<void>{
+        return this.rest.channels.unpinForumThread(channelID, threadID);
     }
 
-    /** Add a reaction to a specified forum topic. */
-    async addTopicReaction(channelID: string, topicID: number, emoteID: number): Promise<void>{
-        await this.calls.put(endpoints.FORUM_TOPIC_EMOTE(channelID, topicID, emoteID), this.token, {});
+    /** Lock a forum thread.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     */
+    async lockForumThread(channelID: string, threadID: number): Promise<void>{
+        return this.rest.channels.lockForumThread(channelID, threadID);
     }
 
-    /** Remove a specific reaction from a forum topic. */
-    async removeTopicReaction(channelID: string, topicID: number, emoteID: number): Promise<void>{
-        await this.calls.delete(endpoints.FORUM_TOPIC_EMOTE(channelID, topicID, emoteID), this.token);
+    /** Unlock a forum thread.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     */
+    async unlockForumThread(channelID: string, threadID: number): Promise<void>{
+        return this.rest.channels.unlockForumThread(channelID, threadID);
     }
 
-    /** Add a comment to a forum topic. */
-    async createTopicComment(channelID: string, topicID: number, options: { content: string; }): Promise<ForumTopicComment>{
-        const response = await this.calls.post(endpoints.FORUM_TOPIC_COMMENTS(channelID, topicID), this.token, { content: options.content });
-        return new ForumTopicComment((response["data" as keyof object] as POSTForumTopicCommentResponse).forumTopicComment, this, { channelID });
+    /** Add a comment to a forum thread.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     * @param options Comment's options.
+     */
+    async createForumComment(channelID: string, threadID: number, options: CreateForumCommentOptions): Promise<ForumThreadComment>{
+        return this.rest.channels.createForumComment(channelID, threadID, options);
     }
 
-    /** Edit a forum topic's comment. */
-    async editTopicComment(channelID: string, topicID: number, commentID: number, options?: { content?: string; }): Promise<ForumTopicComment>{
-        const response = await this.calls.patch(endpoints.FORUM_TOPIC_COMMENT(channelID, topicID, commentID), this.token, { content: options?.content });
-        return new ForumTopicComment((response["data" as keyof object] as PATCHForumTopicCommentResponse).forumTopicComment, this, { channelID });
+    /** Edit a forum thread's comment.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     * @param commentID ID of a thread comment.
+     * @param options Edit options.
+     */
+    async editForumComment(channelID: string, threadID: number, commentID: number, options?: EditForumCommentOptions): Promise<ForumThreadComment>{
+        return this.rest.channels.editForumComment(channelID, threadID, commentID, options);
     }
 
-    /** Delete a forum topic's comment. */
-    async deleteTopicComment(channelID: string, topicID: number, commentID: number): Promise<void>{
-        await this.calls.delete(endpoints.FORUM_TOPIC_COMMENT(channelID, topicID, commentID), this.token);
+    /** Delete a forum thread comment.
+     * @param channelID ID of a "Forums" channel.
+     * @param threadID ID of a forum thread.
+     * @param commentID ID of a forum thread comment.
+     */
+    async deleteForumComment(channelID: string, threadID: number, commentID: number): Promise<void>{
+        return this.rest.channels.deleteForumComment(channelID, threadID, commentID);
     }
 
     // docs
-    /** Create a doc in a specified 'docs' channel. */
-    async createDoc(channelID: string, options: {title: string; content: string;}): Promise<Doc>{
-        const response = await this.calls.post(endpoints.CHANNEL_DOCS(channelID), this.token, options);
-        return new Doc((response["data" as keyof object] as POSTDocResponse).doc, this);
+    /** Create a doc in a "Docs" channel.
+     * @param channelID ID pf a "Docs" channel.
+     * @param options Doc's options.
+     */
+    async createDoc(channelID: string, options: CreateDocOptions): Promise<Doc>{
+        return this.rest.channels.createDoc(channelID, options);
     }
 
-    /** Edit a doc from a specified 'docs' channel. */
-    async editDoc(channelID: string, docID: number, options: {title: string; content: string;}): Promise<Doc>{
-        const response = await this.calls.put(endpoints.CHANNEL_DOC(channelID, docID), this.token, options);
-        return new Doc((response["data" as keyof object] as PUTDocResponse).doc, this);
+    /** Edit a doc from a "Docs" channel.
+     * @param channelID ID of a "Docs" channel.
+     * @param docID ID of a doc.
+     * @param options Edit options.
+     */
+    async editDoc(channelID: string, docID: number, options: EditDocOptions): Promise<Doc>{
+        return this.rest.channels.editDoc(channelID, docID, options);
     }
 
-    /** Delete a doc from a specified 'docs' channel. */
-    async deleteDoc(channelID: string, docID: number): Promise<void>{
-        await this.calls.delete(endpoints.CHANNEL_DOC(channelID, docID), this.token);
+    /** Delete a doc from a "Docs" channel.
+     * @param channelID ID of a "Docs" channel.
+     * @param docID ID of a doc.
+     */
+    async deleteDoc(channelID: string, docID: number): Promise<void> {
+        return this.rest.channels.deleteDoc(channelID, docID);
     }
 
     // calendar events
-    /** Create an event into a calendar channel. */
-    async createCalendarEvent(channelID: string, options: {name: string; description?: string; location?: string; startsAt?: string; url?: string; color?: number; rsvpLimit?: number; duration?: number; isPrivate?: boolean;}): Promise<CalendarEvent>{
-        const response = await this.calls.post(endpoints.CHANNEL_EVENTS(channelID), this.token, options);
-        return new CalendarEvent((response["data" as keyof object] as POSTCalendarEventResponse).calendarEvent, this);
+    /** Create an event into a "Calendar" channel.
+     * @param channelID ID of a "Calendar" channel.
+     * @param options Event options.
+     */
+    async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions): Promise<CalendarEvent>{
+        return this.rest.channels.createCalendarEvent(channelID, options);
     }
 
-    /** Edit an event from a calendar channel. */
-    async editCalendarEvent(channelID: string, eventID: number, options: {name?: string; description?: string; location?: string; startsAt?: string; url?: string; color?: number; rsvpLimit?: number; duration?: number; isPrivate?: boolean;}): Promise<CalendarEvent>{
-        if (options.duration && typeof options.duration === "number") options.duration = options.duration / 60000; // ms to min.
-        const response = await this.calls.patch(endpoints.CHANNEL_EVENT(channelID, eventID), this.token, options);
-        return new CalendarEvent((response["data" as keyof object] as PATCHCalendarEventResponse).calendarEvent, this);
+    /** Edit an event from a "Calendar" channel.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of a calendar event.
+     * @param options Edit options.
+     */
+    async editCalendarEvent(channelID: string, eventID: number, options: EditCalendarEventOptions): Promise<CalendarEvent>{
+        return this.rest.channels.editCalendarEvent(channelID, eventID, options);
     }
 
-    /** Delete an event from a calendar channel. */
+    /** Delete an event from a "Calendar" channel.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of a calendar event.
+     */
     async deleteCalendarEvent(channelID: string, eventID: number): Promise<void>{
-        await this.calls.delete(endpoints.CHANNEL_EVENT(channelID, eventID), this.token);
+        return this.rest.channels.deleteCalendarEvent(channelID, eventID);
     }
 
-    /** Add/Edit a RSVP in a calendar event. */
-    async editCalendarRsvp(channelID: string, eventID: number, memberID: string, options: {status: "going"|"maybe"|"declined"|"invited"|"waitlisted"|"not responded";}): Promise<CalendarEventRSVP>{
-        if (typeof options !== "object") throw new TypeError("options should be an object.");
-        const response = await this.calls.put(endpoints.CHANNEL_EVENT_RSVP(channelID, eventID, memberID), this.token, options);
-        return new CalendarEventRSVP((response["data" as keyof object] as PUTCalendarEventRSVPResponse).calendarEventRsvp, this);
+    /** Add/Edit a RSVP in a calendar event.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of a calendar event.
+     * @param memberID ID of a member.
+     * @param options Edit options.
+     */
+    async editCalendarRsvp(channelID: string, eventID: number, memberID: string, options: EditCalendarRSVPOptions): Promise<CalendarEventRSVP>{
+        return this.rest.channels.editCalendarRsvp(channelID, eventID, memberID, options);
     }
 
-    /** Delete a RSVP from a calendar event. */
+    /** Delete a RSVP from a calendar event.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of a calendar event.
+     * @param memberID ID of a member.
+     */
     async deleteCalendarRsvp(channelID: string, eventID: number, memberID: string): Promise<void>{
-        await this.calls.delete(endpoints.CHANNEL_EVENT_RSVP(channelID, eventID, memberID), this.token);
+        return this.rest.channels.deleteCalendarRsvp(channelID, eventID, memberID);
     }
 
     // list item
-    /** Create a new item in a list channel. */
-    async createListItem(channelID: string, content: string, note?: {content: string;}): Promise<ListItem>{
-        const response = await this.calls.post(endpoints.LIST_ITEMS(channelID), this.token, { message: content, note });
-        return new ListItem((response["data" as keyof object] as POSTListItemResponse).listItem, this);
+    /** Create a new item in a list channel.
+     * @param channelID ID of a "Lists" channel.
+     * @param content String content of the new item.
+     * @param note Add a note to the new item.
+     */
+    async createListItem(channelID: string, content: POSTListItemBody["message"], note?: POSTListItemBody["note"]): Promise<ListItem>{
+        return this.rest.channels.createListItem(channelID, content, note);
     }
 
-    /** Edit a specific item from a list channel. */
-    async editListItem(channelID: string, itemID: string, content: string, note?: {content: string;}): Promise<ListItem>{
-        const response = await this.calls.put(endpoints.LIST_ITEM(channelID, itemID), this.token, { message: content, note });
-        return new ListItem((response["data" as keyof object] as PUTListItemResponse).listItem, this);
+    /** Edit an item from a list channel.
+     * @param channelID ID of a "Lists" channel.
+     * @param itemID ID of a list item.
+     * @param content New item's content.
+     * @param note Add a note to the item.
+     */
+    async editListItem(channelID: string, itemID: string, content: PUTListItemBody["message"], note?: PUTListItemBody["note"]): Promise<ListItem>{
+        return this.rest.channels.editListItem(channelID, itemID, content, note);
     }
 
-    /** Delete a specific item from a list channel. */
+    /** Delete an item from a list channel.
+     * @param channelID ID of a "Lists" channel.
+     * @param itemID ID of a list item.
+     */
     async deleteListItem(channelID: string, itemID: string): Promise<void>{
-        await this.calls.delete(endpoints.LIST_ITEM(channelID, itemID), this.token);
+        return this.rest.channels.deleteListItem(channelID, itemID);
     }
 
-    /** Complete (checkmark will show up) a specific item from a list channel. */
+    /** Mark a list item as completed.
+     * @param channelID ID of a "Lists" channel.
+     * @param itemID ID of a list item.
+     */
     async completeListItem(channelID: string, itemID: string): Promise<void>{
-        await this.calls.post(endpoints.LIST_ITEM_COMPLETE(channelID, itemID), this.token, {});
+        return this.rest.channels.completeListItem(channelID, itemID);
     }
 
-    /** Uncomplete (checkmark will disappear) a specific item from a list channel. */
+    /** Mark a list item as uncompleted.
+     * @param channelID ID of a "Lists" channel.
+     * @param itemID ID of a list item.
+     */
     async uncompleteListItem(channelID: string, itemID: string): Promise<void>{
-        await this.calls.delete(endpoints.LIST_ITEM_COMPLETE(channelID, itemID), this.token);
+        return this.rest.channels.uncompleteListItem(channelID, itemID);
     }
 
     // group membership
-    /** Add a Guild Member to a Guild Group */
+    /** Add a member to a group
+     * @param groupID ID of a guild group.
+     * @param memberID ID of a member.
+     */
     async addGuildMemberGroup(groupID: string, memberID: string): Promise<void>{
-        await this.calls.put(endpoints.GUILD_GROUP_MEMBER(groupID, memberID), this.token, {});
+        return this.rest.guilds.memberAddGroup(groupID, memberID);
     }
 
-    /** Remove a Guild Member from a Guild Group */
+    /** Remove a member from a group
+     * @param groupID ID of a guild group.
+     * @param memberID ID of a member.
+     */
     async removeGuildMemberGroup(groupID: string, memberID: string): Promise<void>{
-        await this.calls.delete(endpoints.GUILD_GROUP_MEMBER(groupID, memberID), this.token);
+        return this.rest.guilds.memberRemoveGroup(groupID, memberID);
     }
 
     // role membership
-    /** Add a role to a guild member */
-    async addGuildMemberRole(guildID: string, memberID: string, roleID: number): Promise<void>{
-        await this.calls.put(endpoints.GUILD_MEMBER_ROLE(guildID, memberID, roleID), this.token, {});
+    /** Add a role to a member
+     * @param guildID ID of a guild.
+     * @param memberID ID of a member.
+     * @param roleID ID of a role.
+     */
+    async memberAddRole(guildID: string, memberID: string, roleID: number): Promise<void>{
+        return this.rest.guilds.memberAddRole(guildID, memberID, roleID);
     }
 
-    /** Remove a role from a guild member */
-    async removeGuildMemberRole(guildID: string, memberID: string, roleID: number): Promise<void>{
-        await this.calls.delete(endpoints.GUILD_MEMBER_ROLE(guildID, memberID, roleID), this.token);
+    /** Remove a role from a member
+     * @param guildID ID of a guild.
+     * @param memberID ID of a member.
+     * @param roleID ID of a role.
+     */
+    async memberRemoveRole(guildID: string, memberID: string, roleID: number): Promise<void>{
+        return this.rest.guilds.memberRemoveRole(guildID, memberID, roleID);
     }
 
-    /** Create a guild webhook */
-    async createGuildWebhook(guildID: string, channelID: string, name: string): Promise<Webhook> {
-        if (!guildID) throw new TypeError("You need to insert the guild id, guildID is not defined.");
-        if (!channelID) throw new TypeError("You need to insert a webhook name.");
-        if (!channelID) throw new TypeError("You need to insert a channelID.");
-        const response = await this.calls.post(endpoints.GUILD_WEBHOOKS(guildID), this.token, { name, channelId: channelID });
-        return new Webhook((response["data" as keyof object] as POSTGuildWebhookResponse).webhook, this);
+    /** Create a webhook
+     * @param guildID ID of a guild.
+     * @param channelID ID of a channel.
+     * @param name Name of the new webhook.
+     */
+    async createWebhook(guildID: string, channelID: string, name: string): Promise<Webhook> {
+        return this.rest.guilds.createWebhook(guildID, channelID, name);
     }
 
-    /** Update a guild webhook */
-    async editGuildWebhook(guildID: string, webhookID: string, options: {name: string; channelID?: string;}): Promise<Webhook>{
-        const response = await this.calls.put(endpoints.GUILD_WEBHOOK(guildID, webhookID), this.token, { name: options.name, channelId: options.channelID });
-        return new Webhook((response["data" as keyof object] as PUTGuildWebhookResponse).webhook, this);
+    /** Update a webhook
+     * @param guildID ID of a guild.
+     * @param webhookID ID of an existent webhook.
+     * @param options Edit options.
+     */
+    async editWebhook(guildID: string, webhookID: string, options: PUTGuildWebhookBody): Promise<Webhook>{
+        return this.rest.guilds.editWebhook(guildID, webhookID, options);
     }
 
-    /** Delete a guild webhook */
-    async deleteGuildWebhook(guildID: string, webhookID: string): Promise<void>{
-        await this.calls.delete(endpoints.GUILD_WEBHOOK(guildID, webhookID), this.token);
+    /** Delete a webhook
+     * @param guildID ID of a guild.
+     * @param webhookID ID of an existent webhook.
+     */
+    async deleteWebhook(guildID: string, webhookID: string): Promise<void>{
+        return this.rest.guilds.deleteWebhook(guildID, webhookID);
     }
 
     // MISC
 
-    /** Awards a member using the built-in EXP system. */
-    async awardMember(guildID: string, memberID: string, xpAmount: number): Promise<number>{
-        if (typeof xpAmount !== "number") throw new TypeError("xpAmount needs to be an integer/number.");
-        const response = await this.calls.post(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { amount: xpAmount });
-        return (response as POSTGuildMemberXPResponse).total as number;
+    /** Award a member using the built-in EXP system.
+     * @param guildID ID of a guild.
+     * @param memberID ID of a member.
+     * @param amount Amount of experience.
+     */
+    async awardMember(guildID: string, memberID: string, amount: number): Promise<number>{
+        return this.rest.guilds.awardMember(guildID, memberID, amount);
     }
 
-    /** Sets a member's xp using the built-in EXP system. */
-    async setMemberXP(guildID: string, memberID: string, xpAmount: number): Promise<number>{
-        const response = await this.calls.put(endpoints.GUILD_MEMBER_XP(guildID, memberID), this.token, { total: xpAmount });
-        return (response as PUTGuildMemberXPResponse).total as number;
+    /** Set a member's xp using the built-in EXP system.
+     * @param guildID ID of a guild.
+     * @param memberID ID of a member.
+     * @param amount Total amount of experience.
+     */
+    async setMemberXP(guildID: string, memberID: string, amount: number): Promise<number>{
+        return this.rest.guilds.setMemberXP(guildID, memberID, amount);
     }
 
-    /** Awards all members having a role using the built-in EXP system. */
-    async awardRole(guildID: string, roleID: number, xpAmount: number): Promise<void>{
-        await this.calls.post(endpoints.GUILD_MEMBER_ROLE_XP(guildID, roleID), this.token, { amount: xpAmount });
+    /** Award every members of a guild having a role using the built-in EXP system.
+     * @param guildID ID of a guild.
+     * @param roleID ID of a role.
+     * @param amount Amount of experience.
+     */
+    async awardRole(guildID: string, roleID: number, amount: number): Promise<void>{
+        return this.rest.guilds.awardRole(guildID, roleID, amount);
     }
 }

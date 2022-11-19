@@ -1,10 +1,10 @@
+/** @module BannedMember */
 import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
-import { call } from "../Utils";
-import { APIGuildMemberBan, APIUser } from "guildedapi-types.ts/v1";
-const calls = new call();
+import { APIGuildMemberBan, APIUser } from "../Constants";
 
+/** BannedMember represents a banned guild member. */
 export class BannedMember extends User {
     /** Server ID. */
     guildID: string;
@@ -17,6 +17,11 @@ export class BannedMember extends User {
         /** ID of the member that banned the user. */
         createdBy: string;
     };
+    /**
+     * @param guildID ID of the guild.
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(guildID: string, data: APIGuildMemberBan, client: Client){
         super(data.user as APIUser, client);
         this.guildID = guildID;
@@ -27,8 +32,11 @@ export class BannedMember extends User {
         };
     }
 
-    /** Guild/server component */
-    get guild(): Guild{
-        return calls.syncGetGuild(this.guildID, this._client) as Guild;
+    /** Getter used to get the message's guild
+     *
+     * Note: this can return a promise, make sure to await it before.
+     */
+    get guild(): Guild | Promise<Guild> {
+        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
     }
 }

@@ -1,11 +1,10 @@
+/** @module UserClient */
 import { Client } from "./Client";
-import { APIBotUser } from "guildedapi-types.ts/v1";
+import { Base } from "./Base";
+import { APIBotUser } from "../Constants";
 
-export class UserClient {
-    /** Client. */
-    _client: Client;
-    /** Client User Standard ID */
-    id: string;
+/** UserClient represents the logged bot's user. */
+export class UserClient extends Base {
     /** Client User Bot ID */
     botID: string;
     /** User type (user, bot) */
@@ -16,12 +15,12 @@ export class UserClient {
     _createdAt: number; // user
     /** ID of the bot's owner. */
     createdBy: string;
-
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APIBotUser["user"], client: Client){
-        // this.userdata = data.user;  // basically member > user
-        // this.fulldata = data // basically the whole data
-        this._client = client;
-        this.id = data.id;
+        super(data.id, client);
         this.botID = data.botId;
         this.type = "bot";
         this.username = data.name;
@@ -29,12 +28,14 @@ export class UserClient {
         this.createdBy = data.createdBy;
     }
 
-    /** Boolean that shows if the user is a bot or not. */
-    get bot(): boolean {
+    /** Boolean that shows if the user is a bot or not.
+     * @defaultValue true
+     */
+    get bot(): true {
         return true;
     }
 
-    /** Date-time string of the user's creation. */
+    /** Date-time string of the bot's creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
     }

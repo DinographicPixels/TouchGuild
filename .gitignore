@@ -9,3 +9,10 @@ README.md
 .env
 CHANGELOG.md
 package-lock.json
+
+dark.js
+favicon.ico
+docs/
+typedoc.json
+.vscode/
+archives/

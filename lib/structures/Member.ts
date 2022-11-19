@@ -1,11 +1,11 @@
+/** @module Member */
 import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
-import * as endpoints from "../rest/endpoints";
-import { socialLinkTypes } from "../tg-types/types";
-import { APIGuildMember, GETGuildMemberSocialsResponse } from "guildedapi-types.ts/v1";
+import { socialLinkTypes } from "../types/types";
+import { APIGuildMember } from "../Constants";
 
-/** Guild Member component, with all its methods and declarations. */
+/** Represents a guild user. */
 export class Member extends User {
     /** Timestamp (unix epoch time) of when the member joined the server. */
     _joinedAt: number | null;
@@ -18,6 +18,11 @@ export class Member extends User {
     /** Server ID. */
     guildID: string; // member
     private _data: APIGuildMember;
+    /**
+     * @param data raw data.
+     * @param client client.
+     * @param guildID ID of the guild.
+     */
     constructor(data: APIGuildMember, client: Client, guildID: string){
         super(data.user, client);
         this._data = data;
@@ -28,63 +33,70 @@ export class Member extends User {
         this.guildID = guildID;
     }
 
-    /** returns a Guild component with all its method and declaration. */
-    get guild(): Guild{
-        return this._client.calls.syncGetGuild(this.guildID, this._client) as Guild;
+    /** Guild where the user comes from, returns Guild or a promise.
+     * If guild isn't cached & the request failed, this will return you undefined.
+     */
+    get guild(): Guild | Promise<Guild> {
+        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
     }
 
-    /** string representation of the _joinedAt timestamp. */
+    /** String representation of the _joinedAt timestamp. */
     get joinedAt(): Date|number|null{
         return this._joinedAt ? new Date(this._joinedAt) : null;
     }
 
-    /** User component. */
+    /** Member's user, shows less information. */
     get user(): User{
-        return new User(this._data.user, this._client);
+        return new User(this._data.user, this.client);
     }
 
-    /** Get a specific member's social link. */
+    /** Get a specified social link from the member, if member is connected to them through Guilded.
+     * @param socialMediaName Name of a social media linked to this member.
+     */
     async getSocialLink(socialMediaName: string): Promise<socialLinkTypes|void>{
-        const response = await this._client.calls.get(endpoints.GUILD_MEMBER_SOCIALS(this.guildID, this.id, socialMediaName), this._client.token, undefined, false);
-        if (response){
-            const rawsLink: GETGuildMemberSocialsResponse["socialLink"] = response["data" as keyof object]["socialLink" as keyof object];
-            const outputsLink = { memberUsername: rawsLink.handle, serviceID: rawsLink.serviceId, type: rawsLink.type };
-            return outputsLink as socialLinkTypes;
-        }
+        return this.client.rest.misc.getSocialLink(this.guildID, this.id as string, socialMediaName);
     }
 
-    /** Add Member to a Guild Group */
+    /** Add this member to a guild group.
+     * @param groupID ID of the guild group.
+     */
     async addToGroup(groupID: string): Promise<void>{
-        await this._client.calls.put(endpoints.GUILD_GROUP_MEMBER(groupID, this.id), this._client.token, {});
+        return this.client.rest.guilds.memberAddGroup(groupID, this.id as string);
     }
 
-    /** Remove Member from a Guild Group */
+    /** Remove this member from a guild group.
+     * @param groupID ID of the guild group.
+     */
     async removeFromGroup(groupID: string): Promise<void>{
-        await this._client.calls.delete(endpoints.GUILD_GROUP_MEMBER(groupID, this.id), this._client.token);
+        return this.client.rest.guilds.memberRemoveGroup(groupID, this.id as string);
     }
 
-    // role membership
-    /** Add a role to member */
+    /** Add a role to this member.
+     * @param roleID ID of the role to be added.
+     */
     async addRole(roleID: number): Promise<void>{
-        await this._client.calls.put(endpoints.GUILD_MEMBER_ROLE(this.guildID, this.id, roleID), this._client.token, {});
+        return this.client.rest.guilds.memberAddRole(this.guildID, this.id as string, roleID);
     }
 
-    /** Remove a role from member */
+    /** Remove a role from this member.
+     * @param roleID ID of the role to be added.
+     */
     async removeRole(roleID: number): Promise<void>{
-        await this._client.calls.delete(endpoints.GUILD_MEMBER_ROLE(this.guildID, this.id, roleID), this._client.token);
+        return this.client.rest.guilds.memberRemoveRole(this.guildID, this.id as string, roleID);
     }
 
-    /** Awards member using the built-in EXP system. */
-    async award(xpAmount: number): Promise<number>{
-        if (typeof xpAmount !== "number") throw new TypeError("xpAmount needs to be an integer/number.");
-        const response = await this._client.calls.post(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { amount: xpAmount });
-        return response["total" as keyof object] as number;
+    /** Award the member using the built-in EXP system.
+     * @param amount Amount of experience to give.
+     */
+    async award(amount: number): Promise<number>{
+        return this.client.rest.guilds.awardMember(this.guildID, this.id as string, amount);
     }
 
-    /** Sets member's xp using the built-in EXP system. */
-    async setXP(xpAmount: number): Promise<number>{
-        const response = await this._client.calls.put(endpoints.GUILD_MEMBER_XP(this.guildID, this.id), this._client.token, { total: xpAmount });
-        return response["total" as keyof object] as number;
+    /** Set member's experience using the built-in EXP system.
+     * @param amount Amount of experience to set.
+     */
+    async setXP(amount: number): Promise<number>{
+        return this.client.rest.guilds.setMemberXP(this.guildID, this.id as string, amount);
     }
-
 }
+

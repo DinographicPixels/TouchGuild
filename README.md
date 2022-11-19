@@ -1,78 +1,51 @@
 <p align="center">
-  <img width=80% src="https://images-ext-1.discordapp.net/external/hpMY7GrDRdqgDuwOqNmDYEgomOGjf97p4_7QCfenuFs/%3Fw%3D3796%26h%3D1640/https/s3-us-west-2.amazonaws.com/www.guilded.gg/ContentMediaGenericFiles/fd1c2baad81023a365cd510eb2a48fc5-Full.webp?width=2046&height=884">
+<a href="https://touchguild.com/"><img width=80% src="https://cdn.glitch.global/bc68313e-6abb-488c-a1e3-e6d10817c2bd/touchguild-cradius.png?v=1665311272247"></a>
   <br>
   <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
-  <img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square">
+   <a href="https://github.com/DinographicPixels/TouchGuild/stargazers"><img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square"></a>
   <img src="https://img.shields.io/npm/dw/touchguild?color=red&style=flat-square">
 </p>
 
 
-```javascript
-const TouchGuild = require('touchguild'); // import for CommonJS
-// import * as TouchGuild from 'touchguild' // import for ESM & TS
+```js
+const { Client } = require('touchguild')
+const client = new Client({token: 'TOKEN'});
 
-const client = new TouchGuild.Client({token: 'insert token here'});
-
-client.on('ready', ()=> {
+client.on('ready', () => {
    console.log(`Logged as ${client.user.username}`);
 });
 
-client.on('error', (err)=> {
-   console.error("Whoops, somethin' went wrong..", err);
+client.on('error', (err) => {
+   console.error(err);
 });
 
 client.connect();
 
 ```
 
-## This build is a development build. (Nightly)
-Nightly builds are in development builds and features are constantly added & we also note that those builds can have bugs.
+For more examples, check out the [examples](https://github.com/DinographicPixels/TouchGuild/tree/dev/examples) folder on GitHub.
+<hr>
 
-----
-
-# Installation
+## Installation
 NodeJS **16.16.0** or higher is required.
+**Check out [Development Builds](#development-builds) if you wish to install in-dev versions.**
 
-Install the package automatically:
-```bash
-npm install touchguild@nightly
+```sh
+npm install touchguild
 ```
 
-Install the package manually:
-```bash
-npm install dinographicpixels/touchguild#nightly
+### Development Builds
+```sh
+npm install touchguild@dev
 ```
 
-1. Run the command
-2. Go to node_modules/touchguild
-3. Run: npm run build in the touchguild folder
-4. Now, it's ready.
+The documentation under `dev` is always for the latest commit. If something isn't working that's in the documentation, you're likely looking at the wrong documentation.
 
-You need to reproduce those steps everytime you update to a newer nightly build.
+<hr>
 
-----------------
-
-# What's new on Nightly builds?
-
-- [Check out what's new](https://docs.touchguild.dinographicpixels.com/documentation/select-version/v.0.1.7/whats-new)
-- [Check out new features](https://docs.touchguild.dinographicpixels.com/nightly/features)
-
---------------
-
-# LINKS:
-### Repository & NPM
-- [NPM Package](https://www.npmjs.com/package/touchguild)
-- [GitHub](https://github.com/DinographicPixels/TouchGuild)
-
-### Guide & documentation
-- [Guide](https://guide.touchguild.dinographicpixels.com/)
-- [Documentation](https://docs.touchguild.dinographicpixels.com/)
-
-### Additional links
-- [Our vision of the project](https://docs.touchguild.dinographicpixels.com/misc/our-vision)
-- [FAQ](https://docs.touchguild.dinographicpixels.com/misc/faq)
-- [Get started, youtube video](https://www.youtube.com/watch?v=AUaiQRMjJZo)
-
-### Our servers
-- [Our Discord server](https://discord.gg/UgPRaGRkrQ)
-- [Our Guilded server](https://www.guilded.gg/i/ExPXPrwE)
+## Links:
+- [Guide](https://guide.touchguild.com/)
+- [Release documentation](https://touchguild.com/)
+- [Development documentation](https://touchguild.com/dev/)
+- [Discord server](https://discord.gg/UgPRaGRkrQ)
+- [Guilded server](https://www.guilded.gg/i/ExPXPrwE)

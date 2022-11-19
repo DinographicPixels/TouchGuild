@@ -1,8 +1,11 @@
-import { ForumTopic } from "../structures/ForumTopic";
+/** @module Types */
+import { ForumThread } from "../structures/ForumThread";
 import { Guild } from "../structures/Guild";
 import { Member } from "../structures/Member";
 import { Message } from "../structures/Message";
-import { APIEmote, APIMentions } from "guildedapi-types.ts/v1";
+import type { MessageReactionInfo } from "../structures/MessageReactionInfo";
+import type { ForumThreadReactionInfo } from "../structures/ForumThreadReactionInfo";
+import type { APIEmote, APIMentions } from "../Constants";
 
 export interface messageReactionInfo {
     message: Message | {
@@ -18,8 +21,8 @@ export interface messageReactionInfo {
     };
 }
 
-export interface forumTopicReactionInfo {
-    topic: ForumTopic | {
+export interface forumThreadReactionInfo {
+    thread: ForumThread | {
         id: number;
         guild: Guild | {
             id?: string;
@@ -62,3 +65,5 @@ export interface GuildCreateInfo {
     /** The ID of the user who created this server membership */
     createdBy: string;
 }
+
+export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo;

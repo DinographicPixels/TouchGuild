@@ -1,14 +1,16 @@
+/** @module WebhookHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 import { Webhook } from "../../structures/Webhook";
-import { GatewayEvent_TeamWebhookCreated, GatewayEvent_TeamWebhookUpdated } from "guildedapi-types.ts/v1";
+import { GatewayEvent_ServerWebhookCreated, GatewayEvent_ServerWebhookUpdated } from "../../Constants";
 
+// Internal component, emitting webhook events.
 export class WebhookHandler extends GatewayEventHandler{
-    webhooksCreate(data: GatewayEvent_TeamWebhookCreated): void {
+    webhooksCreate(data: GatewayEvent_ServerWebhookCreated): void {
         const WebhookComponent = new Webhook(data.webhook, this.client);
         this.client.emit("webhooksCreate", WebhookComponent);
     }
 
-    webhooksUpdate(data: GatewayEvent_TeamWebhookUpdated): void {
+    webhooksUpdate(data: GatewayEvent_ServerWebhookUpdated): void {
         const WebhookComponent = new Webhook(data.webhook, this.client);
         this.client.emit("webhooksUpdate", WebhookComponent);
     }

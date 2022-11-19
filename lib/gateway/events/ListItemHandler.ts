@@ -1,3 +1,4 @@
+/** @module ListItemHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 import { ListItem } from "../../structures/ListItem";
 import {
@@ -6,8 +7,9 @@ import {
     GatewayEvent_ListItemDeleted,
     GatewayEvent_ListItemUncompleted,
     GatewayEvent_ListItemUpdated
-} from "guildedapi-types.ts/v1";
+} from "../../Constants";
 
+// Internal component, emitting list events.
 export class ListItemHandler extends GatewayEventHandler{
     listItemCreate(data: GatewayEvent_ListItemCreated): void {
         const ListItemComponent = new ListItem(data.listItem, this.client);

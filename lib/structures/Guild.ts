@@ -1,33 +1,39 @@
+/** @module Guild */
 import { Client } from "./Client";
-import { APIGuild } from "guildedapi-types.ts/v1";
+import { Base } from "./Base";
+import { APIGuild } from "../Constants";
 
-export class Guild {
-    /** Client */
-    client: Client;
-    /** Guild/server id */
-    id: string;
-    /** ID of the sever owner */
+/** Represents a Guild, also called server. */
+export class Guild extends Base {
+    /** ID of the guild owner. */
     ownerID: string;
-    /** Guild type */
+    /** Guild type. */
     type?: string;
-    /** Guild name */
+    /** Guild name. */
     name: string;
-    /** Guild url */
+    /** Guild URL. */
     url?: string;
-    /** Guild's about/description */
+    /** Guild's about/description. */
     about?: string;
-    /** Guild's about/description */
+    /** Guild's about/description. */
     description?: string;
-    /** Guild icon */
+    /** Guild icon URL. */
     iconURL?: string | null;
+    /** Guild banner URL. */
     bannerURL?: string | null;
+    /** Guild's timezone. */
     timezone?: string;
+    /** Default channel of the guild. */
     defaultChannelID?: string;
+    /** Timestamp of the guild's creation. */
     _createdAt: number;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APIGuild, client: Client){
-        this.client = client;
-        this.id = data.id;
+        super(data.id, client);
         this.ownerID = data.ownerId;
         this.type = data.type;
         this.name = data.name;
@@ -41,6 +47,7 @@ export class Guild {
         this._createdAt = Date.parse(data.createdAt);
     }
 
+    /** Date of the guild's creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
     }

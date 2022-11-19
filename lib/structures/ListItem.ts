@@ -1,21 +1,16 @@
+/** @module ListItem */
 import { Client } from "./Client";
 import { Member } from "./Member";
-import * as endpoints from "../rest/endpoints";
+import { Base } from "./Base";
+import { User } from "./User";
+import { ListItemNoteTypes } from "../types/types";
+import { APIListItem, APIMentions } from "../Constants";
+import { ListItemEditOptions } from "../types/listItem";
 
-import { call } from "../Utils";
-const calls = new call();
-
-// API Typings & TouchGuild Typings.
-import { ListItemNoteTypes } from "../tg-types/types";
-import { APIListItem, APIMentions, PUTListItemResponse } from "guildedapi-types.ts/v1";
-
-export class ListItem {
+/** Represents an item of a "Lists" channel. */
+export class ListItem extends Base {
     /** Raw data */
     _data: APIListItem;
-    /** Client */
-    _client: Client;
-    /** ID of the doc */
-    id: string;
     /** Guild/server id */
     guildID: string;
     /** ID of the 'docs' channel. */
@@ -40,11 +35,13 @@ export class ListItem {
     /** ID of the member that completed the item, if completed. */
     completedBy: string | null;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APIListItem, client: Client){
+        super(data.id, client);
         this._data = data;
-        this._client = client;
-
-        this.id = data.id;
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.content = data.message ?? null;
@@ -70,41 +67,54 @@ export class ListItem {
         } as ListItemNoteTypes : null;
     }
 
-    /** Member who executed this action */
-    get member(): Member|void {
-        if (this.updatedBy){
-            return calls.syncGetMember(this.guildID, this.updatedBy, this._client) as Member;
-        } else if (this.memberID && this.memberID !== "Ann6LewA") {
-            return calls.syncGetMember(this.guildID, this.memberID, this._client) as Member;
-        } else console.log("Couldn't get Member, List item has been probably created by a webhook.");
+    /** Retrieve the member who executed this action.
+     * Note: If the item has been edited, the updatedAt id will be used to get you the member.
+     */
+    get member(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
+            return this.client.cache.members.get(this.updatedBy ?? this.memberID);
+        } else if (this.client.cache.users.get(this.updatedBy ?? this.memberID)){
+            return this.client.cache.users.get(this.updatedBy ?? this.memberID);
+        } else if (this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
+        } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
     }
 
-    get createdAt(): Date|null {
+    /** Date of the item's creation. */
+    get createdAt(): Date | null {
         return this._createdAt ? new Date(this._createdAt) : null;
     }
 
-    get updatedAt(): Date|null {
+    /** Date of the last item's edition, if updated. */
+    get updatedAt(): Date | null {
         return this._updatedAt ? new Date(this._updatedAt) : null;
     }
 
-    get completedAt(): Date|null {
+    /** Date of the item's completion, if completed. */
+    get completedAt(): Date | null {
         return this._completedAt ? new Date(this._completedAt) : null;
     }
 
-    async edit(content: string, note?: { content: string; }): Promise<ListItem> {
-        const response = await calls.put(endpoints.LIST_ITEM(this.channelID, this.id), this._client.token, { message: content, note });
-        return new ListItem((response["data" as keyof object] as PUTListItemResponse).listItem, this._client);
+    /** Edit this item.
+     * @param content Item content
+     * @param note Add/edit a note to this item.
+     */
+    async edit(content: string, note?: ListItemEditOptions): Promise<ListItem> {
+        return this.client.rest.channels.editListItem(this.channelID, this.id as string, content, note);
     }
 
-    async delete(): Promise<void>{
-        await calls.delete(endpoints.LIST_ITEM(this.channelID, this.id), this._client.token);
+    /** Delete this item. */
+    async delete(): Promise<void> {
+        return this.client.rest.channels.deleteListItem(this.channelID, this.id as string);
     }
 
-    async complete(): Promise<void>{
-        await calls.post(endpoints.LIST_ITEM_COMPLETE(this.channelID, this.id), this._client.token, {});
+    /** Set this item as "complete". */
+    async complete(): Promise<void> {
+        return this.client.rest.channels.completeListItem(this.channelID, this.id as string);
     }
 
-    async uncomplete(): Promise<void>{
-        await calls.delete(endpoints.LIST_ITEM_COMPLETE(this.channelID, this.id), this._client.token);
+    /** Set this item as "uncomplete". */
+    async uncomplete(): Promise<void> {
+        return this.client.rest.channels.uncompleteListItem(this.channelID, this.id as string);
     }
 }

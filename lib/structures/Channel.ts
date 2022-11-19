@@ -1,24 +1,15 @@
+/** @module Channel */
 import { Client } from "./Client";
 import { Message } from "./Message";
 
-import * as endpoints from "../rest/endpoints";
+import { Base } from "./Base";
+import { CreateMessageOptions, EditChannelOptions } from "../types/channel";
+import type { APIGuildChannel } from "../Constants";
 
-import {
-    PATCHChannelBody as ChannelEditTypes,
-    APIMessageOptions,
-    APIGuildChannel,
-    POSTChannelMessageResponse,
-    PATCHChannelResponse
-} from "guildedapi-types.ts/v1";
-
-/** Guild Channel component, with all its methods and declarations */
-export class Channel {
+/** Represents a guild channel. */
+export class Channel extends Base {
     /** Raw data */
     data: APIGuildChannel;
-    /** Client */
-    private _client: Client;
-    /** Channel ID */
-    id: string;
     /** Channel type */
     type: string;
     /** Channel name */
@@ -45,11 +36,13 @@ export class Channel {
     /** Timestamp (unix epoch time) of when the channel has been archived. */
     _archivedAt: number|null;
 
+    /**
+     * @param data raw data
+     * @param client client
+     */
     constructor(data: APIGuildChannel, client: Client){
+        super(data.id, client);
         this.data = data;
-        this._client = client;
-
-        this.id = data.id;
         this.type = data.type;
         this.name = data.name;
         this.topic = data.topic ?? null;
@@ -65,38 +58,33 @@ export class Channel {
         this._archivedAt = data.archivedAt ? Date.parse(data.archivedAt) : null;
     }
 
+    /** Date of the channel's creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
     }
 
+    /** Date of the channel's last edition, if updated. */
     get updatedAt(): Date|null{
         return this._updatedAt !== null ? new Date(this._updatedAt) : null;
     }
 
+    /** Date of when the channel got archived, if archived. */
     get archivedAt(): Date|null{
         return this._archivedAt !== null ? new Date(this._archivedAt) : null;
     }
 
     /** Create a message in the channel. */
-    async createMessage(options: APIMessageOptions): Promise<Message>{
-        if (typeof options !== "object") throw new TypeError("message options should be an object.");
-        const bodyContent = JSON.stringify(options);
+    async createMessage(options: CreateMessageOptions): Promise<Message>{
+        return this.client.rest.channels.createMessage(this.id as string, options);
+    }
 
-        const response = await this._client.calls.post(endpoints.CHANNEL_MESSAGES(this.id), this._client.token, bodyContent);
-        return new Message((response["data" as keyof object] as POSTChannelMessageResponse).message, this._client);
+    /** Edit the channel. */
+    async edit(options: EditChannelOptions): Promise<Channel>{
+        return this.client.rest.guilds.editChannel(this.id as string, options);
     }
 
     /** Delete the channel. */
     async delete(): Promise<void>{
-        await this._client.calls.delete(endpoints.CHANNEL(this.id), this._client.token);
-    }
-
-    /** Edit the channel. */
-    async edit(options: ChannelEditTypes): Promise<Channel>{
-        const response = await this._client.calls.patch(endpoints.CHANNEL(this.id), this._client.token, JSON.stringify(options));
-        return new Channel((response["data" as keyof object] as PATCHChannelResponse).channel, this._client);
+        return this.client.rest.guilds.deleteChannel(this.id as string);
     }
 }
-
-
-export { APIChannelCategories, PATCHChannelBody as ChannelEditTypes } from "guildedapi-types.ts/v1";

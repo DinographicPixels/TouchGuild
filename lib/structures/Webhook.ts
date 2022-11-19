@@ -1,17 +1,32 @@
+/** @module Webhook */
 import { Client } from "./Client";
-import * as endpoints from "../rest/endpoints";
-import { call } from "../Utils";
-import { APIWebhook, PUTGuildWebhookResponse } from "guildedapi-types.ts/v1";
-const calls = new call();
+import { Base } from "./Base";
+import { APIWebhook } from "../Constants";
+import { WebhookEditOptions } from "../types/webhook";
 
-export class Webhook {
-    _client: Client;
-    id: string; guildID: string; channelID: string; username: string; _createdAt: number; createdBy: string;
-    _deletedAt: number|null; token: string|null;
+/** Represents a Guild or channel webhook. */
+export class Webhook extends Base {
+    /** ID of the guild, where the webhook comes from. */
+    guildID: string;
+    /** ID of the channel, where the webhook comes from. */
+    channelID: string;
+    /** Username of the webhook. */
+    username: string;
+    /** Timestamp of the webhook's creation. */
+    _createdAt: number;
+    /** ID of the webhook's owner. */
+    createdBy: string;
+    /** Timestamp of the webhook's deletion, if deleted. */
+    _deletedAt: number | null;
+    /** Token of the webhook. */
+    token: string | null;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APIWebhook, client: Client){
-        this._client = client;
-        this.id = data.id;
+        super(data.id, client);
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.username = data.name;
@@ -21,22 +36,23 @@ export class Webhook {
         this.token = data.token ?? null;
     }
 
+    /** Date of the webhook's creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
     }
 
+    /** Date of the webhook's deletion, if deleted. */
     get deletedAt(): Date|null{
         return this._deletedAt ? new Date(this._deletedAt) : null;
     }
 
-    /** Update webhook */
-    async edit(options: {name: string; channelID?: string;}): Promise<Webhook>{
-        const response = await calls.put(endpoints.GUILD_WEBHOOK(this.guildID, this.id), this._client.token, { name: options.name, channelId: options.channelID });
-        return new Webhook((response["data" as keyof object] as PUTGuildWebhookResponse).webhook, this._client);
+    /** Update the webhook. */
+    async edit(options: WebhookEditOptions): Promise<Webhook>{
+        return this.client.rest.guilds.editWebhook(this.guildID, this.id as string, options);
     }
 
-    /** Delete webhook */
+    /** Delete the webhook. */
     async delete(): Promise<void>{
-        await calls.delete(endpoints.GUILD_WEBHOOK(this.guildID, this.id), this._client.token);
+        return this.client.rest.guilds.deleteWebhook(this.guildID, this.id as string);
     }
 }

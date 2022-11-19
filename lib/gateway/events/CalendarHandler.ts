@@ -1,3 +1,4 @@
+/** @module CalendarHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 import { CalendarEvent } from "../../structures/CalendarEvent";
 import { CalendarEventRSVP } from "../../structures/CalendarRSVP";
@@ -7,8 +8,9 @@ import {
     GatewayEvent_CalendarEventRsvpDeleted,
     GatewayEvent_CalendarEventRsvpUpdated,
     GatewayEvent_CalendarEventUpdated
-} from "guildedapi-types.ts/v1";
+} from "../../Constants";
 
+// Internal component, emitting calendar events.
 export class CalendarHandler extends GatewayEventHandler{
     calendarEventCreate(data: GatewayEvent_CalendarEventCreated): void {
         const CalendarEventComponent = new CalendarEvent(data.calendarEvent, this.client);
@@ -33,5 +35,9 @@ export class CalendarHandler extends GatewayEventHandler{
     calendarRsvpDelete(data: GatewayEvent_CalendarEventRsvpDeleted): void {
         const CalendarERSVPComponent = new CalendarEventRSVP(data.calendarEventRsvp, this.client);
         this.client.emit("calendarEventRsvpDelete", CalendarERSVPComponent);
+    }
+
+    calendarRsvpManyUpdated(): void {
+        return; // TouchGuild doesn't support many updated.
     }
 }

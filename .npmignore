@@ -4,3 +4,11 @@ deprecated/
 *.env
 .env
 package-lock.json
+archives/
+dark.js
+favicon.ico
+docs/
+.npm-deprecaterc.json
+typedoc.json
+.vscode/
+archives/

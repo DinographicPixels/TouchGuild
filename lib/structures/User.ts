@@ -1,17 +1,29 @@
+/** @module User */
 import { Client } from "./Client";
-import { APIUser } from "guildedapi-types.ts/v1";
+import { Base } from "./Base";
+import { UserTypes, APIUser } from "../Constants";
 
-export class User {
-    // userdata: any; fulldata: object;
-    _client: Client;
-    id: string; type: string | null; username: string; avatarURL: string | null; bannerURL: string | null; _createdAt: number; // user
+/** Represents a user. */
+export class User extends Base {
+    /** User type */
+    type: UserTypes | null;
+    /** User's username. */
+    username: string;
+    /** Current avatar url of the user. */
+    avatarURL: string | null;
+    /** Current banned url of the user. */
+    bannerURL: string | null;
+    /** Timestamp (unix epoch time) of the user's account creation. */
+    _createdAt: number; // user
+    /** If set to true, the user is a bot. */
     bot: boolean;
 
+    /**
+     * @param data raw data.
+     * @param client client.
+     */
     constructor(data: APIUser, client: Client){
-        // this.userdata = data.user;  // basically member > user
-        // this.fulldata = data // basically the whole data
-        this._client = client;
-        this.id = data.id;
+        super(data.id, client);
         this.type = data.type ?? null;
         this.username = data.name;
         this._createdAt = Date.parse(data.createdAt);
@@ -22,6 +34,7 @@ export class User {
         this.bot = this.type === "bot" ? true : false;
     }
 
+    /** Date of the user's account creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
     }
