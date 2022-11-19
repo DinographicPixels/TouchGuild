@@ -8,15 +8,15 @@
 
 
 ```js
-const { Client } = require('touchguild')
-const client = new Client({token: 'TOKEN'});
+const { Client } = require("touchguild");
+const client = new Client({ token: "TOKEN" });
 
-client.on('ready', () => {
-   console.log(`Logged as ${client.user.username}`);
+client.on("ready", () => {
+    console.log(`Logged as ${client.user.username}`);
 });
 
 client.on('error', (err) => {
-   console.error(err);
+    console.error(err);
 });
 
 client.connect();
