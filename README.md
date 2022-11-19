@@ -44,8 +44,9 @@ The documentation under `dev` is always for the latest commit. If something isn'
 <hr>
 
 ## Links:
+- [Website](https://touchguild.com/)
 - [Guide](https://guide.touchguild.com/)
-- [Release documentation](https://touchguild.com/)
-- [Development documentation](https://touchguild.com/dev/)
+- [Release documentation](https://docs.touchguild.com/)
+- [Development documentation](https://docs.touchguild.com/dev/)
 - [Discord server](https://discord.gg/UgPRaGRkrQ)
 - [Guilded server](https://www.guilded.gg/i/ExPXPrwE)
