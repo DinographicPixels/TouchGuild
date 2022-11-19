@@ -6,14 +6,14 @@ import { GatewayEvent_ForumTopicReactionCreated, GatewayEvent_ForumTopicReaction
 
 /** Information about a ForumThread's reaction. */
 export class ForumThreadReactionInfo extends ReactionInfo {
-    #threadID: number;
+    private threadID: number;
     /**
      * @param data raw data.
      * @param client client.
      */
     constructor(data: GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted, client: Client){
         super(data, client);
-        this.#threadID = data.reaction.forumTopicId;
+        this.threadID = data.reaction.forumTopicId;
     }
 
     /** The forum thread where the reaction has been added.
@@ -21,8 +21,8 @@ export class ForumThreadReactionInfo extends ReactionInfo {
      * otherwise it'll return basic information about this thread.
      */
     get thread(): forumThreadReactionInfo["thread"] {
-        return this.client.cache.forumThreads.get(this.#threadID) ?? {
-            id:    this.#threadID,
+        return this.client.cache.forumThreads.get(this.threadID) ?? {
+            id:    this.threadID,
             guild: this.client.cache.guilds.get(this.data.serverId as string) ?? {
                 id: this.data.serverId
             },
