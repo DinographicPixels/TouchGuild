@@ -31,6 +31,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
     latency: number;
     heartbeatRequested: boolean;
     connected: boolean;
+    connectionTimeout: number;
+    #connectTimeout: NodeJS.Timeout | null;
     constructor(client: Client, params: WSManagerParams) {
         super();
         Object.defineProperties(this, {
@@ -70,6 +72,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.lastHeartbeatAck = false;
         this.heartbeatRequested = false;
         this.connected = false;
+        this.connectionTimeout = 30000;
+        this.#connectTimeout = null;
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -163,16 +167,13 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.ws.on("error", (err: Error) => {
             this.onSocketError.bind(this)(err as Error);
             console.error("GATEWAY ERR: Couldn't connect to Guilded.");
-            if (this.reconnect === true || this.reconnectAttemptLimit as number < this.currReconnectAttempt && this.connected === true) {
-                return this.connect();
-            }
-            this.disconnect(false);
         });
 
-        // this.ws.on("close", (code, reason)=> {
-        //     this._debug(`Connection to gateway has been terminated with code ${code}, reason: ${reason.toString() ?? "None"}`);
-        //     this.ws?.terminate();
-        // });
+        this.#connectTimeout = setTimeout(() => {
+            if (!this.connected) {
+                this.disconnect(undefined, new Error("Connection timeout."));
+            }
+        }, this.connectionTimeout);
     }
 
     private onSocketMessage(rawData: string): void|undefined {
@@ -194,6 +195,9 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
             }
             case GatewayOPCodes.Welcome: {
                 if (!eventDATA["heartbeatIntervalMs" as keyof object]) throw new Error("WSERR: Couldn't get the heartbeat interval.");
+                if (this.#connectTimeout) {
+                    clearInterval(this.#connectTimeout);
+                }
                 this.#heartbeatInterval = setInterval(() => this.heartbeat(), eventDATA["heartbeatIntervalMs" as keyof object] as number);
                 this.emit("GATEWAY_WELCOME", eventDATA as APIBotUser);
                 this.emit("GATEWAY_WELCOME_PACKET", packet);
@@ -232,7 +236,6 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
             switch (code) {
                 case 1006: {
                     err = new Error(`Connection lost | ${code}`);
-                    reconnect = false;
                     break;
                 }
                 default: {
@@ -256,11 +259,6 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
     }
 
     private heartbeat(): void | boolean {
-        this.client.emit("debug", {
-            heartbeatInterval:  this.#heartbeatInterval,
-            lastHeartbeatAck:   this.lastHeartbeatAck,
-            heartbeatRequested: this.heartbeatRequested
-        });
         if (this.heartbeatRequested) {
             if (!this.lastHeartbeatAck) {
                 this.lastHeartbeatAck = false;
@@ -324,11 +322,11 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         if (reconnect) {
             if (this.lastMessageID) {
                 this.client.emit("debug", `Immediately reconnecting for potential resume | Attempt ${this.currReconnectAttempt}`);
-                this.client.connect();
+                this.connect();
             } else {
                 this.client.emit("debug", `Queueing reconnect in ${this.reconnectInterval}ms | Attempt ${this.currReconnectAttempt}`);
                 setTimeout(() => {
-                    this.client.connect();
+                    this.connect();
                 }, this.reconnectInterval);
                 this.reconnectInterval = Math.min(Math.round(this.reconnectInterval * (Math.random() * 2 + 1)), 30000);
             }
@@ -349,6 +347,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.lastHeartbeatReceived = NaN;
         this.lastHeartbeatAck = false;
         this.heartbeatRequested = false;
+        this.connectionTimeout = 30000;
+        this.#connectTimeout = null;
     }
 
     hardReset(): void {
@@ -372,6 +372,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.lastHeartbeatReceived = NaN;
         this.lastHeartbeatAck = false;
         this.heartbeatRequested = false;
+        this.connectionTimeout = 30000;
+        this.#connectTimeout = null;
     }
 }
 
