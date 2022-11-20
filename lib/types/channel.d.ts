@@ -73,7 +73,7 @@ export interface MessageEmbedOptions {
 
 export interface CreateChannelOptions {
     /** Description of the channel. */
-    topic?: string;
+    description?: string;
     /** Set the channel as public or not. */
     isPublic?: boolean;
     /** Place the channel in a specific category. */
@@ -85,8 +85,8 @@ export interface CreateChannelOptions {
 export interface EditChannelOptions {
     /** The name of the channel or thread (min length 1; max length 100) */
     name?: string;
-    /** The topic of the channel. Not applicable to threads (min length 1; max length 512) */
-    topic?: string;
+    /** The description of the channel. Not applicable to threads (min length 1; max length 512) */
+    description?: string;
     /** Whether the channel can be accessed from users who are not member of the server. Not applicable to threads */
     isPublic?: boolean;
 }

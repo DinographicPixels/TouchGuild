@@ -225,7 +225,7 @@ export class Guilds {
             path:   endpoints.CHANNELS(),
             json:   {
                 name,
-                topic:      options?.topic,
+                topic:      options?.description,
                 isPublic:   options?.isPublic,
                 type,
                 serverId:   guildID,
@@ -244,7 +244,11 @@ export class Guilds {
         return this.#manager.authRequest<PATCHChannelResponse>({
             method: "PATCH",
             path:   endpoints.CHANNEL(channelID),
-            json:   options
+            json:   {
+                name:     options.name,
+                topic:    options.description,
+                isPublic: options.isPublic
+            }
         }).then(data => new Channel(data.channel, this.#manager.client));
     }
 

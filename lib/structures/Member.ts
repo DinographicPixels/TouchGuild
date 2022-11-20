@@ -2,7 +2,7 @@
 import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
-import { socialLinkTypes } from "../types/types";
+import { GetSocialLink } from "../types/types";
 import { APIGuildMember } from "../Constants";
 
 /** Represents a guild user. */
@@ -53,21 +53,21 @@ export class Member extends User {
     /** Get a specified social link from the member, if member is connected to them through Guilded.
      * @param socialMediaName Name of a social media linked to this member.
      */
-    async getSocialLink(socialMediaName: string): Promise<socialLinkTypes|void>{
+    async getSocialLink(socialMediaName: string): Promise<GetSocialLink>{
         return this.client.rest.misc.getSocialLink(this.guildID, this.id as string, socialMediaName);
     }
 
     /** Add this member to a guild group.
      * @param groupID ID of the guild group.
      */
-    async addToGroup(groupID: string): Promise<void>{
+    async addGroup(groupID: string): Promise<void>{
         return this.client.rest.guilds.memberAddGroup(groupID, this.id as string);
     }
 
     /** Remove this member from a guild group.
      * @param groupID ID of the guild group.
      */
-    async removeFromGroup(groupID: string): Promise<void>{
+    async removeGroup(groupID: string): Promise<void>{
         return this.client.rest.guilds.memberRemoveGroup(groupID, this.id as string);
     }
 

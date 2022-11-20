@@ -1,6 +1,7 @@
 /** @module Guild */
 import { Client } from "./Client";
 import { Base } from "./Base";
+import { Channel } from "./Channel";
 import { APIGuild } from "../Constants";
 
 /** Represents a Guild, also called server. */
@@ -50,5 +51,12 @@ export class Guild extends Base {
     /** Date of the guild's creation. */
     get createdAt(): Date{
         return new Date(this._createdAt);
+    }
+
+    /** Get a channel from this guild.
+     * @param channelID The ID of the channel to get.
+     */
+    async getChannel(channelID: string): Promise<Channel>{
+        return this.client.rest.channels.getChannel(channelID);
     }
 }

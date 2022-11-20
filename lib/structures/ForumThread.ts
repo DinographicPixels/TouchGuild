@@ -5,8 +5,10 @@ import { Guild } from "./Guild";
 import { Member } from "./Member";
 import { Base } from "./Base";
 import { User } from "./User";
+import { ForumThreadComment } from "./ForumThreadComment";
 import { APIForumTopic, APIMentions } from "../Constants";
 import { EditForumThreadOptions } from "../types/forumThread";
+import { CreateForumCommentOptions } from "../types/forumThreadComment";
 
 /** Represents a thread/topic coming from a "Forums" channel. */
 export class ForumThread extends Base {
@@ -93,6 +95,13 @@ export class ForumThread extends Base {
     /** Boolean that tells you if the forum thread was created by a webhook or not. */
     get createdByWebhook(): boolean {
         return this.webhookID ? true : false;
+    }
+
+    /** Add a comment to this forum thread.
+     * @param options Options of the comment.
+     */
+    async createForumComment(options: CreateForumCommentOptions): Promise<ForumThreadComment>{
+        return this.client.rest.channels.createForumComment(this.channelID, this.id as number, options);
     }
 
     /** Edit the forum thread.

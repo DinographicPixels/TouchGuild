@@ -54,7 +54,7 @@ export interface ListItemNoteTypes {
     content: string;
 }
 
-export interface socialLinkTypes {
+export interface GetSocialLink {
     memberUsername: string;
     serviceID: string;
     type: string;
