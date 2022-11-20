@@ -18,43 +18,36 @@ export class ForumThreadComment extends Base {
     createdBy: string;
     /** ID of the forum thread's server, if provided. */
     guildID: string | null;
-    /** ID of the forum channel, if provided. */
-    channelID: string | null;
+    /** ID of the forum channel containing this thread. */
+    channelID: string;
 
     constructor(data: APIForumTopicComment, client: Client, options?: ConstructorForumThreadOptions){
         super(data.id, client);
         this.content = data.content;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
+        this.channelID = data.channelId;
         this.threadID = data.forumTopicId;
         this.createdBy = data.createdBy;
         this.guildID = options?.guildID ?? null;
-        this.channelID = options?.channelID ?? null;
     }
 
     /** Add a comment to the same forum thread as this comment.
-     * @param channelID ID of a "Forums" channel.
      * @param options New comment's options.
      */
-    async createForumComment(channelID: string, options: CreateForumCommentOptions): Promise<ForumThreadComment> {
-        if (typeof channelID !== "string") throw new TypeError("The channelID property is needed as a string.");
-        return this.client.rest.channels.createForumComment(channelID, this.threadID, options);
+    async createForumComment(options: CreateForumCommentOptions): Promise<ForumThreadComment> {
+        return this.client.rest.channels.createForumComment(this.channelID, this.threadID, options);
     }
 
     /** Edit this forum thread's comment.
-     * @param channelID ID of a "Forums" channel.
      * @param options Edit options.
      */
-    async edit(channelID: string, options?: EditForumCommentOptions): Promise<ForumThreadComment>{
-        if (typeof channelID !== "string") throw new TypeError("The channelID property is needed as a string.");
-        return this.client.rest.channels.editForumComment(channelID, this.threadID, this.id as number, { content: options?.content });
+    async edit(options?: EditForumCommentOptions): Promise<ForumThreadComment>{
+        return this.client.rest.channels.editForumComment(this.channelID, this.threadID, this.id as number, { content: options?.content });
     }
 
-    /** Delete this forum thread comment.
-     * @param channelID ID of a "Forums" channel.
-     */
-    async delete(channelID: string): Promise<void>{
-        if (typeof channelID !== "string") throw new TypeError("The channelID property is needed as a string.");
-        return this.client.rest.channels.deleteForumComment(channelID, this.threadID, this.id as number);
+    /** Delete this forum thread comment. */
+    async delete(): Promise<void>{
+        return this.client.rest.channels.deleteForumComment(this.channelID, this.threadID, this.id as number);
     }
 }
