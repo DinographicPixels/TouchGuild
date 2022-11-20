@@ -46,9 +46,7 @@ export class ForumThreadComment extends Base {
         return this.client.rest.channels.editForumComment(this.channelID, this.threadID, this.id as number, { content: options?.content });
     }
 
-    /** Delete this forum thread comment.
-     * @param channelID ID of a "Forums" channel.
-     */
+    /** Delete this forum thread comment. */
     async delete(): Promise<void>{
         return this.client.rest.channels.deleteForumComment(this.channelID, this.threadID, this.id as number);
     }
