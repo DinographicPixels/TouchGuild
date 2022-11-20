@@ -14,3 +14,5 @@ typedoc.json
 archives/
 examples/
 .github/
+.npm-deprecaterc
+.npm-deprecaterc.json
