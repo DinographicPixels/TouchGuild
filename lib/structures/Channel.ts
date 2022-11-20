@@ -14,8 +14,8 @@ export class Channel extends Base {
     type: string;
     /** Channel name */
     name: string;
-    /** Channel topic/description */
-    topic: string | null;
+    /** Channel description */
+    description: string | null;
     /** Timestamp (unix epoch time) of the channel's creation. */
     _createdAt: number;
     /** ID of the channel's creator. */
@@ -45,7 +45,7 @@ export class Channel extends Base {
         this.data = data;
         this.type = data.type;
         this.name = data.name;
-        this.topic = data.topic ?? null;
+        this.description = data.topic ?? null;
         this._createdAt = Date.parse(data.createdAt);
         this.memberID = data.createdBy;
         this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;

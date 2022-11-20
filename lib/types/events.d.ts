@@ -34,15 +34,15 @@ export interface ClientEvents {
     /** @event Emitted when a guild channel is deleted. */
     channelDelete: [channel: Channel];
     /** @event Emitted when a forum thread is created. */
-    forumThreadCreate: [topic: ForumThread];
+    forumThreadCreate: [thread: ForumThread];
     /** @event Emitted when a forum thread is edited. */
-    forumThreadUpdate: [topic: ForumThread];
+    forumThreadUpdate: [thread: ForumThread];
     /** @event Emitted when a forum thread is deleted. */
-    forumThreadDelete: [topic: ForumThread];
+    forumThreadDelete: [thread: ForumThread];
     /** @event Emitted when a forum thread is pinned. */
-    forumThreadPin: [topic: ForumThread];
+    forumThreadPin: [thread: ForumThread];
     /** @event Emitted when a forum thread is unpinned. */
-    forumThreadUnpin: [topic: ForumThread];
+    forumThreadUnpin: [thread: ForumThread];
     /** @event Emitted when a thread comment is created. */
     forumCommentCreate: [comment: ForumThreadComment];
     /** @event Emitted when forum thread comment is edited. */
