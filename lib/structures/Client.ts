@@ -102,7 +102,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         if (crashOnDisconnect) throw new Error("Connection closed.");
     }
 
-    // REST
+
     /** This method is used to get a specific guild channel.
      *
      * Note: You do not need a guildID to get a channel, only the channelID is needed.
@@ -135,7 +135,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of the channel containing the message.
      * @param messageID ID of the message you'd like to get.
      */
-    async getChannelMessage(channelID: string, messageID: string): Promise<Message> {
+    async getMessage(channelID: string, messageID: string): Promise<Message> {
         return this.rest.channels.getMessage(channelID, messageID);
     }
 
@@ -143,7 +143,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a "Chat" channel.
      * @param filter Object to filter the output.
      */
-    async getChannelMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message>>{
+    async getMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message>>{
         return this.rest.channels.getMessages(channelID, filter);
     }
 
@@ -553,7 +553,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param groupID ID of a guild group.
      * @param memberID ID of a member.
      */
-    async addGuildMemberGroup(groupID: string, memberID: string): Promise<void>{
+    async memberAddGroup(groupID: string, memberID: string): Promise<void>{
         return this.rest.guilds.memberAddGroup(groupID, memberID);
     }
 
@@ -561,7 +561,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param groupID ID of a guild group.
      * @param memberID ID of a member.
      */
-    async removeGuildMemberGroup(groupID: string, memberID: string): Promise<void>{
+    async memberRemoveGroup(groupID: string, memberID: string): Promise<void>{
         return this.rest.guilds.memberRemoveGroup(groupID, memberID);
     }
 
