@@ -46,10 +46,3 @@ export interface LatencyRef {
     timeoffset: number;
 }
 
-export interface LatencyRef {
-    lastTimeOffsetCheck: number;
-    latency: number;
-    raw: Array<number>;
-    timeOffsets: Array<number>;
-    timeoffset: number;
-}
