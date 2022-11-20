@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/DinographicPixels/TouchGuild/issues"
   },
-  "homepage": "https://github.com/DinographicPixels/TouchGuild",
+  "homepage": "https://touchguild.com",
   "devDependencies": {
     "@favware/npm-deprecate": "^1.0.5",
     "@types/events": "^3.0.0",
