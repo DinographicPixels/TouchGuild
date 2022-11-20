@@ -12,3 +12,5 @@ docs/
 typedoc.json
 .vscode/
 archives/
+examples/
+.github/
