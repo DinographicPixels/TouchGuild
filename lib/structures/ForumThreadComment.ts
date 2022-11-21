@@ -1,6 +1,8 @@
 /** @module ForumThreadComment */
 import { Client } from "./Client";
 import { Base } from "./Base";
+import { Member } from "./Member";
+import { User } from "./User";
 import { APIForumTopicComment } from "../Constants";
 import { CreateForumCommentOptions, EditForumCommentOptions, ConstructorForumThreadOptions } from "../types/forumThreadComment";
 
@@ -14,8 +16,8 @@ export class ForumThreadComment extends Base {
     updatedAt?: string;
     /** The ID of the forum thread */
     threadID: number;
-    /** The ID of the user who created this forum thread comment (Note: If this event has createdByWebhookId present, this field will still be populated, but can be ignored. In this case, the value of this field will always be Ann6LewA) */
-    createdBy: string;
+    /** The ID of the owner of this forum thread comment */
+    ownerID: string;
     /** ID of the forum thread's server, if provided. */
     guildID: string | null;
     /** ID of the forum channel containing this thread. */
@@ -28,8 +30,22 @@ export class ForumThreadComment extends Base {
         this.updatedAt = data.updatedAt;
         this.channelID = data.channelId;
         this.threadID = data.forumTopicId;
-        this.createdBy = data.createdBy;
+        this.ownerID = data.createdBy;
         this.guildID = options?.guildID ?? null;
+    }
+
+    /** Retrieve the thread comment's owner, if cached.
+     * If there is no cached member or user, this will make a request which returns a Promise.
+     * If the request fails, this will throw an error or return you undefined as a value.
+     */
+    get owner(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.ownerID) && this.ownerID){
+            return this.client.cache.members.get(this.ownerID);
+        } else if (this.client.cache.users.get(this.ownerID) && this.ownerID){
+            return this.client.cache.users.get(this.ownerID);
+        } else if (this.ownerID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.ownerID);
+        }
     }
 
     /** Add a comment to the same forum thread as this comment.
