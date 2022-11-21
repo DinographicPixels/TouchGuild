@@ -68,7 +68,7 @@ export class ListItem extends Base {
     }
 
     /** Retrieve the member who executed this action.
-     * Note: If the item has been edited, the updatedAt id will be used to get you the member.
+     * Note: If the item has been edited, the updatedBy id will be used to get you the member.
      */
     get member(): Member | User | Promise<Member> | undefined {
         if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
