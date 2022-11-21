@@ -18,20 +18,20 @@ export class ListItem extends Base {
     /** Content of the doc */
     content: string;
     mentions: APIMentions | null;
-    /** Timestamp (unix epoch time) of the list item's creation. */
-    _createdAt: number | null;
+    /** When the item was created. */
+    createdAt: Date | null;
     /** ID of the member who created the doc. */
     memberID: string;
     /** ID of the webhook that created the list item (if it was created by a webhook) */
     webhookID: string | null;
-    /** Timestamp (unix epoch time) of when the item was updated. (if updated) */
-    _updatedAt: number | null;
+    /** Timestamp at which the item was updated. */
+    editedTimestamp: Date | null;
     /** ID of the member who updated the doc. (if updated) */
     updatedBy: string | null;
     /** The ID of the parent list item if this list item is nested */
     parentListItemID: string | null;
-    /** Timestamp (unix epoch time) of the list item completion */
-    _completedAt: number | null;
+    /** When the list item was marked as "completed". */
+    completedAt: Date | null;
     /** ID of the member that completed the item, if completed. */
     completedBy: string | null;
 
@@ -46,24 +46,24 @@ export class ListItem extends Base {
         this.channelID = data.channelId;
         this.content = data.message ?? null;
         this.mentions = data.mentions ??  null;
-        this._createdAt = data.createdAt ? Date.parse(data.createdAt) : null;
+        this.createdAt = data.createdAt ? new Date(data.createdAt) : null;
         this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
+        this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.updatedBy = data.updatedBy ?? null;
         this.parentListItemID = data.parentListItemId ?? null;
-        this._completedAt = data.completedAt ? Date.parse(data.completedAt) : null;
+        this.completedAt = data.completedAt ? new Date(data.completedAt) : null;
         this.completedBy = data.completedBy ?? null;
     }
 
     get note(): ListItemNoteTypes | null {
         return this._data.note ? {
-            createdAt: this._data.note.createdAt ? Date.parse(this._data.note.createdAt) : null,
-            createdBy: this._data.note.createdBy,
-            updatedAt: this._data.note.updatedAt ? Date.parse(this._data.note.updatedAt) : null,
-            updatedBy: this._data.note.updatedBy ?? null,
-            mentions:  this._data.note.mentions ?? null,
-            content:   this._data.note.content
+            createdAt:       new Date(this._data.note.createdAt),
+            memberID:        this._data.note.createdBy,
+            editedTimestamp: this._data.note.updatedAt ? new Date(this._data.note.updatedAt) : null,
+            editedBy:        this._data.note.updatedBy ?? null,
+            mentions:        this._data.note.mentions ?? null,
+            content:         this._data.note.content
         } as ListItemNoteTypes : null;
     }
 
@@ -78,21 +78,6 @@ export class ListItem extends Base {
         } else if (this.guildID){
             return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
         } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
-    }
-
-    /** Date of the item's creation. */
-    get createdAt(): Date | null {
-        return this._createdAt ? new Date(this._createdAt) : null;
-    }
-
-    /** Date of the last item's edition, if updated. */
-    get updatedAt(): Date | null {
-        return this._updatedAt ? new Date(this._updatedAt) : null;
-    }
-
-    /** Date of the item's completion, if completed. */
-    get completedAt(): Date | null {
-        return this._completedAt ? new Date(this._completedAt) : null;
     }
 
     /** Edit this item.

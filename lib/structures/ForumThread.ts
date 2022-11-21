@@ -16,16 +16,16 @@ export class ForumThread extends Base {
     guildID: string;
     /** Forum channel id */
     channelID: string;
-    /** Thread name/title */
+    /** Name of the thread */
     name: string;
-    /** Timestamp (unix epoch time) of the thread's creation. */
-    _createdAt: number;
+    /** When this forum thread was created. */
+    createdAt: Date;
     /** The ID of the owner of this thread. */
     ownerID: string;
     /** ID of the webhook that created the thread (if created by webhook) */
     webhookID: string | null;
-    /** Timestamp (unix epoch time) of when the thread got updated. (if updated) */
-    _updatedAt: number| null;
+    /** Timestamp at which this channel was last edited. */
+    editedTimestamp: Date | null;
     /** Timestamp (unix epoch time) that the forum thread was bumped at. */
     bumpedAt: string | null;
     /** Content of the thread */
@@ -42,10 +42,10 @@ export class ForumThread extends Base {
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.name = data.title;
-        this._createdAt = Date.parse(data.createdAt);
+        this.createdAt = new Date(data.createdAt);
         this.ownerID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
+        this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.bumpedAt = data.bumpedAt ?? null;
         this.content = data.content;
         this.mentions = data.mentions ?? null;
@@ -79,17 +79,7 @@ export class ForumThread extends Base {
         return this.client.rest.channels.getChannel(this.channelID);
     }
 
-    /** string representation of the _createdAt timestamp. */
-    get createdAt(): Date {
-        return new Date(this._createdAt);
-    }
-
-    /** string representation of the _updatedAt timestamp. */
-    get updatedAt(): Date|null {
-        return this._updatedAt ? new Date(this._updatedAt) : null;
-    }
-
-    /** Boolean that tells you if the forum thread was created by a webhook or not. */
+    /** If true, this forum thread was created by a webhook. */
     get createdByWebhook(): boolean {
         return this.webhookID ? true : false;
     }

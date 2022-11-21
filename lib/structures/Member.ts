@@ -7,8 +7,8 @@ import { APIGuildMember } from "../Constants";
 
 /** Represents a guild user. */
 export class Member extends User {
-    /** Timestamp (unix epoch time) of when the member joined the server. */
-    _joinedAt: number | null;
+    /** When this member joined the guild. */
+    joinedAt: Date | null;
     /** Array of member's roles. */
     roles: Array<number>;
     /** Member's server nickname. */
@@ -28,7 +28,7 @@ export class Member extends User {
         this._data = data;
         this.roles = data.roleIds ?? null;
         this.nickname = data.nickname ?? null;
-        this._joinedAt = data.joinedAt ? Date.parse(data.joinedAt) : null;
+        this.joinedAt = data.joinedAt ? new Date(data.joinedAt) : null;
         this.isOwner = data.isOwner ?? false;
         this.guildID = guildID;
     }
@@ -38,11 +38,6 @@ export class Member extends User {
      */
     get guild(): Guild | Promise<Guild> {
         return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
-    }
-
-    /** String representation of the _joinedAt timestamp. */
-    get joinedAt(): Date|number|null{
-        return this._joinedAt ? new Date(this._joinedAt) : null;
     }
 
     /** Member's user, shows less information. */

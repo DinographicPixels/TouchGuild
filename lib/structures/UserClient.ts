@@ -11,10 +11,10 @@ export class UserClient extends Base {
     type: string;
     /** User's name */
     username: string;
-    /** Timestamp (unix epoch time) of the user's creation. */
-    _createdAt: number; // user
+    /** When the bot client was created. */
+    createdAt: Date;
     /** ID of the bot's owner. */
-    createdBy: string;
+    ownerID: string;
     /**
      * @param data raw data.
      * @param client client.
@@ -24,8 +24,8 @@ export class UserClient extends Base {
         this.botID = data.botId;
         this.type = "bot";
         this.username = data.name;
-        this._createdAt = Date.parse(data.createdAt);
-        this.createdBy = data.createdBy;
+        this.createdAt = new Date(data.createdAt);
+        this.ownerID = data.createdBy;
     }
 
     /** Boolean that shows if the user is a bot or not.
@@ -33,10 +33,5 @@ export class UserClient extends Base {
      */
     get bot(): true {
         return true;
-    }
-
-    /** Date-time string of the bot's creation. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
     }
 }

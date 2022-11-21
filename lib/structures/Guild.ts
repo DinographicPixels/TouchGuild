@@ -26,8 +26,8 @@ export class Guild extends Base {
     timezone?: string;
     /** Default channel of the guild. */
     defaultChannelID?: string;
-    /** Timestamp of the guild's creation. */
-    _createdAt: number;
+    /** When this guild was created. */
+    createdAt: Date;
 
     /**
      * @param data raw data.
@@ -44,12 +44,7 @@ export class Guild extends Base {
         this.bannerURL = data.banner ?? null;
         this.timezone = data.timezone;
         this.defaultChannelID = data.defaultChannelId;
-        this._createdAt = Date.parse(data.createdAt);
-    }
-
-    /** Date of the guild's creation. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
+        this.createdAt = new Date(data.createdAt);
     }
 
     /** Retrieve guild's owner, if cached.

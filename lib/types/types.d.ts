@@ -35,6 +35,7 @@ export interface forumThreadReactionInfo {
     };
 }
 
+// deprecated.
 export interface UserClientTypes {
     user: {
         id: string;
@@ -46,11 +47,17 @@ export interface UserClientTypes {
 }
 
 export interface ListItemNoteTypes {
-    createdAt: number;
-    createdBy: string;
-    updatedAt?: number;
-    updatedBy?: string;
-    mentions?: APIMentions;
+    /** Date of the note's creation. */
+    createdAt: Date;
+    /** ID of the member who created this note. */
+    memberID: string;
+    /** Date of the note's last edition, if edited. */
+    editedTimestamp: null | Date;
+    /** ID of the member who edited this note, if edited. */
+    editedBy: null | string;
+    /** The mentions in this note. */
+    mentions: null | APIMentions;
+    /** The content of the note. */
     content: string;
 }
 
@@ -62,8 +69,8 @@ export interface GetSocialLink {
 
 export interface GuildCreateInfo {
     guild: Guild;
-    /** The ID of the user who created this server membership */
-    createdBy: string;
+    /** The ID of the member who invited the bot to the guild. */
+    inviterID: string;
 }
 
 export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo;

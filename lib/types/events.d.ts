@@ -1,4 +1,4 @@
-import type { AnyReactionInfo } from "./types";
+import type { AnyReactionInfo, GuildCreateInfo } from "./types";
 import type { BannedMember } from "../structures/BannedMember";
 import type { ForumThread } from "../structures/ForumThread";
 import type { ForumThreadComment } from "../structures/ForumThreadComment";
@@ -6,6 +6,12 @@ import type { Message } from "../structures/Message";
 import type { Channel } from "../structures/Channel";
 import type { MemberRemoveInfo } from "../structures/MemberRemoveInfo";
 import type { MemberUpdateInfo } from "../structures/MemberUpdateInfo";
+import type { ListItem } from "../structures/ListItem";
+import type { CalendarEventRSVP } from "../structures/CalendarRSVP";
+import type { CalendarEvent } from "../structures/CalendarEvent";
+import type { Doc } from "../structures/Doc";
+import type { Member } from "../structures/Member";
+import type { Webhook } from "../structures/Webhook";
 
 export interface ClientEvents {
     // message: [message: string];
@@ -84,19 +90,19 @@ export interface ClientEvents {
     /** @event Emitted when an event RSVP is deleted. */
     calendarEventRsvpDelete: [CalendarRSVP: CalendarEventRSVP];
     /** @event Emitted when a list item is created. */
-    listItemCreate: [ListItem: ListItem];
+    listItemCreate: [item: ListItem];
     /** @event Emitted when a list item is edited. */
-    listItemUpdate: [ListItem: ListItem];
+    listItemUpdate: [item: ListItem];
     /** @event Emitted when a list item is deleted. */
-    listItemDelete: [ListItem: ListItem];
+    listItemDelete: [item: ListItem];
     /** @event Emitted when a list item is completed. */
-    listItemComplete: [ListItem: ListItem];
+    listItemComplete: [item: ListItem];
     /** @event Emitted when a list item is uncompleted. */
-    listItemUncomplete: [ListItem: ListItem];
+    listItemUncomplete: [item: ListItem];
     /** @event Emitted when a webhook got created. */
-    webhooksCreate: [Webhook: Webhook];
+    webhooksCreate: [webhook: Webhook];
     /** @event Emitted when a webhook is deleted. */
-    webhooksUpdate: [Webhook: Webhook];
+    webhooksUpdate: [webhook: Webhook];
     /** @event Emitted on process exit. */
     exit: [message: string];
 }

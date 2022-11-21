@@ -8,20 +8,18 @@ import type { APIGuildChannel } from "../Constants";
 
 /** Represents a guild channel. */
 export class Channel extends Base {
-    /** Raw data */
-    data: APIGuildChannel;
     /** Channel type */
     type: string;
     /** Channel name */
     name: string;
     /** Channel description */
     description: string | null;
-    /** Timestamp (unix epoch time) of the channel's creation. */
-    _createdAt: number;
-    /** ID of the channel's creator. */
-    memberID: string;
-    /** Timestamp (unix epoch time) of the channel's edition. (if edited) */
-    _updatedAt: number|null;
+    /** When this channel was created. */
+    createdAt: Date;
+    /** ID of the member who created this channel. */
+    creatorID: string;
+    /** Timestamp at which this channel was last edited. */
+    editedTimestamp: Date | null;
     /** Server ID */
     guildID: string;
     /** ID of the parent category. */
@@ -33,8 +31,8 @@ export class Channel extends Base {
     isPublic: boolean;
     /** ID of the member that archived the channel (if archived) */
     archivedBy: string | null;
-    /** Timestamp (unix epoch time) of when the channel has been archived. */
-    _archivedAt: number|null;
+    /** When the channel was last archived. */
+    archivedAt: Date | null;
 
     /**
      * @param data raw data
@@ -42,35 +40,19 @@ export class Channel extends Base {
      */
     constructor(data: APIGuildChannel, client: Client){
         super(data.id, client);
-        this.data = data;
         this.type = data.type;
         this.name = data.name;
         this.description = data.topic ?? null;
-        this._createdAt = Date.parse(data.createdAt);
-        this.memberID = data.createdBy;
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
+        this.createdAt = new Date(data.createdAt);
+        this.creatorID = data.createdBy;
+        this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.guildID = data.serverId;
         this.parentID = data.parentId ?? null;
         this.categoryID = data.categoryId ?? null;
         this.groupID = data.groupId;
         this.isPublic = data.isPublic ?? false;
         this.archivedBy = data.archivedBy ?? null;
-        this._archivedAt = data.archivedAt ? Date.parse(data.archivedAt) : null;
-    }
-
-    /** Date of the channel's creation. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
-    }
-
-    /** Date of the channel's last edition, if updated. */
-    get updatedAt(): Date|null{
-        return this._updatedAt !== null ? new Date(this._updatedAt) : null;
-    }
-
-    /** Date of when the channel got archived, if archived. */
-    get archivedAt(): Date|null{
-        return this._archivedAt !== null ? new Date(this._archivedAt) : null;
+        this.archivedAt = data.archivedAt ? new Date(data.archivedAt) : null;
     }
 
     /** Create a message in the channel. */
