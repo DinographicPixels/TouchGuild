@@ -20,8 +20,8 @@ export class ForumThread extends Base {
     name: string;
     /** Timestamp (unix epoch time) of the thread's creation. */
     _createdAt: number;
-    /** ID of the member who created the thread */
-    memberID: string;
+    /** The ID of the owner of this thread. */
+    ownerID: string;
     /** ID of the webhook that created the thread (if created by webhook) */
     webhookID: string | null;
     /** Timestamp (unix epoch time) of when the thread got updated. (if updated) */
@@ -43,7 +43,7 @@ export class ForumThread extends Base {
         this.channelID = data.channelId;
         this.name = data.title;
         this._createdAt = Date.parse(data.createdAt);
-        this.memberID = data.createdBy;
+        this.ownerID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
         this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
         this.bumpedAt = data.bumpedAt ?? null;
@@ -58,17 +58,17 @@ export class ForumThread extends Base {
         return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
     }
 
-    /** Retrieve message's member, if cached.
+    /** Retrieve thread's owner, if cached.
      * If there is no cached member or user, this will make a request which returns a Promise.
      * If the request fails, this will throw an error or return you undefined as a value.
      */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.memberID) && this.memberID){
-            return this.client.cache.members.get(this.memberID);
-        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
-            return this.client.cache.users.get(this.memberID);
-        } else if (this.memberID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
+    get owner(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.ownerID) && this.ownerID){
+            return this.client.cache.members.get(this.ownerID);
+        } else if (this.client.cache.users.get(this.ownerID) && this.ownerID){
+            return this.client.cache.users.get(this.ownerID);
+        } else if (this.ownerID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.ownerID);
         }
     }
 
