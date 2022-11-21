@@ -18,8 +18,6 @@ export class ForumThread extends Base {
     channelID: string;
     /** Thread name/title */
     name: string;
-    /** Thread name/title */
-    title: string;
     /** Timestamp (unix epoch time) of the thread's creation. */
     _createdAt: number;
     /** ID of the member who created the thread */
@@ -44,7 +42,6 @@ export class ForumThread extends Base {
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.name = data.title;
-        this.title = data.title;
         this._createdAt = Date.parse(data.createdAt);
         this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
