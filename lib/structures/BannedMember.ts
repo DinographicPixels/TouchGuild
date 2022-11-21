@@ -12,10 +12,10 @@ export class BannedMember extends User {
     ban: {
         /** Reason of the ban */
         reason?: string;
-        /** Timestamp (unix epoch time) of when the member has been banned. */
-        createdAt: number|null;
-        /** ID of the member that banned the user. */
-        createdBy: string;
+        /** When the member has been banned. */
+        createdAt: Date | null;
+        /** ID of the member who banned this member. */
+        bannedBy: string;
     };
     /**
      * @param guildID ID of the guild.
@@ -27,8 +27,8 @@ export class BannedMember extends User {
         this.guildID = guildID;
         this.ban = {
             reason:    data.reason,
-            createdAt: data.createdAt ? Date.parse(data.createdAt) : null,
-            createdBy: data.createdBy
+            createdAt: data.createdAt ? new Date(data.createdAt) : null,
+            bannedBy:  data.createdBy
         };
     }
 

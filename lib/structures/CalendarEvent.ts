@@ -28,16 +28,16 @@ export class CalendarEvent extends Base {
     /** Limit of event entry. */
     rsvpLimit: number | null;
     /** Timestamp (unix epoch time) of the event starting time.*/
-    _startsAt: number|null;
+    startsAt: Date | null;
     /** Duration in *ms* of the event. */
     duration: number;
     /** */
     isPrivate: boolean;
     mentions: APIMentions | null;
-    /** Timestamp (unix epoch time) of the event's creation. */
-    _createdAt: number|null;
-    /** ID of the member that created the event. */
-    memberID: string;
+    /** When the event was created. */
+    createdAt: Date | null;
+    /** ID of the owner of this event. */
+    ownerID: string;
     /** Details about event cancelation (if canceled) */
     cancelation: APICalendarEvent["cancellation"] | null;
 
@@ -57,32 +57,27 @@ export class CalendarEvent extends Base {
         this.url = data.url ?? null;
         this.color = data.color ?? null;
         this.rsvpLimit = data.rsvpLimit ?? null;
-        this._startsAt = data.startsAt ? Date.parse(data.startsAt) : null;
+        this.startsAt = data.startsAt ? new Date(data.startsAt) : null;
         this.duration = (data.duration as number) * 60000 ?? null; // in ms.
         this.isPrivate = data.isPrivate ?? false;
         this.mentions = data.mentions ?? null;
-        this._createdAt = data.createdAt ? Date.parse(data.createdAt) : null;
-        this.memberID = data.createdBy;
+        this.createdAt = data.createdAt ? new Date(data.createdAt) : null;
+        this.ownerID = data.createdBy;
         this.cancelation = data.cancellation ?? null;
     }
 
-    /** Retrieve message's member, if cached.
+    /** Retrieve the event's owner, if cached.
      *
      * Note: this getter can output: Member, User, Promise<Member> or undefined.
      */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.memberID) && this.memberID){
-            return this.client.cache.members.get(this.memberID);
-        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
-            return this.client.cache.users.get(this.memberID);
-        } else if (this.memberID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
+    get owner(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.ownerID) && this.ownerID){
+            return this.client.cache.members.get(this.ownerID);
+        } else if (this.client.cache.users.get(this.ownerID) && this.ownerID){
+            return this.client.cache.users.get(this.ownerID);
+        } else if (this.ownerID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.ownerID);
         }
-    }
-
-    /** string representation of the _createdAt timestamp */
-    get createdAt(): Date|number|null{
-        return this._createdAt ? new Date(this._createdAt) : null;
     }
 
     /** Edit this event */

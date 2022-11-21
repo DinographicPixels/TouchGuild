@@ -13,9 +13,9 @@ export class User extends Base {
     avatarURL: string | null;
     /** Current banned url of the user. */
     bannerURL: string | null;
-    /** Timestamp (unix epoch time) of the user's account creation. */
-    _createdAt: number; // user
-    /** If set to true, the user is a bot. */
+    /** When the user account was created. */
+    createdAt: Date; // user
+    /** If true, the user is a bot. */
     bot: boolean;
 
     /**
@@ -26,16 +26,11 @@ export class User extends Base {
         super(data.id, client);
         this.type = data.type ?? null;
         this.username = data.name;
-        this._createdAt = Date.parse(data.createdAt);
+        this.createdAt = new Date(data.createdAt);
         this.avatarURL = data.avatar ?? null;
         this.bannerURL = data.banner ?? null;
 
         if (!this.type) this.type = "user"; // since it's only defined when it's a bot.
         this.bot = this.type === "bot" ? true : false;
-    }
-
-    /** Date of the user's account creation. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
     }
 }

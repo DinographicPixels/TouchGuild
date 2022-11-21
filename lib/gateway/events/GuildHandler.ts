@@ -53,7 +53,7 @@ export class GuildHandler extends GatewayEventHandler{
         const GuildComponent = new Guild(data.server, this.client);
         const output = {
             guild:     GuildComponent,
-            createdBy: data.createdBy
+            inviterID: data.createdBy
         };
         this.client.emit("guildCreate", output as GuildCreateInfo);
     }

@@ -25,10 +25,16 @@ export class RESTManager {
         this.misc = new Miscellaneous(this);
     }
 
+    /** Send an authenticated request.
+     * @param options Request options.
+     */
     async authRequest<T = unknown>(options: Omit<RequestOptions, "auth">): Promise<T> {
         return this.handler.authRequest<T>(options);
     }
 
+    /** Send a request.
+     * @param options Request options.
+     */
     async request<T = unknown>(options: RequestOptions): Promise<T> {
         return this.handler.request<T>(options);
     }

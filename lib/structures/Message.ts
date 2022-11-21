@@ -36,12 +36,12 @@ export class Message extends Base {
     /** ID of the webhook used to send this message. (if sent by a webhook) */
     webhookID?: string|null;
 
-    /** Timestamp (unix epoch time) of the message's creation. */
-    readonly _createdAt: number;
-    /** Timestamp (unix epoch time) of the last message update/edition. */
-    readonly _updatedAt: number | null;
-    /** Timestamp (unix epoch time) of the message's deletion. */
-    readonly _deletedAt: number | null;
+    /** When the message was created. */
+    createdAt: Date;
+    /** Timestamp at which this message was last edited. */
+    editedTimestamp: Date | null;
+    /** When the message was deleted. */
+    deletedAt: Date | null;
 
     /** ID of the last message created with the message itself. */
     _lastMessageID: string | null;
@@ -61,31 +61,16 @@ export class Message extends Base {
         this.isPrivate = data.isPrivate ?? false;
         this.isSilent = data.isSilent ?? false;
         this.mentions = data.mentions as APIMentions ?? null;
-        this._createdAt = Date.parse(data.createdAt);
-        this._updatedAt = data.updatedAt ? Date.parse(data.updatedAt) : null;
+        this.createdAt = new Date(data.createdAt);
+        this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
-        this._deletedAt = data["deletedAt" as keyof object] ? Date.parse(data["deletedAt" as keyof object]) : null;
+        this.deletedAt = data["deletedAt" as keyof object] ? new Date(data["deletedAt" as keyof object]) : null;
         this._lastMessageID = null;
         this.#originalMessageID = params?.originalMessageID ?? null;
         this.#originalMessageBool = false;
         this.oldContent = params?.oldMessage?.["content" as keyof object] ?? null; // taken from cache.
         void this.setCache.bind(this)();
-    }
-
-    /** string representation of the _createdAt timestamp. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
-    }
-
-    /** string representation of the _updatedAt timestamp. */
-    get updatedAt(): Date|void{
-        return this._updatedAt !== null ? new Date(this._updatedAt) : undefined;
-    }
-
-    /** string representation of the _deletedAt timestamp. */
-    get deletedAt(): Date|void{
-        return this._deletedAt !== null ? new Date(this._deletedAt) : undefined;
     }
 
     /** Retrieve message's member, if cached.

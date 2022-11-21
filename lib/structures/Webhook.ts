@@ -12,12 +12,12 @@ export class Webhook extends Base {
     channelID: string;
     /** Username of the webhook. */
     username: string;
-    /** Timestamp of the webhook's creation. */
-    _createdAt: number;
+    /** When the webhook was created. */
+    createdAt: Date;
     /** ID of the webhook's owner. */
-    createdBy: string;
-    /** Timestamp of the webhook's deletion, if deleted. */
-    _deletedAt: number | null;
+    ownerID: string;
+    /** When the webhook was deleted. */
+    deletedAt: Date | null;
     /** Token of the webhook. */
     token: string | null;
 
@@ -30,20 +30,10 @@ export class Webhook extends Base {
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.username = data.name;
-        this._createdAt = Date.parse(data.createdAt);
-        this._deletedAt = data.deletedAt ? Date.parse(data.deletedAt) : null;
-        this.createdBy = data.createdBy;
+        this.createdAt = new Date(data.createdAt);
+        this.deletedAt = data.deletedAt ? new Date(data.deletedAt) : null;
+        this.ownerID = data.createdBy;
         this.token = data.token ?? null;
-    }
-
-    /** Date of the webhook's creation. */
-    get createdAt(): Date{
-        return new Date(this._createdAt);
-    }
-
-    /** Date of the webhook's deletion, if deleted. */
-    get deletedAt(): Date|null{
-        return this._deletedAt ? new Date(this._deletedAt) : null;
     }
 
     /** Update the webhook. */

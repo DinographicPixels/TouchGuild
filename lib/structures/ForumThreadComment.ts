@@ -1,6 +1,8 @@
 /** @module ForumThreadComment */
 import { Client } from "./Client";
 import { Base } from "./Base";
+import { Member } from "./Member";
+import { User } from "./User";
 import { APIForumTopicComment } from "../Constants";
 import { CreateForumCommentOptions, EditForumCommentOptions, ConstructorForumThreadOptions } from "../types/forumThreadComment";
 
@@ -14,8 +16,8 @@ export class ForumThreadComment extends Base {
     updatedAt?: string;
     /** The ID of the forum thread */
     threadID: number;
-    /** The ID of the user who created this forum thread comment (Note: If this event has createdByWebhookId present, this field will still be populated, but can be ignored. In this case, the value of this field will always be Ann6LewA) */
-    createdBy: string;
+    /** The ID of the user who sent this comment. */
+    memberID: string;
     /** ID of the forum thread's server, if provided. */
     guildID: string | null;
     /** ID of the forum channel containing this thread. */
@@ -28,8 +30,22 @@ export class ForumThreadComment extends Base {
         this.updatedAt = data.updatedAt;
         this.channelID = data.channelId;
         this.threadID = data.forumTopicId;
-        this.createdBy = data.createdBy;
+        this.memberID = data.createdBy;
         this.guildID = options?.guildID ?? null;
+    }
+
+    /** Retrieve the member who sent this comment, if cached.
+     * If there is no cached member or user, this will make a request which returns a Promise.
+     * If the request fails, this will throw an error or return you undefined as a value.
+     */
+    get member(): Member | User | Promise<Member> | undefined {
+        if (this.client.cache.members.get(this.memberID) && this.memberID){
+            return this.client.cache.members.get(this.memberID);
+        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
+            return this.client.cache.users.get(this.memberID);
+        } else if (this.memberID && this.guildID){
+            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
+        }
     }
 
     /** Add a comment to the same forum thread as this comment.
