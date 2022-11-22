@@ -1,4 +1,4 @@
-import type { AnyReactionInfo, GuildCreateInfo } from "./types";
+import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
 import type { BannedMember } from "../structures/BannedMember";
 import type { ForumThread } from "../structures/ForumThread";
 import type { ForumThreadComment } from "../structures/ForumThreadComment";
@@ -71,8 +71,10 @@ export interface ClientEvents {
      * It does include role changes, nickname & more.
      */
     guildMemberUpdate: [MemberUpdateInfo: MemberUpdateInfo];
-    /** @event Emitted when the bot joined a guild. */
+    /** @event Emitted when the client joins a guild. */
     guildCreate: [GuildCreateInfo: GuildCreateInfo];
+    /** @event Emitted when the client leaves a guild. */
+    guildDelete: [GuildDeleteInfo: GuildDeleteInfo];
     /** @event Emitted when a doc is created. */
     docCreate: [Doc: Doc];
     /** @event Emitted when a doc is edited. */

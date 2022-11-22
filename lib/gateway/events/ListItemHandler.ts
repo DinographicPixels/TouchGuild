@@ -9,7 +9,7 @@ import {
     GatewayEvent_ListItemUpdated
 } from "../../Constants";
 
-// Internal component, emitting list events.
+/** Internal component, emitting list events. */
 export class ListItemHandler extends GatewayEventHandler{
     listItemCreate(data: GatewayEvent_ListItemCreated): void {
         const ListItemComponent = new ListItem(data.listItem, this.client);

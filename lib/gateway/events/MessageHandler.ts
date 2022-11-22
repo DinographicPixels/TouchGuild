@@ -10,7 +10,7 @@ import {
     GatewayEvent_ChatMessageUpdated
 } from "../../Constants";
 
-// Internal component, emitting message events.
+/** Internal component, emitting message events. */
 export class MessageHandler extends GatewayEventHandler{
     messageCreate(data: GatewayEvent_ChatMessageCreated): boolean {
         const MessageComponent = new Message(data.message, this.client);

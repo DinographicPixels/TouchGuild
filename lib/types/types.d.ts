@@ -37,12 +37,18 @@ export interface forumThreadReactionInfo {
 
 // deprecated.
 export interface UserClientTypes {
+    /** Client's user. */
     user: {
+        /** The ID of this user. */
         id: string;
+        /** The Bot ID of this user. */
         botID: string;
+        /** The user */
         username: string;
-        createdAt: number;
-        createdBy: string;
+        /** When the user was created. */
+        createdAt: Date;
+        /** The owner of this bot. */
+        ownerID: string;
     };
 }
 
@@ -69,8 +75,14 @@ export interface GetSocialLink {
 
 export interface GuildCreateInfo {
     guild: Guild;
-    /** The ID of the member who invited the bot to the guild. */
+    /** The ID of the member who invited the client to the guild. */
     inviterID: string;
+}
+
+export interface GuildDeleteInfo {
+    guild: Guild;
+    /** The ID of the member who removed the client. */
+    removerID: string;
 }
 
 export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo;

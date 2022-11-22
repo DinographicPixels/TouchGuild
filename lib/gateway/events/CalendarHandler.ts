@@ -10,7 +10,7 @@ import {
     GatewayEvent_CalendarEventUpdated
 } from "../../Constants";
 
-// Internal component, emitting calendar events.
+/** Internal component, emitting calendar events. */
 export class CalendarHandler extends GatewayEventHandler{
     calendarEventCreate(data: GatewayEvent_CalendarEventCreated): void {
         const CalendarEventComponent = new CalendarEvent(data.calendarEvent, this.client);

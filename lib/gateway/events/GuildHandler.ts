@@ -3,9 +3,10 @@ import { GatewayEventHandler } from "./GatewayEventHandler";
 
 import { BannedMember, Guild, Member } from "../../index";
 
-import { GuildCreateInfo } from "../../types/types";
+import { GuildCreateInfo, GuildDeleteInfo } from "../../types/types";
 import {
     GatewayEvent_BotServerMembershipCreated,
+    GatewayEvent_BotServerMembershipDeleted,
     GatewayEvent_ServerMemberBanned,
     GatewayEvent_ServerMemberJoined,
     GatewayEvent_ServerMemberRemoved,
@@ -16,7 +17,7 @@ import {
 import { MemberUpdateInfo } from "../../structures/MemberUpdateInfo";
 import { MemberRemoveInfo } from "../../structures/MemberRemoveInfo";
 
-// Internal component, emitting guild events.
+/** Internal component, emitting guild events. */
 export class GuildHandler extends GatewayEventHandler{
     guildBanAdd(data: GatewayEvent_ServerMemberBanned): void{
         const GuildMemberBanComponent = new BannedMember(data.serverId, data.serverMemberBan, this.client);
@@ -48,7 +49,6 @@ export class GuildHandler extends GatewayEventHandler{
         this.client.emit("guildMemberUpdate", output);
     }
 
-    // fired when bot joins a guild.
     guildCreate(data: GatewayEvent_BotServerMembershipCreated): void{
         const GuildComponent = new Guild(data.server, this.client);
         const output = {
@@ -56,5 +56,14 @@ export class GuildHandler extends GatewayEventHandler{
             inviterID: data.createdBy
         };
         this.client.emit("guildCreate", output as GuildCreateInfo);
+    }
+
+    guildDelete(data: GatewayEvent_BotServerMembershipDeleted): void{
+        const GuildComponent = new Guild(data.server, this.client);
+        const output = {
+            guild:     GuildComponent,
+            removerID: data.createdBy
+        };
+        this.client.emit("guildDelete", output as GuildDeleteInfo);
     }
 }
