@@ -37,6 +37,7 @@ import type {
     GatewayEvent_ServerMemberUpdated,
     GatewayEvent_ServerRolesUpdated,
     GatewayEvent_BotServerMembershipCreated,
+    GatewayEvent_BotServerMembershipDeleted,
     GatewayEvent_ServerWebhookCreated,
     GatewayEvent_ServerWebhookUpdated,
     GatewayEvent_DocCreated,
@@ -100,6 +101,7 @@ export class GatewayHandler {
         ServerMemberUpdated:           data => this.guildHandler.guildMemberUpdate(data as GatewayEvent_ServerMemberUpdated),
         ServerRolesUpdated:            data => this.guildHandler.guildMemberRoleUpdate(data as GatewayEvent_ServerRolesUpdated),
         BotServerMembershipCreated:    data => this.guildHandler.guildCreate(data as GatewayEvent_BotServerMembershipCreated),
+        BotServerMembershipDeleted:    data => this.guildHandler.guildDelete(data as GatewayEvent_BotServerMembershipDeleted),
         // Webhooks
         ServerWebhookCreated:          data => this.webhookHandler.webhooksCreate(data as GatewayEvent_ServerWebhookCreated),
         ServerWebhookUpdated:          data => this.webhookHandler.webhooksUpdate(data as GatewayEvent_ServerWebhookUpdated),

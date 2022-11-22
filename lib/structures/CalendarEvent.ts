@@ -31,8 +31,9 @@ export class CalendarEvent extends Base {
     startsAt: Date | null;
     /** Duration in *ms* of the event. */
     duration: number;
-    /** */
+    /** If true, this event is private. */
     isPrivate: boolean;
+    /** Mentions in this calendar event. */
     mentions: APIMentions | null;
     /** When the event was created. */
     createdAt: Date | null;

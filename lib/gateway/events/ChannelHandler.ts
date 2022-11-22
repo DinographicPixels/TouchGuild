@@ -3,7 +3,7 @@ import { GatewayEventHandler } from "./GatewayEventHandler";
 import { Channel } from "../../structures/Channel";
 import { GatewayEvent_ServerChannelCreated, GatewayEvent_ServerChannelDeleted, GatewayEvent_ServerChannelUpdated } from "../../Constants";
 
-// Internal component, emitting channel events.
+/** Internal component, emitting channel events. */
 export class ChannelHandler extends GatewayEventHandler{
     channelCreate(data: GatewayEvent_ServerChannelCreated): void {
         const ChannelComponent = new Channel(data.channel, this.client);

@@ -3,7 +3,7 @@ import { Client } from "./Client";
 import { Base } from "./Base";
 import { Member } from "./Member";
 import { User } from "./User";
-import { APIForumTopicComment } from "../Constants";
+import { APIForumTopicComment, APIMentions } from "../Constants";
 import { CreateForumCommentOptions, EditForumCommentOptions, ConstructorForumThreadOptions } from "../types/forumThreadComment";
 
 /** Represents a comment coming from a ForumThread. */
@@ -22,6 +22,8 @@ export class ForumThreadComment extends Base {
     guildID: string | null;
     /** ID of the forum channel containing this thread. */
     channelID: string;
+    /** Mentions in this thread comment. */
+    mentions: APIMentions | null;
 
     constructor(data: APIForumTopicComment, client: Client, options?: ConstructorForumThreadOptions){
         super(data.id, client);
@@ -32,6 +34,7 @@ export class ForumThreadComment extends Base {
         this.threadID = data.forumTopicId;
         this.memberID = data.createdBy;
         this.guildID = options?.guildID ?? null;
+        this.mentions = data.mentions ?? null;
     }
 
     /** Retrieve the member who sent this comment, if cached.

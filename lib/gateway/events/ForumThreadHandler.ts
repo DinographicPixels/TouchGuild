@@ -18,7 +18,7 @@ import {
     GatewayEvent_ForumTopicUpdated
 } from "../../Constants";
 
-// Internal component, emitting forum thread events.
+/** Internal component, emitting forum thread events. */
 export class ForumThreadHandler extends GatewayEventHandler{
     forumThreadCreate(data: GatewayEvent_ForumTopicCreated): boolean {
         const Thread = new ForumThread(data.forumTopic, this.client);

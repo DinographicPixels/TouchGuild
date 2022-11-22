@@ -77,7 +77,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    get identifiers(){
+    get identifiers() {
         return {
             ChatMessageCreated:            "messageCreate",
             ChatMessageUpdated:            "messageUpdate",
@@ -100,6 +100,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
             ForumTopicLocked:              "forumThreadLock",
             ForumTopicUnlocked:            "forumThreadUnlock",
             BotServerMembershipCreated:    "guildCreate",
+            BotServerMembershipDeleted:    "guildDelete",
             ServerMemberBanned:            "guildBanAdd",
             ServerMemberUnbanned:          "guildBanRemove",
             ServerMemberJoined:            "guildMemberAdd",
@@ -235,11 +236,11 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
             this.client.emit("debug", `${code === 1000 ? "Clean" : "Unclean"} WS close: ${code}: ${reason}`);
             switch (code) {
                 case 1006: {
-                    err = new Error(`Connection lost | ${code}`);
+                    err = new GatewayError("Connection lost", code);
                     break;
                 }
                 default: {
-                    err = new Error(`${code} | ${reason}`);
+                    err = new GatewayError(reason, code);
                     break;
                 }
             }
