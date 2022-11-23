@@ -33,8 +33,7 @@ import {
     GATEWAY_EVENTS,
     ChannelReactionTypes
 } from "../Constants";
-import { CreateChannelOptions, CreateMessageOptions, EditChannelOptions, 
-    lMessagesFilter } from "../types/channel";
+import { CreateChannelOptions, CreateMessageOptions, EditChannelOptions, GetChannelMessagesFilter } from "../types/channel";
 import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions, GetDocsFilter } from "../types/doc";

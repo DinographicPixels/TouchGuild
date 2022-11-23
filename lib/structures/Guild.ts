@@ -4,8 +4,8 @@ import { Base } from "./Base";
 import { Channel } from "./Channel";
 import { Member } from "./Member";
 import { User } from "./User";
-import { APIGuild } from "../Constants";
 import { BannedMember } from "./BannedMember";
+import { APIGuild } from "../Constants";
 
 /** Represents a Guild, also called server. */
 export class Guild extends Base {
