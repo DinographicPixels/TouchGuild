@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /** @module WSManager */
 import GatewayError from "./GatewayError";
 import { Client } from "../structures/Client";
@@ -6,7 +5,38 @@ import { APIBotUser, GatewayOPCodes } from "../Constants";
 import TypedEmitter from "../types/TypedEmitter";
 import { WebsocketEvents } from "../types/wsevents";
 import { config as pkgconfig } from "../../pkgconfig";
-import WebSocket from "ws";
+import { is } from "../util/Util";
+import { AnyPacket, WelcomePacket } from "../types/gateway-raw";
+import WebSocket, { Data } from "ws";
+import type Pako from "pako";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import type { Inflate } from "zlib-sync";
+import assert from "node:assert";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+let Erlpack: typeof import("erlpack") | undefined;
+try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment, unicorn/prefer-module
+    Erlpack = require("erlpack");
+} catch {}
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+let ZlibSync: typeof import("pako") | typeof import("zlib-sync") | undefined, zlibConstants: typeof import("pako").constants | typeof import("zlib-sync") | undefined;
+try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment, unicorn/prefer-module
+    ZlibSync = require("zlib-sync");
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment, unicorn/prefer-module
+    zlibConstants = require("zlib-sync");
+} catch {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, unicorn/prefer-module
+        ZlibSync = require("pako");
+        // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, unicorn/prefer-module
+        zlibConstants = require("pako").constants;
+    } catch {}
+}
 
 /** Websocket manager, used to receive ws events. */
 export class WSManager extends TypedEmitter<WebsocketEvents> {
@@ -33,6 +63,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
     connected: boolean;
     connectionTimeout: number;
     #connectTimeout: NodeJS.Timeout | null;
+    compression: boolean;
+    #sharedZLib!: Pako.Inflate | Inflate;
     constructor(client: Client, params: WSManagerParams) {
         super();
         Object.defineProperties(this, {
@@ -74,6 +106,8 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.connected = false;
         this.connectionTimeout = 30000;
         this.#connectTimeout = null;
+
+        this.compression = params.compression ?? false; // not enabled, guilded doesn't support compression for now.
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -149,6 +183,16 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
 
     private initialize(): void {
         if (!this.token) return this.disconnect(false, new Error("Invalid Token."));
+
+        if (this.compression) {
+            if (!ZlibSync) {
+                throw new Error("Cannot use compression without the pako or zlib-sync module.");
+            }
+            this.client.emit("debug", "Initializing compression.");
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+            this.#sharedZLib = new ZlibSync.Inflate({ chunkSize: 128 * 1024 });
+        }
+
         const wsoptions = { headers: { Authorization: `Bearer ${this.params.token}` }, protocol: "HTTPS" };
         if (this.replayEventsCondition) Object.assign(wsoptions.headers, { "guilded-last-message-id": this.lastMessageID });
         this.ws = new WebSocket(this.proxyURL, wsoptions);
@@ -177,31 +221,70 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         }, this.connectionTimeout);
     }
 
-    private onSocketMessage(rawData: string): void|undefined {
-        const packet = rawData;
-        // s: Message ID used for replaying events after a disconnect.
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-var
-            var { t: eventTYPE, d: eventDATA, s: eventMSGID, op: opCODE }: { t: string; d: object; s: string; op: number; } = JSON.parse(packet);
-        } catch {
-            this.emit("exit", "Error while parsing data."); return void 0;
+    private onSocketMessage(data: Data): void | undefined {
+        if (typeof data === "string") {
+            data = Buffer.from(data);
         }
+        try {
+            if (data instanceof ArrayBuffer) {
+                if (this.compression || Erlpack) {
+                    data = Buffer.from(data);
+                }
 
-        if (eventMSGID) this.lastMessageID = eventMSGID as string;
-        switch (opCODE) {
+            } else if (Array.isArray(data)) {
+                data = Buffer.concat(data);
+            }
+
+            assert(is<Buffer>(data));
+            if (this.compression) {
+                if (data.length >= 4 && data.readUInt32BE(data.length - 4) === 0x30307D7D) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    this.#sharedZLib.push(data, zlibConstants!.Z_SYNC_FLUSH);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    if (this.#sharedZLib.err) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
+                        this.client.emit("error", new Error(`ZLib ERROR ${this.#sharedZLib.err}: ${this.#sharedZLib.msg ?? ""}`));
+                        return;
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+                    data = Buffer.from(this.#sharedZLib.result ?? "");
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    return this.onPacket((Erlpack ? Erlpack.unpack(data as Buffer) : JSON.parse(data.toString())) as AnyPacket);
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    this.#sharedZLib.push(data, false);
+                }
+            } else if (Erlpack) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                return this.onPacket(Erlpack.unpack(data) as AnyPacket);
+            } else {
+                return this.onPacket(JSON.parse(data.toString()) as AnyPacket);
+            }
+
+        } catch (err) {
+            this.client.emit("error", err as Error);
+        }
+    }
+
+    private onPacket(packet: AnyPacket): void {
+        // s: Message ID used for replaying events after a disconnect.
+        if (packet.s) this.lastMessageID = packet.s;
+        switch (packet.op) {
             case GatewayOPCodes.Event: {
-                this.emit("GATEWAY_PARSED_PACKET", eventTYPE, eventDATA);
+                this.emit("GATEWAY_PARSED_PACKET", packet.t, packet.d as object);
                 this.emit("GATEWAY_PACKET", packet);
                 break;
             }
             case GatewayOPCodes.Welcome: {
-                if (!eventDATA["heartbeatIntervalMs" as keyof object]) throw new Error("WSERR: Couldn't get the heartbeat interval.");
+                if (!packet.d) throw new Error("WSERR: Couldn't get packet data.");
+                if (!packet.d["heartbeatIntervalMs" as keyof object]) throw new Error("WSERR: Couldn't get the heartbeat interval.");
                 if (this.#connectTimeout) {
                     clearInterval(this.#connectTimeout);
                 }
-                this.#heartbeatInterval = setInterval(() => this.heartbeat(), eventDATA["heartbeatIntervalMs" as keyof object] as number);
-                this.emit("GATEWAY_WELCOME", eventDATA as APIBotUser);
-                this.emit("GATEWAY_WELCOME_PACKET", packet);
+                this.#heartbeatInterval = setInterval(() => this.heartbeat(), packet.d["heartbeatIntervalMs" as keyof object] as number);
+                this.emit("GATEWAY_WELCOME", packet.d as APIBotUser);
+                this.emit("GATEWAY_WELCOME_PACKET", packet as WelcomePacket);
                 this.connected = true;
                 break;
             }
@@ -394,4 +477,6 @@ export interface WSManagerParams {
     replayMissedEvents?: boolean;
     /** Client. */
     client: Client;
+    /** Compression */
+    compression?: boolean;
 }

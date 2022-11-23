@@ -1,3 +1,4 @@
+/** @module Events/ClientEvents */
 import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
 import { PossiblyUncachedMessage } from "./channel";
 import type { BannedMember } from "../structures/BannedMember";

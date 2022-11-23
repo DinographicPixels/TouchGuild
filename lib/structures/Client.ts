@@ -87,7 +87,7 @@ export class Client extends TypedEmitter<ClientEvents> {
             this.emit("ready");
         });
 
-        this.ws.on("GATEWAY_PARSED_PACKET", (type, data)=> {
+        this.ws.on("GATEWAY_PARSED_PACKET", (type, data) => {
             this.#gateway.handleMessage(type as keyof GATEWAY_EVENTS, data);
         });
     }
