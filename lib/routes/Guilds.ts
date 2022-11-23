@@ -19,10 +19,17 @@ import {
     PUTGuildMemberXPBody,
     PUTGuildMemberXPResponse,
     PUTGuildWebhookResponse,
-    PATCHChannelResponse
+    PATCHChannelResponse,
+    POSTGuildBanResponse,
+    GETGuildMembersResponse,
+    APIGuildMember,
+    GETGuildBanResponse,
+    GETGuildBansResponse
 } from "../Constants";
 import { CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
+import { EditMemberOptions } from "../types/guilds";
+import { BannedMember } from "../structures/BannedMember";
 
 export class Guilds {
     #manager: RESTManager;
@@ -71,13 +78,44 @@ export class Guilds {
 
     /** This method is used to get a specific guild member.
      * @param guildID The ID of the Guild.
-     * @param memberID The ID of the Guild Member you'd like to get.
+     * @param memberID The ID of the Guild Member to get.
      */
     async getMember(guildID: string, memberID: string): Promise<Member>{
         return this.#manager.authRequest<GETGuildMemberResponse>({
             method: "GET",
             path:   endpoints.GUILD_MEMBER(guildID, memberID)
         }).then(data => new Member(data.member, this.#manager.client, guildID));
+    }
+
+    /** This method is used to get a list of guild member.
+     * @param guildID ID of the guild to get members.
+     */
+    async getMembers(guildID: string): Promise<Array<Member>> {
+        return this.#manager.authRequest<GETGuildMembersResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_MEMBERS(guildID)
+        }).then(data => data.members.map(d => new Member(d as APIGuildMember, this.#manager.client, guildID)));
+    }
+
+    /** Get a ban.
+     * @param guildID ID of the guild.
+     * @param memberID ID of the banned member.
+     */
+    async getBan(guildID: string, memberID: string): Promise<BannedMember> {
+        return this.#manager.authRequest<GETGuildBanResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_BAN(guildID, memberID)
+        }).then(data => new BannedMember(guildID, data.serverMemberBan, this.#manager.client));
+    }
+
+    /** This method is used to get a list of guild ban.
+     * @param guildID ID of the guild.
+     */
+    async getBans(guildID: string): Promise<Array<BannedMember>> {
+        return this.#manager.authRequest<GETGuildBansResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_BANS(guildID)
+        }).then(data => data.serverMemberBans.map(d => new BannedMember(guildID, d, this.#manager.client)));
     }
 
     /** Add a member to a group
@@ -123,6 +161,63 @@ export class Guilds {
         return this.#manager.authRequest<void>({
             method: "DELETE",
             path:   endpoints.GUILD_MEMBER_ROLE(guildID, memberID, roleID)
+        });
+    }
+
+    /** Edit a member.
+     * @param guildID ID of the guild the member is in.
+     * @param memberID ID of the the member to edit.
+     * @param options Edit options.
+     */
+    async editMember(guildID: string, memberID: string, options: EditMemberOptions): Promise<void> {
+        if (options.nickname) {
+            return this.#manager.authRequest<void>({
+                method: "PUT",
+                path:   endpoints.MEMBER_NICKNAME(guildID, memberID),
+                json:   {
+                    nickname: options.nickname
+                }
+            });
+        } else if (!options.nickname) {
+            return this.#manager.authRequest<void>({
+                method: "DELETE",
+                path:   endpoints.MEMBER_NICKNAME(guildID, memberID)
+            });
+        }
+    }
+
+    /** Remove a member from a guild.
+     * @param guildID The ID of the guild the member is in.
+     * @param memberID The ID of the member to kick.
+     */
+    async removeMember(guildID: string, memberID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.GUILD_MEMBER(guildID, memberID)
+        });
+    }
+
+    /** Ban a guild member.
+     * @param guildID ID of the guild the member is in.
+     * @param memberID ID of the member to ban.
+     * @param reason The reason of the ban.
+     */
+    async createBan(guildID: string, memberID: string, reason?: string): Promise<BannedMember> {
+        return this.#manager.authRequest<POSTGuildBanResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_BAN(guildID, memberID),
+            json:   { reason }
+        }).then(data => new BannedMember(guildID, data.serverMemberBan, this.#manager.client));
+    }
+
+    /** Unban a guild member.
+     * @param guildID ID of the guild the member was in.
+     * @param memberID ID of the member to unban.
+     */
+    async removeBan(guildID: string, memberID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.GUILD_BAN(guildID, memberID)
         });
     }
 
