@@ -1,3 +1,4 @@
+import type { Message } from "../structures/Message";
 import type { APIEmbedField } from "guildedapi-types.ts/v1";
 
 export interface CreateMessageOptions {
@@ -101,3 +102,16 @@ export interface GetChannelMessagesFilter {
     /** Whether to include private messages between all users in response (default `false`) */
     includePrivate?: boolean;
 }
+
+export type PossiblyUncachedMessage = Message | {
+    /** The ID of the message. */
+    id: string;
+    /** ID of the server on which the message was sent. */
+    guildID: string;
+    /** ID of the channel where the message was sent. */
+    channelID: string;
+    /** When the message was deleted. */
+    deletedAt: Date;
+    /** If true, the message is private. */
+    isPrivate: boolean | null;
+};

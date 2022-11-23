@@ -20,21 +20,19 @@ export class Message extends Base {
     /** ID of the channel on which the message was sent. */
     channelID: string;
     /** Content of the message. */
-    content: string|undefined;
-    /** Old content of the message, if edited. */
-    oldContent: string|null;
+    content: string | null;
     /** Array of message embed. */
     embeds?: Array<APIEmbedOptions> | [];
     /** The IDs of the message replied by the message. */
     replyMessageIds: Array<string>;
-    isPrivate: boolean|undefined;
-    isSilent: boolean|undefined;
+    isPrivate: boolean | null;
+    isSilent: boolean | null;
     /** object containing all mentioned users. */
     mentions: APIMentions;
     /** ID of the message author. */
     memberID: string;
     /** ID of the webhook used to send this message. (if sent by a webhook) */
-    webhookID?: string|null;
+    webhookID?: string | null;
 
     /** When the message was created. */
     createdAt: Date;
@@ -49,7 +47,7 @@ export class Message extends Base {
     #originalMessageID: string | null;
     #originalMessageBool: boolean;
 
-    constructor(data: APIChatMessage, client: Client, params?: {oldMessage?: object; originalMessageID?: string|null;}){
+    constructor(data: APIChatMessage, client: Client, params?: { originalMessageID?: string | null; }){
         super(data.id, client);
         this.#data = data;
         this.type = data.type;
@@ -58,8 +56,8 @@ export class Message extends Base {
         this.content = data.content ?? "";
         this.embeds = data.embeds ?? [];
         this.replyMessageIds = data.replyMessageIds ?? [];
-        this.isPrivate = data.isPrivate ?? false;
-        this.isSilent = data.isSilent ?? false;
+        this.isPrivate = data.isPrivate ?? null;
+        this.isSilent = data.isSilent ?? null;
         this.mentions = data.mentions as APIMentions ?? null;
         this.createdAt = new Date(data.createdAt);
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
@@ -69,7 +67,6 @@ export class Message extends Base {
         this._lastMessageID = null;
         this.#originalMessageID = params?.originalMessageID ?? null;
         this.#originalMessageBool = false;
-        this.oldContent = params?.oldMessage?.["content" as keyof object] ?? null; // taken from cache.
         void this.setCache.bind(this)();
     }
 
