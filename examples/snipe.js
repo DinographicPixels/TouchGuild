@@ -1,5 +1,7 @@
+// This script is only working in current development builds due to Message.oldContent changes.
+
 // Importing TouchGuild.Client
-const { Client } = require("touchguild");
+const { Client, Message } = require("touchguild");
 
 // Creating client & connecting.
 const client = new Client({
@@ -8,7 +10,11 @@ const client = new Client({
 });
 
 client.on("ready", () => {
-    console.log("Ready as", client.user.username);
+    console.log("Ready as", client.user?.username);
+});
+
+client.on("error", (err) => {
+    console.log(err);
 });
 
 // Declaring deleted & edited message maps.
@@ -39,18 +45,15 @@ client.on("messageCreate", (message) => {
 });
 
 // Detect when message is updated/deleted & save their content.
-client.on("messageUpdate", (message) => {
-    if (!message.oldContent) return; // return if message oldContent not cached.
-    lastEditedMessage.set(message.channelID, message.oldContent);
+client.on("messageUpdate", (message, oldMessage) => {
+    if (!oldMessage) return; // return if message oldContent not cached.
+    lastEditedMessage.set(message.channelID, oldMessage.content);
 });
 
 client.on("messageDelete", (message) => {
-    if (!message.oldContent) return; // return if message oldContent not cached.
-    lastDeletedMessage.set(message.channelID, message.oldContent);
-});
-
-client.on("error", (err) => {
-    console.log(err);
+    if (message instanceof Message) {
+        lastDeletedMessage.set(message.channelID, message.content);
+    } else return;
 });
 
 client.connect();
