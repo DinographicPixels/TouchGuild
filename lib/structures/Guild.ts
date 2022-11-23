@@ -4,6 +4,7 @@ import { Base } from "./Base";
 import { Channel } from "./Channel";
 import { Member } from "./Member";
 import { User } from "./User";
+import { BannedMember } from "./BannedMember";
 import { APIGuild } from "../Constants";
 
 /** Represents a Guild, also called server. */
@@ -66,5 +67,20 @@ export class Guild extends Base {
      */
     async getChannel(channelID: string): Promise<Channel>{
         return this.client.rest.channels.getChannel(channelID);
+    }
+
+    /** Ban a member.
+     * @param memberID ID of the member to ban.
+     * @param reason The reason of the ban.
+     */
+    async createBan(memberID: string, reason?: string): Promise<BannedMember> {
+        return this.client.rest.guilds.createBan(this.id as string, memberID, reason);
+    }
+
+    /** Unban a member.
+     * @param memberID ID of the member to unban.
+     */
+    async removeBan(memberID: string): Promise<void> {
+        return this.client.rest.guilds.removeBan(this.id as string, memberID);
     }
 }

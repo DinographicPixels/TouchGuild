@@ -2,8 +2,10 @@
 import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
+import { BannedMember } from "./BannedMember";
 import { GetSocialLink } from "../types/types";
 import { APIGuildMember } from "../Constants";
+import { EditMemberOptions } from "../types/guilds";
 
 /** Represents a guild user. */
 export class Member extends User {
@@ -43,6 +45,30 @@ export class Member extends User {
     /** Member's user, shows less information. */
     get user(): User{
         return new User(this._data.user, this.client);
+    }
+
+    /** Edit this member.
+     * @param options Edit options.
+     */
+    async edit(options: EditMemberOptions): Promise<void> {
+        return this.client.rest.guilds.editMember(this.guildID, this.id as string, options);
+    }
+
+    /** Kick this member. */
+    async kick(): Promise<void> {
+        return this.client.rest.guilds.removeMember(this.guildID, this.id as string);
+    }
+
+    /** Ban this member.
+     * @param reason The reason of the ban.
+     */
+    async ban(reason?: string): Promise<BannedMember> {
+        return this.client.rest.guilds.createBan(this.guildID, this.id as string, reason);
+    }
+
+    /** Unban this member. */
+    async unban(): Promise<void> {
+        return this.client.rest.guilds.removeBan(this.guildID, this.id as string);
     }
 
     /** Get a specified social link from the member, if member is connected to them through Guilded.

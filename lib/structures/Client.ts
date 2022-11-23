@@ -17,6 +17,7 @@ import { ListItem } from "./ListItem";
 import { UserClient } from "./UserClient";
 import { ForumThreadComment } from "./ForumThreadComment";
 import { User } from "./User";
+import { BannedMember } from "./BannedMember";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -37,6 +38,7 @@ import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions, GetDocsFilter } from "../types/doc";
 import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
+import { EditMemberOptions } from "../types/guilds";
 
 /** Represents the bot's client. */
 export class Client extends TypedEmitter<ClientEvents> {
@@ -120,6 +122,28 @@ export class Client extends TypedEmitter<ClientEvents> {
         const rMember = this.rest.guilds.getMember(guildID, memberID);
         this.cache.members.add(await rMember);
         return rMember;
+    }
+
+    /** This method is used to get a list of guild member.
+     * @param guildID ID of the guild to get members.
+     */
+    async getMembers(guildID: string): Promise<Array<Member>> {
+        return this.rest.guilds.getMembers(guildID);
+    }
+
+    /** Get a ban.
+     * @param guildID ID of the guild.
+     * @param memberID ID of the banned member.
+     */
+    async getBan(guildID: string, memberID: string): Promise<BannedMember> {
+        return this.rest.guilds.getBan(guildID, memberID);
+    }
+
+    /** This method is used to get a list of guild ban.
+     * @param guildID ID of the guild.
+     */
+    async getBans(guildID: string): Promise<Array<BannedMember>> {
+        return this.rest.guilds.getBans(guildID);
     }
 
     /** This method is used to get a specific Guild.
@@ -582,6 +606,40 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async memberRemoveRole(guildID: string, memberID: string, roleID: number): Promise<void>{
         return this.rest.guilds.memberRemoveRole(guildID, memberID, roleID);
+    }
+
+    /** Edit a member.
+     * @param guildID ID of the guild the member is in.
+     * @param memberID ID of the the member to edit.
+     * @param options Edit options.
+     */
+    async editMember(guildID: string, memberID: string, options: EditMemberOptions): Promise<void> {
+        return this.rest.guilds.editMember(guildID, memberID, options);
+    }
+
+    /** Remove a member from a guild.
+     * @param guildID The ID of the guild the member is in.
+     * @param memberID The ID of the member to kick.
+     */
+    async removeMember(guildID: string, memberID: string): Promise<void> {
+        return this.rest.guilds.removeMember(guildID, memberID);
+    }
+
+    /** Ban a guild member.
+     * @param guildID ID of the guild the member is in.
+     * @param memberID ID of the member to ban.
+     * @param reason The reason of the ban.
+     */
+    async createBan(guildID: string, memberID: string, reason?: string): Promise<BannedMember> {
+        return this.rest.guilds.createBan(guildID, memberID, reason);
+    }
+
+    /** Unban a guild member.
+     * @param guildID ID of the guild the member was in.
+     * @param memberID ID of the member to unban.
+     */
+    async removeBan(guildID: string, memberID: string): Promise<void> {
+        return this.rest.guilds.removeBan(guildID, memberID);
     }
 
     /** Create a webhook
