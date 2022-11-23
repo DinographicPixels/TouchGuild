@@ -1,4 +1,5 @@
 import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
+import { PossiblyUncachedMessage } from "./channel";
 import type { BannedMember } from "../structures/BannedMember";
 import type { ForumThread } from "../structures/ForumThread";
 import type { ForumThreadComment } from "../structures/ForumThreadComment";
@@ -26,9 +27,9 @@ export interface ClientEvents {
     /** @event Emitted when a message is created in a "chat" channel. */
     messageCreate: [message: Message];
     /** @event Emitted when a message coming from a "chat" channel is edited. */
-    messageUpdate: [message: Message];
+    messageUpdate: [message: Message, oldMessage: Message | null];
     /** @event Emitted when a message coming from a "chat" channel is deleted. */
-    messageDelete: [message: Message];
+    messageDelete: [message: PossiblyUncachedMessage];
     /** @event Emitted when a reaction is added to anything. */
     reactionAdd: [reactionInfo: AnyReactionInfo];
     /** @event Emitted when a reaction is removed from anything. */

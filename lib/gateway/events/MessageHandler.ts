@@ -19,29 +19,22 @@ export class MessageHandler extends GatewayEventHandler{
     }
 
     messageUpdate(data: GatewayEvent_ChatMessageUpdated): boolean {
+        const MessageComponent = new Message(data.message, this.client);
         const CachedMessage = this.client.cache.messages.get(data.message.id);
-        let MessageComponent: Message;
-        if (CachedMessage){
-            MessageComponent = new Message(data.message, this.client, { oldMessage: this.client.cache.messages.get(data.message.id) });
-            this.client.cache.messages.add(MessageComponent);
-        } else {
-            MessageComponent = new Message(data.message, this.client);
-            this.client.cache.messages.add(MessageComponent);
-        }
-        return this.client.emit("messageUpdate", MessageComponent);
+        this.client.cache.messages.add(MessageComponent);
+        return this.client.emit("messageUpdate", MessageComponent, CachedMessage ?? null);
     }
 
     messageDelete(data: GatewayEvent_ChatMessageDeleted): boolean {
-        const CachedMessage = this.client.cache.messages.get(data.message.id);
-        let MessageComponent: Message;
-        if (CachedMessage){
-            MessageComponent = new Message(data.message as keyof object, this.client, { oldMessage: this.client.cache.messages.get(data.message.id) });
-            this.client.cache.messages.delete(data.message.id);
-        } else {
-            MessageComponent = new Message(data.message as keyof object, this.client);
-            this.client.cache.messages.add(MessageComponent);
-        }
-        return this.client.emit("messageDelete", MessageComponent);
+        const PU_Message = this.client.cache.messages.get(data.message.id) ?? {
+            id:        data.message.id,
+            guildID:   data.serverId,
+            channelID: data.message.channelId,
+            deletedAt: new Date(data.message.deletedAt),
+            isPrivate: data.message.isPrivate ?? null
+        };
+        this.client.cache.messages.delete(data.message.id);
+        return this.client.emit("messageDelete", PU_Message);
     }
 
     messageReactionAdd(data: GatewayEvent_ChannelMessageReactionAdded): boolean {
