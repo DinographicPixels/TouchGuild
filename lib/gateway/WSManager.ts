@@ -3,7 +3,7 @@ import GatewayError from "./GatewayError";
 import { Client } from "../structures/Client";
 import { APIBotUser, GatewayOPCodes } from "../Constants";
 import TypedEmitter from "../types/TypedEmitter";
-import { WebsocketEvents } from "../types/wsevents";
+import { WebsocketEvents } from "../types/events";
 import { config as pkgconfig } from "../../pkgconfig";
 import { is } from "../util/Util";
 import { AnyPacket, WelcomePacket } from "../types/gateway-raw";
