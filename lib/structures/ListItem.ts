@@ -2,15 +2,14 @@
 import { Client } from "./Client";
 import { Member } from "./Member";
 import { Base } from "./Base";
-import { User } from "./User";
-import { ListItemNoteTypes } from "../types/types";
+import { ListItemNoteTypes, Uncached } from "../types/types";
 import { APIListItem, APIMentions } from "../Constants";
 import { ListItemEditOptions } from "../types/listItem";
 
 /** Represents an item of a "Lists" channel. */
 export class ListItem extends Base {
     /** Raw data */
-    _data: APIListItem;
+    #data: APIListItem;
     /** Guild/server id */
     guildID: string;
     /** ID of the 'docs' channel. */
@@ -21,7 +20,7 @@ export class ListItem extends Base {
     /** When the item was created. */
     createdAt: Date | null;
     /** ID of the member who created the doc. */
-    memberID: string;
+    creatorID: string;
     /** ID of the webhook that created the list item (if it was created by a webhook) */
     webhookID: string | null;
     /** Timestamp at which the item was updated. */
@@ -41,13 +40,13 @@ export class ListItem extends Base {
      */
     constructor(data: APIListItem, client: Client){
         super(data.id, client);
-        this._data = data;
+        this.#data = data;
         this.guildID = data.serverId;
         this.channelID = data.channelId;
         this.content = data.message ?? null;
         this.mentions = data.mentions ??  null;
         this.createdAt = data.createdAt ? new Date(data.createdAt) : null;
-        this.memberID = data.createdBy;
+        this.creatorID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.updatedBy = data.updatedBy ?? null;
@@ -57,27 +56,19 @@ export class ListItem extends Base {
     }
 
     get note(): ListItemNoteTypes | null {
-        return this._data.note ? {
-            createdAt:       new Date(this._data.note.createdAt),
-            memberID:        this._data.note.createdBy,
-            editedTimestamp: this._data.note.updatedAt ? new Date(this._data.note.updatedAt) : null,
-            editedBy:        this._data.note.updatedBy ?? null,
-            mentions:        this._data.note.mentions ?? null,
-            content:         this._data.note.content
+        return this.#data.note ? {
+            createdAt:       new Date(this.#data.note.createdAt),
+            memberID:        this.#data.note.createdBy,
+            editedTimestamp: this.#data.note.updatedAt ? new Date(this.#data.note.updatedAt) : null,
+            editedBy:        this.#data.note.updatedBy ?? null,
+            mentions:        this.#data.note.mentions ?? null,
+            content:         this.#data.note.content
         } as ListItemNoteTypes : null;
     }
 
-    /** Retrieve the member who executed this action.
-     * Note: If the item has been edited, the updatedBy id will be used to get you the member.
-     */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.members.get(this.updatedBy ?? this.memberID);
-        } else if (this.client.cache.users.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.users.get(this.updatedBy ?? this.memberID);
-        } else if (this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
-        } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
+    /** Retrieve the member who executed this action, if cached. */
+    get member(): Member | Uncached {
+        return this.client.cache.members.get(this.#data.updatedBy ?? this.#data.createdBy) ?? { id: this.#data.updatedBy ?? this.#data.createdBy };
     }
 
     /** Edit this item.

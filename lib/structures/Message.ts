@@ -8,8 +8,9 @@ import { Base } from "./Base";
 
 import { User } from "./User";
 import { APIChatMessage, APIEmbedOptions, APIMentions, APIMessageOptions } from "../Constants";
+import { Uncached } from "../types/types";
 
-/** Message component, with all its methods and declarations. */
+/** Represents a guild message. */
 export class Message extends Base {
     /** Raw data. */
     #data: APIChatMessage;
@@ -29,8 +30,6 @@ export class Message extends Base {
     isSilent: boolean | null;
     /** object containing all mentioned users. */
     mentions: APIMentions;
-    /** ID of the message author. */
-    memberID: string;
     /** ID of the webhook used to send this message. (if sent by a webhook) */
     webhookID?: string | null;
 
@@ -61,7 +60,6 @@ export class Message extends Base {
         this.mentions = data.mentions as APIMentions ?? null;
         this.createdAt = new Date(data.createdAt);
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
-        this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
         this.deletedAt = data["deletedAt" as keyof object] ? new Date(data["deletedAt" as keyof object]) : null;
         this._lastMessageID = null;
@@ -70,30 +68,15 @@ export class Message extends Base {
         void this.setCache.bind(this)();
     }
 
-    /** Retrieve message's member, if cached.
-     * If there is no cached member or user, this will make a request which returns a Promise.
-     * If the request fails, this will throw an error or return you undefined as a value.
-     */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.memberID) && this.memberID){
-            return this.client.cache.members.get(this.memberID);
-        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
-            return this.client.cache.users.get(this.memberID);
-        } else if (this.memberID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
-        } else if (this.client.cache.messages.get(this.id)){
-            const message = this.client.cache.messages.get(this.id) as Message;
-            if (message.guildID && message.memberID) return this.client.rest.guilds.getMember(message.guildID, message.memberID) as Promise<Member>;
-        }
+    /** Retrieve the member who sent this message, if cached. */
+    get member(): Member | Uncached {
+        return this.client.cache.members.get(this.#data.createdBy) ?? { id: this.#data.createdBy };
     }
 
-    /** Getter used to get the message's guild
-     *
-     * Note: this can return a promise, make sure to await it before.
-     */
-    get guild(): Guild | Promise<Guild> {
+    /** The message's guild, if cached. */
+    get guild(): Guild | Uncached {
         if (!this.guildID) throw new Error("Couldn't get Guild, 'guildID' is not defined. You're probably using a modified version of the Message component.");
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+        return this.client.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 
     /** Getter used to get the message's channel
@@ -106,7 +89,10 @@ export class Message extends Base {
     }
 
     private async setCache(): Promise<void> {
-        if (this.guild) this.client.cache.guilds.add(await this.guild);
+        if (!this.client.cache.guilds.get(this.guildID as string)) {
+            const guild = void this.client.rest.guilds.getGuild(this.guildID as string).catch();
+            if (guild) this.client.cache.guilds.add(guild);
+        }
         if (this.member instanceof Member){
             this.client.cache.members.add(this.member);
         } else if (this.member instanceof User){

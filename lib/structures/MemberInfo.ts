@@ -3,6 +3,7 @@ import type { Client } from "./Client";
 import type { Guild } from "./Guild";
 import type { Member } from "./Member";
 import type { GatewayEvent_ServerMemberUpdated as GWMUpdated, GatewayEvent_ServerRolesUpdated as GWMRolesUpdated, GatewayEvent_ServerMemberRemoved as GWMRemoved } from "../Constants";
+import { Uncached } from "../types/types";
 
 /** Base class for member information classes. */
 export abstract class MemberInfo {
@@ -18,11 +19,13 @@ export abstract class MemberInfo {
         this.memberID = memberID;
     }
 
-    get guild(): Guild | Promise<Guild> {
-        return this.client!.cache.guilds.get(this.guildID) ?? this.client!.rest.guilds.getGuild(this.guildID);
+    /** Retrieve guild, if cached. */
+    get guild(): Guild | Uncached {
+        return this.client!.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 
-    get member(): Member | Promise<Member> {
-        return this.client!.cache.members.get(this.memberID) ?? this.client!.rest.guilds.getMember(this.guildID, this.memberID);
+    /** Retrieve member, if cached. */
+    get member(): Member | Uncached {
+        return this.client!.cache.members.get(this.memberID) ?? { id: this.memberID };
     }
 }

@@ -85,3 +85,4 @@ export interface GuildDeleteInfo {
 }
 
 export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo;
+export interface Uncached { id: string | number; }

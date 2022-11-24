@@ -9,6 +9,7 @@ import { ForumThreadComment } from "./ForumThreadComment";
 import { APIForumTopic, APIMentions } from "../Constants";
 import { EditForumThreadOptions } from "../types/forumThread";
 import { CreateForumCommentOptions } from "../types/forumThreadComment";
+import { Uncached } from "../types/types";
 
 /** Represents a thread/topic coming from a "Forums" channel. */
 export class ForumThread extends Base {
@@ -51,11 +52,9 @@ export class ForumThread extends Base {
         this.mentions = data.mentions ?? null;
     }
 
-    /** Guild where this thread's owner comes from, returns Guild or a promise.
-     * If guild isn't cached & the request failed, this will return you undefined.
-     */
-    get guild(): Guild | Promise<Guild> {
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+    /** Guild where this thread's owner comes from, if cached. */
+    get guild(): Guild | Uncached {
+        return this.client.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 
     /** Retrieve thread's owner, if cached.

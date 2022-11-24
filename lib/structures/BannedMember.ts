@@ -3,10 +3,11 @@ import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
 import { APIGuildMemberBan, APIUser } from "../Constants";
+import { Uncached } from "../types/types";
 
 /** BannedMember represents a banned guild member. */
 export class BannedMember extends User {
-    /** Server ID. */
+    /** Guild ID. */
     guildID: string;
     /** Information about the banned member (object) */
     ban: {
@@ -32,11 +33,8 @@ export class BannedMember extends User {
         };
     }
 
-    /** Getter used to get the message's guild
-     *
-     * Note: this can return a promise, make sure to await it before.
-     */
-    get guild(): Guild | Promise<Guild> {
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+    /** Banned member's guild, if cached. */
+    get guild(): Guild | Uncached {
+        return this.client.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 }

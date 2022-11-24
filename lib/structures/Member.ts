@@ -3,7 +3,7 @@ import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
 import { BannedMember } from "./BannedMember";
-import { GetSocialLink } from "../types/types";
+import { GetSocialLink, Uncached } from "../types/types";
 import { APIGuildMember } from "../Constants";
 import { EditMemberOptions } from "../types/guilds";
 
@@ -38,12 +38,12 @@ export class Member extends User {
     /** Guild where the user comes from, returns Guild or a promise.
      * If guild isn't cached & the request failed, this will return you undefined.
      */
-    get guild(): Guild | Promise<Guild> {
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+    get guild(): Guild | Uncached {
+        return this.client.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 
     /** Member's user, shows less information. */
-    get user(): User{
+    get user(): User {
         return new User(this._data.user, this.client);
     }
 

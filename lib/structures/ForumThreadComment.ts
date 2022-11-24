@@ -2,12 +2,14 @@
 import { Client } from "./Client";
 import { Base } from "./Base";
 import { Member } from "./Member";
-import { User } from "./User";
 import { APIForumTopicComment, APIMentions } from "../Constants";
 import { CreateForumCommentOptions, EditForumCommentOptions, ConstructorForumThreadOptions } from "../types/forumThreadComment";
+import { Uncached } from "../types/types";
 
 /** Represents a comment coming from a ForumThread. */
 export class ForumThreadComment extends Base {
+    /** Data */
+    #data: APIForumTopicComment;
     /** The content of the forum thread comment */
     content: string;
     /** The ISO 8601 timestamp that the forum thread comment was created at */
@@ -16,8 +18,6 @@ export class ForumThreadComment extends Base {
     updatedAt?: string;
     /** The ID of the forum thread */
     threadID: number;
-    /** The ID of the user who sent this comment. */
-    memberID: string;
     /** ID of the forum thread's server, if provided. */
     guildID: string | null;
     /** ID of the forum channel containing this thread. */
@@ -27,28 +27,19 @@ export class ForumThreadComment extends Base {
 
     constructor(data: APIForumTopicComment, client: Client, options?: ConstructorForumThreadOptions){
         super(data.id, client);
+        this.#data = data;
         this.content = data.content;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
         this.channelID = data.channelId;
         this.threadID = data.forumTopicId;
-        this.memberID = data.createdBy;
         this.guildID = options?.guildID ?? null;
         this.mentions = data.mentions ?? null;
     }
 
-    /** Retrieve the member who sent this comment, if cached.
-     * If there is no cached member or user, this will make a request which returns a Promise.
-     * If the request fails, this will throw an error or return you undefined as a value.
-     */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.memberID) && this.memberID){
-            return this.client.cache.members.get(this.memberID);
-        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
-            return this.client.cache.users.get(this.memberID);
-        } else if (this.memberID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
-        }
+    /** Retrieve the member who sent this comment, if cached. */
+    get member(): Member | Uncached {
+        return this.client.cache.members.get(this.#data.createdBy) ?? { id: this.#data.createdBy };
     }
 
     /** Add a comment to the same forum thread as this comment.
