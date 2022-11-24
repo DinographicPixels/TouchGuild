@@ -81,7 +81,7 @@ export class Message extends Base {
         return this.client.cache.guilds.get(this.guildID) ?? { id: this.guildID };
     }
 
-    /** Getter used to get the message's channel
+    /** Channel where the message was sent.
      *
      * Note: this returns a promise, make sure to await it before.
      */
