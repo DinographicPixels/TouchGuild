@@ -18,6 +18,8 @@ export class ForumThreadComment extends Base {
     updatedAt?: string;
     /** The ID of the forum thread */
     threadID: number;
+    /** The ID of the user who sent this comment. */
+    memberID: string;
     /** ID of the forum thread's server, if provided. */
     guildID: string | null;
     /** ID of the forum channel containing this thread. */
@@ -33,6 +35,7 @@ export class ForumThreadComment extends Base {
         this.updatedAt = data.updatedAt;
         this.channelID = data.channelId;
         this.threadID = data.forumTopicId;
+        this.memberID = data.createdBy;
         this.guildID = options?.guildID ?? null;
         this.mentions = data.mentions ?? null;
     }

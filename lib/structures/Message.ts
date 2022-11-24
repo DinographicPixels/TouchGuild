@@ -6,7 +6,6 @@ import { Guild } from "./Guild";
 
 import { Base } from "./Base";
 
-import { User } from "./User";
 import { APIChatMessage, APIEmbedOptions, APIMentions, APIMessageOptions } from "../Constants";
 import { Uncached } from "../types/types";
 
@@ -30,6 +29,8 @@ export class Message extends Base {
     isSilent: boolean | null;
     /** object containing all mentioned users. */
     mentions: APIMentions;
+    /** ID of the message author. */
+    memberID: string;
     /** ID of the webhook used to send this message. (if sent by a webhook) */
     webhookID?: string | null;
 
@@ -60,6 +61,7 @@ export class Message extends Base {
         this.mentions = data.mentions as APIMentions ?? null;
         this.createdAt = new Date(data.createdAt);
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
+        this.memberID = data.createdBy;
         this.webhookID = data.createdByWebhookId ?? null;
         this.deletedAt = data["deletedAt" as keyof object] ? new Date(data["deletedAt" as keyof object]) : null;
         this._lastMessageID = null;
@@ -89,14 +91,11 @@ export class Message extends Base {
     }
 
     private async setCache(): Promise<void> {
-        if (!this.client.cache.guilds.get(this.guildID as string)) {
-            const guild = void this.client.rest.guilds.getGuild(this.guildID as string).catch();
-            if (guild) this.client.cache.guilds.add(guild);
+        if (!this.client.cache.guilds.get(this.#data.serverId as string)) {
+            void this.client.rest.guilds.getGuild(this.#data.serverId as string).then(guild => this.client.cache.guilds.add(guild)).catch();
         }
-        if (this.member instanceof Member){
-            this.client.cache.members.add(this.member);
-        } else if (this.member instanceof User){
-            this.client.cache.users.add(this.member);
+        if (!this.client.cache.members.get(this.#data.createdBy)) {
+            void this.client.rest.guilds.getMember(this.#data.serverId as string, this.#data.createdBy).then(member => this.client.cache.members.add(member)).catch();
         }
     }
 
