@@ -7,7 +7,7 @@ import type { MessageReactionInfo } from "../structures/MessageReactionInfo";
 import type { ForumThreadReactionInfo } from "../structures/ForumThreadReactionInfo";
 import type { APIEmote, APIMentions } from "../Constants";
 
-export interface messageReactionInfo {
+export interface MessageReactionTypes {
     message: Message | {
         id: string;
         guild: Guild | {
@@ -21,7 +21,7 @@ export interface messageReactionInfo {
     };
 }
 
-export interface forumThreadReactionInfo {
+export interface ForumThreadReactionTypes {
     thread: ForumThread | {
         id: number;
         guild: Guild | {
@@ -35,7 +35,6 @@ export interface forumThreadReactionInfo {
     };
 }
 
-// deprecated.
 export interface UserClientTypes {
     /** Client's user. */
     user: {

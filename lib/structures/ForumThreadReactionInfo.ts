@@ -1,7 +1,7 @@
 /** @module ForumThreadReactionInfo */
 import { ReactionInfo } from "./ReactionInfo";
 import { Client } from "./Client";
-import { forumThreadReactionInfo } from "../types/types";
+import { ForumThreadReactionTypes } from "../types/types";
 import { GatewayEvent_ForumTopicReactionCreated, GatewayEvent_ForumTopicReactionDeleted } from "../Constants";
 
 /** Information about a ForumThread's reaction. */
@@ -20,7 +20,7 @@ export class ForumThreadReactionInfo extends ReactionInfo {
      * If the thread is cached, it'll return a ForumThread component,
      * otherwise it'll return basic information about this thread.
      */
-    get thread(): forumThreadReactionInfo["thread"] {
+    get thread(): ForumThreadReactionTypes["thread"] {
         return this.client.cache.forumThreads.get(this.#threadID) ?? {
             id:    this.#threadID,
             guild: this.client.cache.guilds.get(this.data.serverId as string) ?? {
