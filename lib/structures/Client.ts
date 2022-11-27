@@ -59,7 +59,7 @@ export class Client extends TypedEmitter<ClientEvents> {
     /** @param params Client's parameters, this includes bot's token & rest options. */
     constructor(params: ClientOptions){
         if (typeof params !== "object") throw new Error("The token isn't provided in an object.");
-        if (typeof params?.token === "undefined") throw new Error("Cannot create client without token, no token is provided.");
+        if (!params?.token) throw new Error("Cannot create client without token, no token is provided.");
         super();
         this.params = { token: params.token, REST: params.REST ?? true, RESTOptions: params.RESTOptions };
         this.ws = new WSManager(this, { token: this.token, client: this });
