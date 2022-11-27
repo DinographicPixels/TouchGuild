@@ -323,6 +323,8 @@ module.exports = {
     "unicorn/consistent-destructuring": "off",
     "unicorn/prefer-number-properties": "off",
     "unicorn/no-array-callback-reference": "off",
-    "unicorn/no-array-method-this-argument": "off"
+    "unicorn/no-array-method-this-argument": "off",
+    "unicorn/no-negated-condition": "off",
+    "unicorn/no-typeof-undefined": "off"
   }
 }
