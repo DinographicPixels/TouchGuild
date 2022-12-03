@@ -1,18 +1,22 @@
 /** @module ForumThread */
 import { Client } from "./Client";
-import { Channel } from "./Channel";
 import { Guild } from "./Guild";
 import { Member } from "./Member";
 import { Base } from "./Base";
 import { User } from "./User";
 import { ForumThreadComment } from "./ForumThreadComment";
-import { APIForumTopic, APIMentions } from "../Constants";
+import { APIForumTopic, APIForumTopicComment, APIMentions } from "../Constants";
 import { EditForumThreadOptions } from "../types/forumThread";
 import { CreateForumCommentOptions } from "../types/forumThreadComment";
+import TypedCollection from "../util/TypedCollection";
+import { JSONForumThread } from "../types/json";
+import { AnyChannel, AnyTextableChannel } from "../types/channel";
 
 /** Represents a thread/topic coming from a "Forums" channel. */
-export class ForumThread extends Base {
-    /** Guild/server id */
+export class ForumThread<T extends AnyChannel> extends Base<number> {
+    private _cachedChannel!: T extends AnyTextableChannel ? T : undefined;
+    private _cachedGuild?: T extends Guild ? Guild : Guild | null;
+    /** Guild ID */
     guildID: string;
     /** Forum channel id */
     channelID: string;
@@ -20,6 +24,8 @@ export class ForumThread extends Base {
     name: string;
     /** When this forum thread was created. */
     createdAt: Date;
+    /** Owner of this thread, if cached. */
+    owner: T extends Guild ? Member : Member | User | Promise<Member> | undefined;
     /** The ID of the owner of this thread. */
     ownerID: string;
     /** ID of the webhook that created the thread (if created by webhook) */
@@ -27,11 +33,17 @@ export class ForumThread extends Base {
     /** Timestamp at which this channel was last edited. */
     editedTimestamp: Date | null;
     /** Timestamp (unix epoch time) that the forum thread was bumped at. */
-    bumpedAt: string | null;
+    bumpedAt: Date | null;
     /** Content of the thread */
     content: string;
     /** Thread mentions */
     mentions: APIMentions | null;
+    /** Cached comments. */
+    comments: TypedCollection<number, APIForumTopicComment, ForumThreadComment>;
+    /** If true, the thread is locked. */
+    isLocked: boolean;
+    /** If true, the thread is pinned. */
+    isPinned: boolean;
 
     /**
      * @param data raw data
@@ -44,39 +56,91 @@ export class ForumThread extends Base {
         this.name = data.title;
         this.createdAt = new Date(data.createdAt);
         this.ownerID = data.createdBy;
+        this.owner =  (this.client.getMember(data.serverId, data.createdBy) ?? this.client.users.get(data.createdBy) ?? this.client.rest.guilds.getMember(data.serverId, data.createdBy)) as T extends Guild ? Member : Member | User | Promise<Member> | undefined;
         this.webhookID = data.createdByWebhookId ?? null;
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
-        this.bumpedAt = data.bumpedAt ?? null;
+        this.bumpedAt = data.bumpedAt ? new Date(data.bumpedAt) : null;
         this.content = data.content;
         this.mentions = data.mentions ?? null;
+        this.comments = new TypedCollection(ForumThreadComment, client, client.params.collectionLimits?.threadComments);
+        this.isLocked = data.isLocked ?? false;
+        this.isPinned = data.isPinned ?? false;
+        this.update(data);
     }
 
-    /** Guild where this thread's owner comes from, returns Guild or a promise.
-     * If guild isn't cached & the request failed, this will return you undefined.
-     */
-    get guild(): Guild | Promise<Guild> {
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+    override toJSON(): JSONForumThread {
+        return {
+            ...super.toJSON(),
+            guildID:         this.guildID,
+            channelID:       this.channelID,
+            name:            this.name,
+            createdAt:       this.createdAt,
+            owner:           this.owner,
+            ownerID:         this.ownerID,
+            webhookID:       this.webhookID,
+            editedTimestamp: this.editedTimestamp,
+            bumpedAt:        this.bumpedAt,
+            content:         this.content,
+            mentions:        this.mentions,
+            comments:        this.comments,
+            isLocked:        this.isLocked,
+            isPinned:        this.isPinned
+        };
     }
 
-    /** Retrieve thread's owner, if cached.
-     * If there is no cached member or user, this will make a request which returns a Promise.
-     * If the request fails, this will throw an error or return you undefined as a value.
-     */
-    get owner(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.ownerID) && this.ownerID){
-            return this.client.cache.members.get(this.ownerID);
-        } else if (this.client.cache.users.get(this.ownerID) && this.ownerID){
-            return this.client.cache.users.get(this.ownerID);
-        } else if (this.ownerID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.ownerID);
+    protected override update(data: APIForumTopic): void {
+        if (data.bumpedAt !== undefined) {
+            this.bumpedAt = new Date(data.bumpedAt);
+        }
+        if (data.channelId !== undefined) {
+            this.channelID = data.channelId;
+        }
+        if (data.content !== undefined) {
+            this.content = data.content;
+        }
+        if (data.createdAt !== undefined) {
+            this.createdAt = new Date(data.createdAt);
+        }
+        if (data.createdBy !== undefined) {
+            this.ownerID = data.createdBy;
+        }
+        if (data.createdByWebhookId !== undefined) {
+            this.webhookID = data.createdByWebhookId;
+        }
+        if (data.id !== undefined) {
+            this.id = data.id;
+        }
+        if (data.isLocked !== undefined) {
+            this.isLocked = data.isLocked;
+        }
+        if (data.mentions !== undefined) {
+            this.mentions = data.mentions ?? null;
+        }
+        if (data.serverId !== undefined) {
+            this.guildID = data.serverId;
+        }
+        if (data.title !== undefined) {
+            this.name = data.title;
+        }
+        if (data.updatedAt !== undefined) {
+            this.editedTimestamp = new Date(data.updatedAt);
         }
     }
 
-    /** The forum channel, where the thread is in.
-     * This will send a request to Guilded, a promise will be returned.
-     */
-    get channel(): Promise<Channel> {
-        return this.client.rest.channels.getChannel(this.channelID);
+    /** The guild the thread is in. This will throw an error if the guild isn't cached.*/
+    get guild(): T extends Guild ? Guild : Guild | null {
+        if (!this._cachedGuild) {
+            this._cachedGuild = this.client.getGuild(this.guildID);
+            if (!this._cachedGuild) {
+                throw new Error(`${this.constructor.name}#guild: couldn't find the Guild in cache.`);
+            }
+        }
+        return this._cachedGuild as T extends Guild ? Guild : Guild | null;
+    }
+
+    /** The forum channel this thread was created in.  */
+    get channel(): T extends AnyTextableChannel ? T : undefined {
+        return this._cachedChannel ?? (this._cachedChannel = this.client.getChannel(this.guildID, this.channelID) as T extends AnyTextableChannel ? T : undefined);
     }
 
     /** If true, this forum thread was created by a webhook. */
@@ -94,8 +158,8 @@ export class ForumThread extends Base {
     /** Edit the forum thread.
      * @param options Edit options.
      */
-    async edit(options: EditForumThreadOptions): Promise<ForumThread> {
-        return this.client.rest.channels.editForumThread(this.channelID, this.id as number, options);
+    async edit(options: EditForumThreadOptions): Promise<ForumThread<T>> {
+        return this.client.rest.channels.editForumThread<T>(this.channelID, this.id as number, options);
     }
 
     /** Delete this forum thread. */

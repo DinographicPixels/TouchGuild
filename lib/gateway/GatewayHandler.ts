@@ -124,8 +124,13 @@ export class GatewayHandler {
         ListItemUncompleted:           data => this.listItemHandler.listItemUncomplete(data as GatewayEvent_ListItemUncompleted)
     };
 
-    handleMessage(eventType: keyof GATEWAY_EVENTS, eventData: object): void {
+    async handleMessage(eventType: keyof GATEWAY_EVENTS, eventData: object): Promise<void> {
         if (this.client.identifiers[eventType as keyof object]){
+            const serverId = "serverId" as keyof object;
+            if (eventData[serverId] && this.client.guilds.get(eventData[serverId]) === undefined) {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                this.client.guilds.add(await this.client.rest.guilds.getGuild(eventData[serverId]));
+            }
             if (eventData["message" as keyof object] && eventData["message" as keyof object]["type" as keyof object] === "system") return; // system sending fake messages, haha :)
             this.toHandlerMap[eventType]?.(eventData);
         }

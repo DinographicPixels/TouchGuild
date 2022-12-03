@@ -16,6 +16,15 @@ export interface ClientOptions {
      * This includes some properties like the baseURL and much more.
      */
     RESTOptions?: RESTOptions;
+
+    collectionLimits?: {
+        messages?: number;
+        threads?: number;
+        threadComments?: number;
+        docs?: number;
+        scheduledEvents?: number;
+        scheduledEventsRSVPS?: number;
+    };
 }
 
 export interface RESTOptions {

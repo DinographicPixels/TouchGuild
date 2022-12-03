@@ -26,7 +26,7 @@ import {
     GETGuildBanResponse,
     GETGuildBansResponse
 } from "../Constants";
-import { CreateChannelOptions, EditChannelOptions } from "../types/channel";
+import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
 import { EditMemberOptions } from "../types/guilds";
 import { BannedMember } from "../structures/BannedMember";
@@ -310,7 +310,7 @@ export class Guilds {
      * @param type Type of the new channel. (e.g: chat)
      * @param options New channel's additional options.
      */
-    async createChannel(guildID: string, name: string, type: APIChannelCategories, options?: CreateChannelOptions): Promise<Channel> {
+    async createChannel<T extends AnyChannel = AnyChannel>(guildID: string, name: string, type: APIChannelCategories, options?: CreateChannelOptions): Promise<T> {
         if (!guildID) throw new Error("guildID is a required parameter.");
         if (!name) throw new Error("name parameter is a required parameter.");
         if (!type) type = "chat";
@@ -327,14 +327,14 @@ export class Guilds {
                 groupId:    options?.groupID,
                 categoryId: options?.categoryID
             }
-        }).then(data => new Channel(data.channel, this.#manager.client));
+        }).then(data => Channel.from<T>(data.channel, this.#manager.client));
     }
 
     /** Edit a channel.
      * @param channelID ID of the channel to edit.
      * @param options Channel edit options.
      */
-    async editChannel(channelID: string, options: EditChannelOptions): Promise<Channel> {
+    async editChannel<T extends AnyChannel = AnyChannel>(channelID: string, options: EditChannelOptions): Promise<T> {
         if (!channelID) throw new Error("channelID is a required parameter.");
         return this.#manager.authRequest<PATCHChannelResponse>({
             method: "PATCH",
@@ -344,7 +344,7 @@ export class Guilds {
                 topic:    options.description,
                 isPublic: options.isPublic
             }
-        }).then(data => new Channel(data.channel, this.#manager.client));
+        }).then(data => Channel.from<T>(data.channel, this.#manager.client));
     }
 
     /** Delete a channel.

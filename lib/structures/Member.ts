@@ -6,6 +6,7 @@ import { BannedMember } from "./BannedMember";
 import { GetSocialLink } from "../types/types";
 import { APIGuildMember } from "../Constants";
 import { EditMemberOptions } from "../types/guilds";
+import { JSONMember } from "../types/json";
 
 /** Represents a guild user. */
 export class Member extends User {
@@ -33,18 +34,54 @@ export class Member extends User {
         this.joinedAt = data.joinedAt ? new Date(data.joinedAt) : null;
         this.isOwner = data.isOwner ?? false;
         this.guildID = guildID;
+        this.update(data);
+    }
+
+    override toJSON(): JSONMember {
+        return {
+            ...super.toJSON(),
+            roles:    this.roles,
+            nickname: this.nickname,
+            joinedAt: this.joinedAt,
+            isOwner:  this.isOwner,
+            guildID:  this.guildID
+        };
+    }
+
+    protected override update(data: APIGuildMember): void {
+        if (data.isOwner !== undefined) {
+            this.isOwner = data.isOwner ?? false;
+        }
+        if (data.joinedAt !== undefined) {
+            this.joinedAt = data.joinedAt ? new Date(data.joinedAt) : null;
+        }
+        if (data.nickname !== undefined) {
+            this.nickname = data.nickname ?? null;
+        }
+        if (data.roleIds !== undefined) {
+            this.roles = data.roleIds ?? null;
+        }
+        if (data.user !== undefined) {
+            super.update(data.user);
+            this.client.users.update(data.user);
+        }
     }
 
     /** Guild where the user comes from, returns Guild or a promise.
      * If guild isn't cached & the request failed, this will return you undefined.
      */
     get guild(): Guild | Promise<Guild> {
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+        return this.client.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
     }
 
     /** Member's user, shows less information. */
-    get user(): User{
-        return new User(this._data.user, this.client);
+    get user(): User {
+        if (this.client.users.get(this.id)) {
+            return this.client.users.update(this._data.user);
+        } else {
+            const USER = new User(this._data.user, this.client);
+            this.client.users.add(USER); return USER;
+        }
     }
 
     /** Edit this member.

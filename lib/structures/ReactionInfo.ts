@@ -36,7 +36,7 @@ export class ReactionInfo {
 
     /** Cached member. If member isn't cached will return an object with the member's id. */
     get reactor(): Member | { id: string; } {
-        return this.client.cache.members.get(this.data.reaction.createdBy) ?? {
+        return this.client.getGuild(this.data.serverId as string)?.members.get(this.data.reaction.createdBy) ?? {
             id: this.data.reaction.createdBy
         };
     }
