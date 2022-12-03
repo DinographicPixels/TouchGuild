@@ -1,4 +1,9 @@
 import type { Message } from "../structures/Message";
+import { GuildChannel } from "../structures/GuildChannel";
+import { TextChannel } from "../structures/TextChannel";
+import { ForumChannel } from "../structures/ForumChannel";
+import { DocChannel } from "../structures/DocChannel";
+import { CalendarChannel } from "../structures/CalendarChannel";
 import type { APIEmbedField } from "guildedapi-types.ts/v1";
 
 export interface CreateMessageOptions {
@@ -103,7 +108,7 @@ export interface GetChannelMessagesFilter {
     includePrivate?: boolean;
 }
 
-export type PossiblyUncachedMessage = Message | {
+export type PossiblyUncachedMessage = Message<AnyTextableChannel> | {
     /** The ID of the message. */
     id: string;
     /** ID of the server on which the message was sent. */
@@ -115,3 +120,7 @@ export type PossiblyUncachedMessage = Message | {
     /** If true, the message is private. */
     isPrivate: boolean | null;
 };
+
+export type AnyTextableChannel = TextChannel;
+export type AnyChannel = GuildChannel | TextChannel | ForumChannel | DocChannel | CalendarChannel;
+export type AnyGuildChannel = Exclude<AnyChannel, GuildChannel>;

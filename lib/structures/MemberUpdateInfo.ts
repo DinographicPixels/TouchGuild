@@ -29,16 +29,6 @@ export class MemberUpdateInfo extends MemberInfo {
         super(data, memberID, client);
         this.updatedNickname = (data as GWMUpdated)?.userInfo?.nickname ?? null;
         this.roles = (data as GWRolesUpdated)?.memberRoleIds?.[0]?.roleIds ?? null;
-        this.oldRoles = (this.client.cache.members.get(this.memberID))?.roles ?? null;
-        this.updateCache.bind(this)();
-    }
-
-    private updateCache(): void {
-        const CachedMember = this.client.cache.members.get(this.memberID);
-        if (CachedMember){
-            if (!this.roles) return;
-            CachedMember.roles = this.roles;
-            this.client.cache.members.add(CachedMember);
-        }
+        this.oldRoles = (this.client.getGuild(data.serverId)?.members.get(this.memberID))?.roles ?? null;
     }
 }

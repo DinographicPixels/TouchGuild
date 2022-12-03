@@ -4,6 +4,11 @@ export * from "./structures/Client";
 export * from "./structures/User";
 export * from "./structures/Member";
 export * from "./structures/Channel";
+export * from "./structures/GuildChannel";
+export * from "./structures/DocChannel";
+export * from "./structures/TextChannel";
+export * from "./structures/ForumChannel";
+export * from "./structures/CalendarChannel";
 export * from "./structures/Guild";
 export * from "./structures/UserClient";
 

@@ -1,22 +1,32 @@
 /** @module ChannelHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
-import { Channel } from "../../structures/Channel";
 import { GatewayEvent_ServerChannelCreated, GatewayEvent_ServerChannelDeleted, GatewayEvent_ServerChannelUpdated } from "../../Constants";
 
 /** Internal component, emitting channel events. */
 export class ChannelHandler extends GatewayEventHandler{
     channelCreate(data: GatewayEvent_ServerChannelCreated): void {
-        const ChannelComponent = new Channel(data.channel, this.client);
+        void this.addGuildChannel(data.serverId, data.channel.id);
+        const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelCreate", ChannelComponent);
     }
 
     channelUpdate(data: GatewayEvent_ServerChannelUpdated): void {
-        const ChannelComponent = new Channel(data.channel, this.client);
+        void this.addGuildChannel(data.serverId, data.channel.id);
+        const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelUpdate", ChannelComponent);
     }
 
     channelDelete(data: GatewayEvent_ServerChannelDeleted): void {
-        const ChannelComponent = new Channel(data.channel, this.client);
+        const guild = this.client.guilds.get(data.serverId);
+        const ChannelComponent = this.client.util.updateChannel(data.channel);
+        guild?.channels.delete(data.channel.id);
         this.client.emit("channelDelete", ChannelComponent);
+    }
+
+    private async addGuildChannel(guildID: string, channelID: string): Promise<void> {
+        if (this.client.getChannel(guildID, channelID) !== undefined) return;
+        const channel = await this.client.rest.channels.getChannel(channelID);
+        const guild = this.client.guilds.get(guildID);
+        guild?.channels?.add(channel);
     }
 }
