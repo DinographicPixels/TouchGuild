@@ -1,12 +1,12 @@
 /** @module Events */
 import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
-import { PossiblyUncachedMessage } from "./channel";
+import { AnyChannel, AnyTextableChannel, PossiblyUncachedMessage } from "./channel";
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
+import { JSONMessage } from "./json";
 import type { BannedMember } from "../structures/BannedMember";
 import type { ForumThread } from "../structures/ForumThread";
 import type { ForumThreadComment } from "../structures/ForumThreadComment";
 import type { Message } from "../structures/Message";
-import type { Channel } from "../structures/Channel";
 import type { MemberRemoveInfo } from "../structures/MemberRemoveInfo";
 import type { MemberUpdateInfo } from "../structures/MemberUpdateInfo";
 import type { ListItem } from "../structures/ListItem";
@@ -28,9 +28,9 @@ export interface ClientEvents {
     /** @event Emitted when the bot is ready. */
     ready: [];
     /** @event Emitted when a message is created in a "chat" channel. */
-    messageCreate: [message: Message];
+    messageCreate: [message: Message<AnyTextableChannel>];
     /** @event Emitted when a message coming from a "chat" channel is edited. */
-    messageUpdate: [message: Message, oldMessage: Message | null];
+    messageUpdate: [message: Message<AnyTextableChannel>, oldMessage: JSONMessage | null];
     /** @event Emitted when a message coming from a "chat" channel is deleted. */
     messageDelete: [message: PossiblyUncachedMessage];
     /** @event Emitted when a reaction is added to anything. */
@@ -38,21 +38,21 @@ export interface ClientEvents {
     /** @event Emitted when a reaction is removed from anything. */
     reactionRemove: [reactionInfo: AnyReactionInfo];
     /** @event Emitted when a guild channel is created. */
-    channelCreate: [channel: Channel];
+    channelCreate: [channel: AnyChannel];
     /** @event Emitted when a guild channel is updated. */
-    channelUpdate: [channel: Channel];
+    channelUpdate: [channel: AnyChannel];
     /** @event Emitted when a guild channel is deleted. */
-    channelDelete: [channel: Channel];
+    channelDelete: [channel: AnyChannel];
     /** @event Emitted when a forum thread is created. */
-    forumThreadCreate: [thread: ForumThread];
+    forumThreadCreate: [thread: ForumThread<AnyChannel>];
     /** @event Emitted when a forum thread is edited. */
-    forumThreadUpdate: [thread: ForumThread];
+    forumThreadUpdate: [thread: ForumThread<AnyChannel>];
     /** @event Emitted when a forum thread is deleted. */
-    forumThreadDelete: [thread: ForumThread];
+    forumThreadDelete: [thread: ForumThread<AnyChannel>];
     /** @event Emitted when a forum thread is pinned. */
-    forumThreadPin: [thread: ForumThread];
+    forumThreadPin: [thread: ForumThread<AnyChannel>];
     /** @event Emitted when a forum thread is unpinned. */
-    forumThreadUnpin: [thread: ForumThread];
+    forumThreadUnpin: [thread: ForumThread<AnyChannel>];
     /** @event Emitted when a thread comment is created. */
     forumCommentCreate: [comment: ForumThreadComment];
     /** @event Emitted when forum thread comment is edited. */
@@ -60,9 +60,9 @@ export interface ClientEvents {
     /** @event Emitted when forum thread is deleted. */
     forumCommentDelete: [comment: ForumThreadComment];
     /** @event Emitted when forum thread got locked. */
-    forumThreadLock: [ForumThread: ForumThread];
+    forumThreadLock: [ForumThread: ForumThread<AnyChannel>];
     /** @event Emitted when forum thread got unlocked. */
-    forumThreadUnlock: [ForumThread: ForumThread];
+    forumThreadUnlock: [ForumThread: ForumThread<AnyChannel>];
     /** @event Emitted when a guild member got banned. */
     guildBanAdd: [BannedMember: BannedMember];
     /** @event Emitted when guild member got unbanned. */

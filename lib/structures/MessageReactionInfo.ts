@@ -1,5 +1,6 @@
 /** @module MessageReactionInfo */
 import { ReactionInfo } from "./ReactionInfo";
+import { TextChannel } from "./TextChannel";
 import { Client } from "../structures/Client";
 import { MessageReactionTypes } from "../types/types";
 import { GatewayEvent_ChannelMessageReactionAdded, GatewayEvent_ChannelMessageReactionDeleted } from "../Constants";
@@ -21,9 +22,10 @@ export class MessageReactionInfo extends ReactionInfo {
      * otherwise it'll return basic information about this message.
      */
     get message(): MessageReactionTypes["message"] {
-        return this.client.cache.messages.get(this.#messageID) ?? {
+        const channel = this.client.getChannel<TextChannel>(this.data.serverId as string, this.data.reaction.channelId);
+        return channel?.messages?.get(this.#messageID) ?? {
             id:    this.#messageID,
-            guild: this.client.cache.guilds.get(this.data.serverId as string) ?? {
+            guild: this.client.guilds.get(this.data.serverId as string) ?? {
                 id: this.data.serverId
             },
             channelID: this.data.reaction.channelId

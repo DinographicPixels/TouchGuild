@@ -19,10 +19,10 @@ export abstract class MemberInfo {
     }
 
     get guild(): Guild | Promise<Guild> {
-        return this.client!.cache.guilds.get(this.guildID) ?? this.client!.rest.guilds.getGuild(this.guildID);
+        return this.client!.guilds.get(this.guildID) ?? this.client!.rest.guilds.getGuild(this.guildID);
     }
 
     get member(): Member | Promise<Member> {
-        return this.client!.cache.members.get(this.memberID) ?? this.client!.rest.guilds.getMember(this.guildID, this.memberID);
+        return this.client!.getGuild(this.guildID)?.members.get(this.memberID) ?? this.client!.rest.guilds.getMember(this.guildID, this.memberID);
     }
 }

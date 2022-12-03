@@ -2,16 +2,16 @@
 import { Client } from "./Client";
 import { Member } from "./Member";
 import { Base } from "./Base";
-import { User } from "./User";
 import { ListItemNoteTypes } from "../types/types";
 import { APIListItem, APIMentions } from "../Constants";
 import { ListItemEditOptions } from "../types/listItem";
+import { JSONListItem } from "../types/json";
 
 /** Represents an item of a "Lists" channel. */
-export class ListItem extends Base {
+export class ListItem extends Base<string> {
     /** Raw data */
     _data: APIListItem;
-    /** Guild/server id */
+    /** Guild id */
     guildID: string;
     /** ID of the 'docs' channel. */
     channelID: string;
@@ -54,6 +54,70 @@ export class ListItem extends Base {
         this.parentListItemID = data.parentListItemId ?? null;
         this.completedAt = data.completedAt ? new Date(data.completedAt) : null;
         this.completedBy = data.completedBy ?? null;
+        this.update(data);
+    }
+
+    override toJSON(): JSONListItem {
+        return {
+            ...super.toJSON(),
+            guildID:          this.guildID,
+            channelID:        this.channelID,
+            content:          this.content,
+            mentions:         this.mentions,
+            createdAt:        this.createdAt,
+            memberID:         this.memberID,
+            webhookID:        this.webhookID,
+            editedTimestamp:  this.editedTimestamp,
+            updatedBy:        this.updatedBy,
+            parentListItemID: this.parentListItemID,
+            completedAt:      this.completedAt,
+            completedBy:      this.completedBy
+        };
+    }
+
+    protected override update(data: APIListItem): void {
+        if (data.channelId !== undefined) {
+            this.channelID = data.channelId;
+        }
+        if (data.completedAt !== undefined) {
+            this.completedAt = new Date(data.completedAt);
+        }
+        if (data.completedBy !== undefined) {
+            this.completedBy = data.completedBy;
+        }
+        if (data.createdAt !== undefined) {
+            this.createdAt = new Date(data.createdAt);
+        }
+        if (data.createdBy !== undefined) {
+            this.memberID = data.createdBy;
+        }
+        if (data.createdByWebhookId !== undefined) {
+            this.webhookID = data.createdByWebhookId;
+        }
+        if (data.id !== undefined) {
+            this.id = data.id;
+        }
+        if (data.mentions !== undefined) {
+            this.mentions = data.mentions;
+        }
+        if (data.message !== undefined) {
+            this.content = data.message;
+        }
+        if (data.note !== undefined) {
+            this._data.note = data.note;
+        }
+        if (data.parentListItemId !== undefined) {
+            this.parentListItemID = data.parentListItemId;
+        }
+        if (data.serverId !== undefined) {
+            this.guildID = data.serverId;
+        }
+        if (data.updatedAt !== undefined) {
+            this.editedTimestamp = new Date(data.updatedAt);
+        }
+        if (data.updatedBy !== undefined) {
+            this.updatedBy = data.updatedBy;
+        }
     }
 
     get note(): ListItemNoteTypes | null {
@@ -68,16 +132,11 @@ export class ListItem extends Base {
     }
 
     /** Retrieve the member who executed this action.
+     *
      * Note: If the item has been edited, the updatedBy id will be used to get you the member.
      */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.members.get(this.updatedBy ?? this.memberID);
-        } else if (this.client.cache.users.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.users.get(this.updatedBy ?? this.memberID);
-        } else if (this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
-        } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
+    get member(): Member | Promise<Member> {
+        return this.client.getGuild(this.guildID)?.members.get(this.updatedBy ?? this.memberID) ?? this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
     }
 
     /** Edit this item.

@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/method-signature-style */
 
 import { Message } from "./Message";
-import { Channel } from "./Channel";
 
 import { Member } from "./Member";
 import { Guild } from "./Guild";
@@ -18,36 +17,44 @@ import { UserClient } from "./UserClient";
 import { ForumThreadComment } from "./ForumThreadComment";
 import { User } from "./User";
 import { BannedMember } from "./BannedMember";
+import { TextChannel } from "./TextChannel";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
 import TypedCollection from "../util/TypedCollection";
 import TypedEmitter from "../types/TypedEmitter";
 import { ClientEvents } from "../types/events";
-import { ClientOptions, RESTOptions } from "../types/client";
+import { ClientOptions } from "../types/client";
 import {
     APIChannelCategories,
     PUTGuildWebhookBody,
     PUTListItemBody,
     POSTListItemBody,
     GATEWAY_EVENTS,
-    ChannelReactionTypes
+    ChannelReactionTypes,
+    APIGuild,
+    APIUser
 } from "../Constants";
-import { CreateChannelOptions, CreateMessageOptions, EditChannelOptions, GetChannelMessagesFilter } from "../types/channel";
+import {
+    AnyChannel,
+    AnyTextableChannel,
+    CreateChannelOptions,
+    CreateMessageOptions,
+    EditChannelOptions
+} from "../types/channel";
 import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions, GetDocsFilter } from "../types/doc";
 import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
 import { EditMemberOptions } from "../types/guilds";
+import { Util } from "../util/Util";
 
 /** Represents the bot's client. */
 export class Client extends TypedEmitter<ClientEvents> {
     /** Client's params, including bot's token & rest options. */
-    params: { token: string; REST?: boolean; RESTOptions?: RESTOptions; };
+    params: ClientOptions;
     /** Websocket Manager. */
     ws: WSManager;
-    /** Client's cache. */
-    cache;
     /** Default event names to TouchGuild event names. */
     identifiers;
     /** Client's user. */
@@ -56,28 +63,48 @@ export class Client extends TypedEmitter<ClientEvents> {
     rest: RESTManager;
     /** Gateway Handler. */
     #gateway: GatewayHandler;
+    /** Cached guilds. */
+    guilds: TypedCollection<string, APIGuild, Guild>;
+    /** Cached users. */
+    users: TypedCollection<string, APIUser, User>;
+    /** Utils */
+    util: Util;
+    startTime: number;
     /** @param params Client's parameters, this includes bot's token & rest options. */
     constructor(params: ClientOptions){
         if (typeof params !== "object") throw new Error("The token isn't provided in an object.");
         if (!params?.token) throw new Error("Cannot create client without token, no token is provided.");
         super();
-        this.params = { token: params.token, REST: params.REST ?? true, RESTOptions: params.RESTOptions };
-        this.ws = new WSManager(this, { token: this.token, client: this });
-        this.cache = {
-            guilds:       new TypedCollection(Guild, this),
-            users:        new TypedCollection(User, this),
-            members:      new TypedCollection(Member, this, 15),
-            messages:     new TypedCollection(Message, this, 15),
-            forumThreads: new TypedCollection(ForumThread, this, 20)
+        this.params = {
+            token:            params.token,
+            REST:             params.REST ?? true,
+            RESTOptions:      params.RESTOptions,
+            collectionLimits: {
+                messages:             params.collectionLimits?.messages             ?? 100,
+                threads:              params.collectionLimits?.threads              ?? 100,
+                threadComments:       params.collectionLimits?.threadComments       ?? 100,
+                docs:                 params.collectionLimits?.docs                 ?? 100,
+                scheduledEvents:      params.collectionLimits?.scheduledEvents      ?? 100,
+                scheduledEventsRSVPS: params.collectionLimits?.scheduledEventsRSVPS ?? 100
+            }
         };
+        this.ws = new WSManager(this, { token: this.token, client: this });
+        this.guilds = new TypedCollection(Guild, this);
+        this.users = new TypedCollection(User, this);
         this.identifiers = this.ws.identifiers;
         this.rest = new RESTManager(this, params.RESTOptions);
         this.#gateway = new GatewayHandler(this);
+        this.util = new Util(this);
+        this.startTime = 0;
     }
 
     /** Bot's token. */
     get token(): string {
         return this.params.token;
+    }
+
+    get uptime(): number {
+        return this.startTime ? Date.now() - this.startTime : 0;
     }
 
     /** Connect to Guilded. */
@@ -86,11 +113,17 @@ export class Client extends TypedEmitter<ClientEvents> {
         this.ws.on("GATEWAY_WELCOME", data => {
             this.user = new UserClient(data.user, this);
             console.log("> Connection established.");
+            this.startTime = Date.now();
             this.emit("ready");
         });
 
+        this.ws.on("disconnect", err => {
+            this.startTime = 0;
+            this.emit("error", err);
+        });
+
         this.ws.on("GATEWAY_PARSED_PACKET", (type, data) => {
-            this.#gateway.handleMessage(type as keyof GATEWAY_EVENTS, data);
+            void this.#gateway.handleMessage(type as keyof GATEWAY_EVENTS, data);
         });
     }
 
@@ -105,30 +138,37 @@ export class Client extends TypedEmitter<ClientEvents> {
     }
 
 
-    /** This method is used to get a specific guild channel.
+    /** This method is used to get a specific guild channel, if cached.
      *
-     * Note: You do not need a guildID to get a channel, only the channelID is needed.
-     * @param channelID The ID of the channel you'd like to get.
+     * Note: this method doesn't send a rest request, it only returns cached entities.
+     * @param channelID The ID of the channel to get from cache.
      */
-    async getChannel(channelID: string): Promise<Channel>{
-        return this.rest.channels.getChannel(channelID);
+    getChannel<T extends AnyChannel = AnyChannel>(guildID: string, channelID: string): T | undefined {
+        if (!guildID) throw new Error("guildID is a required parameter.");
+        if (!channelID) throw new Error("channelID is a required parameter.");
+        return this.guilds.get(guildID)?.channels.get(channelID) as T;
     }
 
-    /** This method is used to get a specific guild member.
-     * @param guildID The ID of the Guild.
-     * @param memberID The ID of the Guild Member you'd like to get.
+    /** This method is used to get a specific guild member, if cached.
+     *
+     * Note: this method doesn't send a rest request, it only returns cached entities.
+     * @param guildID The ID of the guild the member is in.
+     * @param memberID The ID of the member to get.
      */
-    async getMember(guildID: string, memberID: string): Promise<Member>{
-        const rMember = this.rest.guilds.getMember(guildID, memberID);
-        this.cache.members.add(await rMember);
-        return rMember;
+    getMember(guildID: string, memberID: string): Member | undefined {
+        if (!guildID) throw new Error("guildID is a required parameter.");
+        if (!memberID) throw new Error("memberID is a required parameter.");
+        return this.getGuild(guildID)?.members.get(memberID);
     }
 
-    /** This method is used to get a list of guild member.
+    /** This method is used to get a list of cached guild member.
+     *
+     * Note: this method doesn't send a rest request, it only returns cached entities.
      * @param guildID ID of the guild to get members.
      */
-    async getMembers(guildID: string): Promise<Array<Member>> {
-        return this.rest.guilds.getMembers(guildID);
+    getMembers(guildID: string): Array<Member> | undefined {
+        if (!guildID) throw new Error("guildID is a required parameter.");
+        return this.getGuild(guildID)?.members.map(member => member);
     }
 
     /** Get a ban.
@@ -146,29 +186,39 @@ export class Client extends TypedEmitter<ClientEvents> {
         return this.rest.guilds.getBans(guildID);
     }
 
-    /** This method is used to get a specific Guild.
+    /** Get a cached guild, returns `undefined` if not cached.
      *
-     * Note: Guild = Server
-     * @param guildID The ID of the guild you'd like to get.
+     * Note: this method doesn't send a rest request, it only returns cached entities.
+     * @param guildID The ID of the guild to get.
      */
-    async getGuild(guildID: string): Promise<Guild> {
-        return this.rest.guilds.getGuild(guildID);
+    getGuild(guildID: string): Guild | undefined {
+        if (!guildID) throw new Error("guildID is a required parameter.");
+        return this.guilds.get(guildID);
     }
 
-    /** This method is used to get a specific channel message
+    /** Get a channel's message, if cached.
+     *
+     * Note: this method doesn't send a rest request, it only returns cached entities.
+     * @param guildID ID of the guild.
      * @param channelID ID of the channel containing the message.
      * @param messageID ID of the message you'd like to get.
      */
-    async getMessage(channelID: string, messageID: string): Promise<Message> {
-        return this.rest.channels.getMessage(channelID, messageID);
+    getMessage(guildID: string, channelID: string, messageID: string): Message<AnyTextableChannel> | undefined {
+        const channel = this.getChannel(guildID, channelID);
+        if (channel instanceof TextChannel) {
+            return channel?.messages.get(messageID);
+        }
     }
 
-    /** This method is used to get a list of Message
+    /** This method is used to get cached messages from a channel.
+     * @param guildID ID of the guild.
      * @param channelID ID of a "Chat" channel.
-     * @param filter Object to filter the output.
      */
-    async getMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message>>{
-        return this.rest.channels.getMessages(channelID, filter);
+    getMessages(guildID: string, channelID: string): Array<Message<AnyTextableChannel>> | undefined {
+        const channel = this.getChannel(guildID, channelID);
+        if (channel instanceof TextChannel) {
+            return channel?.messages.map(msg => msg);
+        }
     }
 
     // docs
@@ -196,7 +246,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a "Forum" channel.
      * @param filter Object to filter the output.
      */
-    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread>>{
+    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<AnyTextableChannel>>>{
         return this.rest.channels.getForumThreads(channelID, filter);
     }
 
@@ -206,7 +256,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a speific Forum channel.
      * @param threadID ID of the specific Forum Thread.
      */
-    async getForumThread(channelID: string, threadID: number): Promise<ForumThread>{
+    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<AnyTextableChannel>>{
         return this.rest.channels.getForumThread(channelID, threadID);
     }
 
@@ -306,16 +356,16 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param type Type of the new channel. (e.g: chat)
      * @param options New channel's additional options.
      */
-    async createChannel(guildID: string, name: string, type: APIChannelCategories, options?: CreateChannelOptions): Promise<Channel> {
-        return this.rest.guilds.createChannel(guildID, name, type, options);
+    async createChannel<T extends AnyChannel = AnyChannel>(guildID: string, name: string, type: APIChannelCategories, options?: CreateChannelOptions): Promise<T> {
+        return this.rest.guilds.createChannel<T>(guildID, name, type, options);
     }
 
     /** Edit a channel.
      * @param channelID ID of the channel you'd like to edit.
      * @param options Channel edit options.
      */
-    async editChannel(channelID: string, options: EditChannelOptions): Promise<Channel> {
-        return this.rest.guilds.editChannel(channelID, options);
+    async editChannel<T extends AnyChannel = AnyChannel>(channelID: string, options: EditChannelOptions): Promise<T> {
+        return this.rest.guilds.editChannel<T>(channelID, options);
     }
 
     /** Delete a channel.
@@ -329,8 +379,8 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of the channel.
      * @param options Message options
      */
-    async createMessage(channelID: string, options: CreateMessageOptions): Promise<Message> {
-        return this.rest.channels.createMessage(channelID, options);
+    async createMessage<T extends AnyTextableChannel = AnyTextableChannel>(channelID: string, options: CreateMessageOptions): Promise<Message<T>> {
+        return this.rest.channels.createMessage<T>(channelID, options);
     }
 
     /** Edit a specific message coming from a specified channel.
@@ -338,8 +388,8 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param messageID The ID of the message you'd like to edit.
      * @param newMessage object containing new message's options.
      */
-    async editMessage(channelID: string, messageID: string, newMessage: object): Promise<Message> {
-        return this.rest.channels.editMessage(channelID, messageID, newMessage);
+    async editMessage<T extends AnyTextableChannel>(channelID: string, messageID: string, newMessage: object): Promise<Message<T>> {
+        return this.rest.channels.editMessage<T>(channelID, messageID, newMessage);
     }
 
     /** Delete a specific message.
@@ -376,8 +426,8 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a "Forums" channel.
      * @param options Thread's options including title & content.
      */
-    async createForumThread(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread> {
-        return this.rest.channels.createForumThread(channelID, options);
+    async createForumThread<T extends AnyChannel = AnyChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
+        return this.rest.channels.createForumThread<T>(channelID, options);
     }
 
     /** Edit a forum thread from a specified forum channel.
@@ -385,8 +435,8 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param threadID ID of a forum thread.
      * @param options Edit options.
      */
-    async editForumThread(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread>{
-        return this.rest.channels.editForumThread(channelID, threadID, options);
+    async editForumThread<T extends AnyChannel = AnyChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>>{
+        return this.rest.channels.editForumThread<T>(channelID, threadID, options);
     }
 
     /** Delete a forum thread from a specific forum channel

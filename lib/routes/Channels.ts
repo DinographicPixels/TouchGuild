@@ -43,7 +43,13 @@ import {
     PUTListItemBody,
     PUTListItemResponse
 } from "../Constants";
-import { CreateMessageOptions, EditMessageOptions, GetChannelMessagesFilter } from "../types/channel";
+import {
+    AnyChannel,
+    AnyTextableChannel,
+    CreateMessageOptions,
+    EditMessageOptions,
+    GetChannelMessagesFilter
+} from "../types/channel";
 import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions } from "../types/doc";
@@ -58,11 +64,11 @@ export class Channels {
     /** This method is used to get a guild channel.
      * @param channelID The ID of the channel to get.
      */
-    async getChannel(channelID: string): Promise<Channel> {
+    async getChannel(channelID: string): Promise<AnyChannel> {
         return this.#manager.authRequest<GETChannelResponse>({
             method: "GET",
             path:   endpoints.CHANNEL(channelID)
-        }).then(data => new Channel(data.channel, this.#manager.client));
+        }).then(data => Channel.from(data.channel, this.#manager.client));
     }
 
     /** This method is used to get a channel message.
@@ -70,30 +76,43 @@ export class Channels {
      * @param messageID The ID of the message to get.
      * @param params Optional parameters.
      */
-    async getMessage(channelID: string, messageID: string, params?: object): Promise<Message> {
+    async getMessage<T extends AnyTextableChannel = AnyTextableChannel>(channelID: string, messageID: string, params?: object): Promise<Message<T>> {
         return this.#manager.authRequest<GETChannelMessageResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_MESSAGE(channelID, messageID)
-        }).then(data => new Message(data.message, this.#manager.client, params));
+        }).then(data => new Message<T>(data.message, this.#manager.client, params));
     }
 
     /** This method is used to get a list of Message
      * @param channelID ID of a "Chat" channel.
      * @param filter Object to filter the output.
      */
-    async getMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message>> {
-        const query = new URLSearchParams();
-        if (filter){
-            if (filter.before) query.set("before", filter.before.toString());
-            if (filter.after) query.set("after", filter.after.toString());
-            if (filter.includePrivate) query.set("includePrivate", filter.includePrivate.toString());
-            if (filter.limit) query.set("limit", filter.limit.toString());
+    async getMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message<AnyTextableChannel>>> {
+        const _getMessages = async (): Promise<Array<Message<AnyTextableChannel>>> => {
+            const query = new URLSearchParams();
+            if (filter){
+                if (filter.before) query.set("before", filter.before.toString());
+                if (filter.after) query.set("after", filter.after.toString());
+                if (filter.includePrivate) query.set("includePrivate", filter.includePrivate.toString());
+                if (filter.limit) query.set("limit", filter.limit.toString());
+            }
+            return this.#manager.authRequest<GETChannelMessagesResponse>({
+                method: "GET",
+                path:   endpoints.CHANNEL_MESSAGES(channelID),
+                query
+            }).then(data => data.messages.map(d => new Message(d, this.#manager.client)));
+        };
+
+        const messages = await _getMessages();
+        for (const message of messages) {
+            const channelMessages = (this.#manager.client.guilds.get(messages[0].guildID as string)?.channels.get(channelID) as AnyTextableChannel)?.messages;
+            if (channelMessages?.get(message.id)) {
+                channelMessages.update(message);
+            } else {
+                channelMessages?.add(message);
+            }
         }
-        return this.#manager.authRequest<GETChannelMessagesResponse>({
-            method: "GET",
-            path:   endpoints.CHANNEL_MESSAGES(channelID),
-            query
-        }).then(data => data.messages.map(d => new Message(d, this.#manager.client)) as never);
+        return messages;
     }
 
     /** This method is used to get a channel doc.
@@ -132,7 +151,7 @@ export class Channels {
      * @param channelID ID of a speific Forum channel.
      * @param threadID ID of the specific Forum Thread.
      */
-    async getForumThread(channelID: string, threadID: number): Promise<ForumThread> {
+    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<AnyTextableChannel>> {
         return this.#manager.authRequest<GETForumTopicResponse>({
             method: "GET",
             path:   endpoints.FORUM_TOPIC(channelID, threadID)
@@ -143,7 +162,7 @@ export class Channels {
      * @param channelID ID of a "Forum" channel.
      * @param filter Object to filter the output.
      */
-    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread>> {
+    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<AnyTextableChannel>>> {
         const query = new URLSearchParams();
         if (filter){
             if (filter.before) query.set("before", filter.before.toString());
@@ -263,13 +282,13 @@ export class Channels {
      * @param options Message options
      * @param params Optional parameters.
      */
-    async createMessage(channelID: string, options: CreateMessageOptions, params?: object): Promise<Message> {
+    async createMessage<T extends AnyTextableChannel = AnyTextableChannel>(channelID: string, options: CreateMessageOptions, params?: object): Promise<Message<T>> {
         if (typeof options !== "object") throw new Error("message options should be an object.");
         return this.#manager.authRequest<POSTChannelMessageResponse>({
             method: "POST",
             path:   endpoints.CHANNEL_MESSAGES(channelID),
             json:   options
-        }).then(data => new Message(data.message, this.#manager.client, params));
+        }).then(data => new Message<T>(data.message, this.#manager.client, params));
     }
 
     /** Edit a specific message coming from a specified channel.
@@ -278,13 +297,13 @@ export class Channels {
      * @param newMessage object containing new message's options.
      * @param params Optional parameters.
      */
-    async editMessage(channelID: string, messageID: string, newMessage: EditMessageOptions, params?: object): Promise<Message> {
+    async editMessage<T extends AnyTextableChannel = AnyTextableChannel>(channelID: string, messageID: string, newMessage: EditMessageOptions, params?: object): Promise<Message<T>> {
         if (typeof newMessage !== "object") throw new Error("newMessage should be an object.");
         return this.#manager.authRequest<POSTChannelMessageResponse>({
             method: "PUT",
             path:   endpoints.CHANNEL_MESSAGE(channelID, messageID),
             json:   newMessage
-        }).then(data => new Message(data.message, this.#manager.client, params));
+        }).then(data => new Message<T>(data.message, this.#manager.client, params));
     }
 
     /** Delete a specific message.
@@ -338,13 +357,13 @@ export class Channels {
      * @param channelID ID of a "Forums" channel.
      * @param options Thread's options including title & content.
      */
-    async createForumThread(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread> {
+    async createForumThread<T extends AnyChannel = AnyChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
         if (typeof options !== "object") throw new Error("thread options should be an object.");
         return this.#manager.authRequest<POSTForumTopicResponse>({
             method: "POST",
             path:   endpoints.FORUM_TOPICS(channelID),
             json:   options
-        }).then(data => new ForumThread(data.forumTopic, this.#manager.client));
+        }).then(data => new ForumThread<T>(data.forumTopic, this.#manager.client));
     }
 
     /** Edit a forum thread from a specified forum channel.
@@ -352,13 +371,13 @@ export class Channels {
      * @param threadID ID of a forum thread.
      * @param options Edit options.
      */
-    async editForumThread(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread> {
+    async editForumThread<T extends AnyChannel = AnyChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>> {
         if (typeof options !== "object") throw new Error("thread options should be an object.");
         return this.#manager.authRequest<PATCHForumTopicResponse>({
             method: "PATCH",
             path:   endpoints.FORUM_TOPIC(channelID, threadID),
             json:   options
-        }).then(data => new ForumThread(data.forumTopic, this.#manager.client));
+        }).then(data => new ForumThread<T>(data.forumTopic, this.#manager.client));
     }
 
     /** Delete a forum thread from a specific forum channel

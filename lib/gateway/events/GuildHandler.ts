@@ -18,7 +18,7 @@ import { MemberUpdateInfo } from "../../structures/MemberUpdateInfo";
 import { MemberRemoveInfo } from "../../structures/MemberRemoveInfo";
 
 /** Internal component, emitting guild events. */
-export class GuildHandler extends GatewayEventHandler{
+export class GuildHandler extends GatewayEventHandler {
     guildBanAdd(data: GatewayEvent_ServerMemberBanned): void{
         const GuildMemberBanComponent = new BannedMember(data.serverId, data.serverMemberBan, this.client);
         this.client.emit("guildBanAdd", GuildMemberBanComponent);
@@ -51,6 +51,7 @@ export class GuildHandler extends GatewayEventHandler{
 
     guildCreate(data: GatewayEvent_BotServerMembershipCreated): void{
         const GuildComponent = new Guild(data.server, this.client);
+        this.client.guilds.add(GuildComponent);
         const output = {
             guild:     GuildComponent,
             inviterID: data.createdBy
@@ -60,6 +61,7 @@ export class GuildHandler extends GatewayEventHandler{
 
     guildDelete(data: GatewayEvent_BotServerMembershipDeleted): void{
         const GuildComponent = new Guild(data.server, this.client);
+        this.client.guilds.delete(GuildComponent.id as string);
         const output = {
             guild:     GuildComponent,
             removerID: data.createdBy

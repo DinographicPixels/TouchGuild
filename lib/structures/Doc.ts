@@ -3,12 +3,12 @@ import { Client } from "./Client";
 import { Member } from "./Member";
 import { Base } from "./Base";
 
-import { User } from "./User";
 import { APIDoc, APIMentions } from "../Constants";
 import { EditDocOptions } from "../types/doc";
+import { JSONDoc } from "../types/json";
 
 /** Doc represents an item of a "Docs" channel. */
-export class Doc extends Base {
+export class Doc extends Base<number> {
     /** Guild/server id */
     guildID: string;
     /** ID of the 'docs' channel. */
@@ -43,19 +43,62 @@ export class Doc extends Base {
         this.memberID = data.createdBy;
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.updatedBy = data.updatedBy ?? null;
+        this.update(data);
+    }
+
+    override toJSON(): JSONDoc {
+        return {
+            ...super.toJSON(),
+            guildID:         this.guildID,
+            channelID:       this.channelID,
+            name:            this.name,
+            content:         this.content,
+            mentions:        this.mentions,
+            createdAt:       this.createdAt,
+            memberID:        this.memberID,
+            editedTimestamp: this.editedTimestamp,
+            updatedBy:       this.updatedBy
+        };
+    }
+
+    protected override update(data: APIDoc): void {
+        if (data.channelId !== undefined) {
+            this.channelID = data.channelId;
+        }
+        if (data.content !== undefined) {
+            this.content = data.content;
+        }
+        if (data.createdAt !== undefined) {
+            this.createdAt = new Date(data.createdAt);
+        }
+        if (data.createdBy !== undefined) {
+            this.memberID = data.createdBy;
+        }
+        if (data.id !== undefined) {
+            this.id = data.id;
+        }
+        if (data.mentions !== undefined) {
+            this.mentions = data.mentions;
+        }
+        if (data.serverId !== undefined) {
+            this.guildID = data.serverId;
+        }
+        if (data.title !== undefined) {
+            this.name = data.title;
+        }
+        if (data.updatedAt !== undefined) {
+            this.editedTimestamp = new Date(data.updatedAt);
+        }
+        if (data.updatedBy !== undefined) {
+            this.updatedBy = data.updatedBy;
+        }
     }
 
     /** Retrieve the member who executed this action.
      * Note: If this doc has been edited, the updatedBy id will be used to get you the member.
      */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.members.get(this.updatedBy ?? this.memberID);
-        } else if (this.client.cache.users.get(this.updatedBy ?? this.memberID)){
-            return this.client.cache.users.get(this.updatedBy ?? this.memberID);
-        } else if (this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
-        } else throw new Error("ERROR: Couldn't get member, failed to retrieve member.");
+    get member(): Member | Promise<Member> {
+        return this.client.getGuild(this.guildID)?.members.get(this.updatedBy ?? this.memberID) ?? this.client.rest.guilds.getMember(this.guildID, this.updatedBy ?? this.memberID);
     }
 
     /** Edit this doc.

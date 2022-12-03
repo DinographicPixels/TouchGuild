@@ -1,16 +1,19 @@
 /** @module Message */
 import { Client } from "./Client";
-import { Channel } from "./Channel";
 import { Member } from "./Member";
 import { Guild } from "./Guild";
 
 import { Base } from "./Base";
 
-import { User } from "./User";
+import { TextChannel } from "./TextChannel";
 import { APIChatMessage, APIEmbedOptions, APIMentions, APIMessageOptions } from "../Constants";
+import { JSONMessage } from "../types/json";
+import { AnyTextableChannel } from "../types/channel";
 
-/** Message component, with all its methods and declarations. */
-export class Message extends Base {
+/** Represents a guild message. */
+export class Message<T extends AnyTextableChannel> extends Base<string> {
+    private _cachedChannel!: T extends AnyTextableChannel ? T : undefined;
+    private _cachedGuild?: T extends Guild ? Guild : Guild | null;
     /** Raw data. */
     #data: APIChatMessage;
     /** Message type. */
@@ -25,15 +28,16 @@ export class Message extends Base {
     embeds?: Array<APIEmbedOptions> | [];
     /** The IDs of the message replied by the message. */
     replyMessageIds: Array<string>;
-    isPrivate: boolean | null;
-    isSilent: boolean | null;
+    /** If true, the message appears as private. */
+    isPrivate: boolean;
+    /** If true, the message didn't mention anyone. */
+    isSilent: boolean;
     /** object containing all mentioned users. */
     mentions: APIMentions;
     /** ID of the message author. */
     memberID: string;
     /** ID of the webhook used to send this message. (if sent by a webhook) */
     webhookID?: string | null;
-
     /** When the message was created. */
     createdAt: Date;
     /** Timestamp at which this message was last edited. */
@@ -56,8 +60,8 @@ export class Message extends Base {
         this.content = data.content ?? "";
         this.embeds = data.embeds ?? [];
         this.replyMessageIds = data.replyMessageIds ?? [];
-        this.isPrivate = data.isPrivate ?? null;
-        this.isSilent = data.isSilent ?? null;
+        this.isPrivate = data.isPrivate ?? false;
+        this.isSilent = data.isSilent ?? false;
         this.mentions = data.mentions as APIMentions ?? null;
         this.createdAt = new Date(data.createdAt);
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
@@ -67,50 +71,126 @@ export class Message extends Base {
         this._lastMessageID = null;
         this.#originalMessageID = params?.originalMessageID ?? null;
         this.#originalMessageBool = false;
-        void this.setCache.bind(this)();
+        this.update(data);
     }
 
-    /** Retrieve message's member, if cached.
-     * If there is no cached member or user, this will make a request which returns a Promise.
-     * If the request fails, this will throw an error or return you undefined as a value.
-     */
-    get member(): Member | User | Promise<Member> | undefined {
-        if (this.client.cache.members.get(this.memberID) && this.memberID){
-            return this.client.cache.members.get(this.memberID);
-        } else if (this.client.cache.users.get(this.memberID) && this.memberID){
-            return this.client.cache.users.get(this.memberID);
-        } else if (this.memberID && this.guildID){
-            return this.client.rest.guilds.getMember(this.guildID, this.memberID);
-        } else if (this.client.cache.messages.get(this.id)){
-            const message = this.client.cache.messages.get(this.id) as Message;
-            if (message.guildID && message.memberID) return this.client.rest.guilds.getMember(message.guildID, message.memberID) as Promise<Member>;
+    override toJSON(): JSONMessage {
+        return {
+            ...super.toJSON(),
+            type:            this.type,
+            guildID:         this.guildID,
+            channelID:       this.channelID,
+            content:         this.content,
+            embeds:          this.embeds,
+            replyMessageIds: this.replyMessageIds,
+            isPrivate:       this.isPrivate,
+            isSilent:        this.isSilent,
+            mentions:        this.mentions,
+            createdAt:       this.createdAt,
+            editedTimestamp: this.editedTimestamp,
+            memberID:        this.memberID,
+            webhookID:       this.webhookID,
+            deletedAt:       this.deletedAt
+        };
+    }
+
+    protected override update(data: APIChatMessage): void {
+        if (data.channelId !== undefined) {
+            this.channelID = data.channelId;
+        }
+        if (data.content !== undefined){
+            this.content = data.content;
+        }
+        if (data.createdAt !== undefined) {
+            this.createdAt = new Date(data.createdAt);
+        }
+        if (data.createdBy !== undefined) {
+            this.memberID = data.createdBy;
+        }
+        if (data.createdByWebhookId !== undefined) {
+            this.webhookID = data.createdByWebhookId;
+        }
+        if (data.embeds !== undefined) {
+            this.embeds = data.embeds;
+        }
+        if (data.id !== undefined) {
+            this.id = data.id;
+        }
+        if (data.isPrivate !== undefined) {
+            this.isPrivate = data.isPrivate;
+        }
+        if (data.isSilent !== undefined) {
+            this.isSilent = data.isSilent;
+        }
+        if (data.mentions !== undefined) {
+            this.mentions = data.mentions;
+        }
+        if (data.replyMessageIds !== undefined) {
+            this.replyMessageIds = data.replyMessageIds;
+        }
+        if (data.serverId !== undefined) {
+            this.guildID = data.serverId;
+        }
+        if (data.type !== undefined) {
+            this.type = data.type;
+        }
+        if (data.updatedAt !== undefined) {
+            this.editedTimestamp = new Date(data.updatedAt);
         }
     }
 
-    /** Getter used to get the message's guild
+    /** Retrieve message's member.
      *
-     * Note: this can return a promise, make sure to await it before.
+     * Make sure to await this property (getter) to still get results even if the member is not cached.
+     * @note The API does not provide member information, that's why you might need to await this property.
      */
-    get guild(): Guild | Promise<Guild> {
-        if (!this.guildID) throw new Error("Couldn't get Guild, 'guildID' is not defined. You're probably using a modified version of the Message component.");
-        return this.client.cache.guilds.get(this.guildID) ?? this.client.rest.guilds.getGuild(this.guildID);
+    get member(): T extends Guild ? Member : Member | Promise<Member> | undefined {
+        const guild = this.client.guilds.get(this.guildID as string);
+        if (guild?.members?.get(this.memberID) && this.memberID) {
+            return guild?.members?.get(this.memberID) as T extends Guild ? Member : Member | Promise<Member> | undefined;
+        } else if (this.memberID && this.guildID) {
+            const restMember = this.client.rest.guilds.getMember(this.guildID, this.memberID);
+            void this.setCache(restMember);
+            return (guild?.members.get(this.memberID) ?? restMember) as T extends Guild ? Member : Member | Promise<Member> | undefined;
+        } else {
+            const channel = this.client.getChannel(this.guildID as string, this.channelID) as TextChannel;
+            const message = channel?.messages?.get(this.id);
+            if (message instanceof Message && message.guildID && message.memberID) {
+                const restMember = this.client.rest.guilds.getMember(message.guildID, message.memberID);
+                void this.setCache(restMember);
+                return restMember as T extends Guild ? Member : Member | Promise<Member> | undefined;
+            }
+            return undefined as T extends Guild ? Member : undefined;
+        }
     }
 
-    /** Getter used to get the message's channel
-     *
-     * Note: this returns a promise, make sure to await it before.
-     */
-    get channel(): Promise<Channel> {
-        if (!this.channelID) throw new Error("Couldn't get Channel, 'channelID' is not defined. You're probably using a modified version of the Message component.");
-        return this.client.rest.channels.getChannel(this.channelID);
+    /** The guild the message is in. This will throw an error if the guild isn't cached.*/
+    get guild(): T extends Guild ? Guild : Guild | null {
+        if (!this.guildID) throw new Error(`Couldn't get ${this.constructor.name}#guildID. (guild cannot be retrieved)`);
+        if (!this._cachedGuild) {
+            this._cachedGuild = this.client.getGuild(this.guildID);
+            if (!this._cachedGuild) {
+                throw new Error(`${this.constructor.name}#guild: couldn't find the Guild in cache.`);
+            }
+        }
+        return this._cachedGuild as T extends Guild ? Guild : Guild | null;
     }
 
-    private async setCache(): Promise<void> {
-        if (this.guild) this.client.cache.guilds.add(await this.guild);
-        if (this.member instanceof Member){
-            this.client.cache.members.add(this.member);
-        } else if (this.member instanceof User){
-            this.client.cache.users.add(this.member);
+    /** The channel this message was created in.  */
+    get channel(): T extends AnyTextableChannel ? T : undefined {
+        if (!this.guildID) throw new Error(`Couldn't get ${this.constructor.name}#guildID. (channel cannot be retrieved)`);
+        if (!this.channelID) throw new Error(`Couldn't get ${this.constructor.name}#channelID. (channel cannot be retrieved)`);
+        return this._cachedChannel ?? (this._cachedChannel = this.client.getChannel(this.guildID, this.channelID) as T extends AnyTextableChannel ? T : undefined);
+    }
+
+    private async setCache(obj: Promise<Member> | Promise<Guild>): Promise<void> {
+        const guild = this.client.guilds.get(this.guildID as string);
+        const awaitedObj = await obj;
+        if (guild && awaitedObj instanceof Member) {
+            guild?.members?.add(awaitedObj);
+            if (awaitedObj.user) this.client.users.add(awaitedObj.user);
+        } else if (awaitedObj instanceof Guild) {
+            this.client.guilds.add(awaitedObj);
         }
     }
 
@@ -119,8 +199,8 @@ export class Message extends Base {
      * Note: this method DOES NOT reply to the current message, you have to do it yourself.
      * @param options Message options.
      */
-    async createMessage(options: APIMessageOptions): Promise<Message>{
-        const response = await this.client.rest.channels.createMessage(this.channelID, options, { originalMessageID: this.#originalMessageID });
+    async createMessage(options: APIMessageOptions): Promise<Message<T>>{
+        const response = await this.client.rest.channels.createMessage<T>(this.channelID, options, { originalMessageID: this.#originalMessageID });
         this._lastMessageID = response.id as string;
         if (this.#originalMessageBool === false){
             this.#originalMessageBool = true;
@@ -132,8 +212,8 @@ export class Message extends Base {
     /** This method is used to edit the current message.
      * @param newMessage New message's options
      */
-    async edit(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message>{
-        return this.client.rest.channels.editMessage(this.channelID, this.id as string, newMessage, { originalMessageID: this.#originalMessageID });
+    async edit(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message<T>>{
+        return this.client.rest.channels.editMessage<T>(this.channelID, this.id as string, newMessage, { originalMessageID: this.#originalMessageID });
     }
 
     /** This method is used to delete the current message. */
@@ -145,9 +225,9 @@ export class Message extends Base {
     /** Edit the last message sent with the message itself.
      * @param newMessage New message's options.
      */
-    async editLastMessage(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message>{
+    async editLastMessage(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message<T>>{
         if (!this._lastMessageID) throw new TypeError("Can't edit last message if it does not exist.");
-        return this.client.rest.channels.editMessage(this.channelID, this._lastMessageID, newMessage);
+        return this.client.rest.channels.editMessage<T>(this.channelID, this._lastMessageID, newMessage);
     }
 
     /** Delete the last message sent with the message itself. */
@@ -159,9 +239,9 @@ export class Message extends Base {
     /** Edit the message's original response message.
      * @param newMessage New message's options.
      */
-    async editOriginalMessage(newMessage: { content?: string; embeds?: Array<APIEmbedOptions>; }): Promise<Message>{
+    async editOriginalMessage(newMessage: { content?: string; embeds?: Array<APIEmbedOptions>; }): Promise<Message<T>>{
         if (!this.#originalMessageID) throw new TypeError("Can't edit original message if it does not exist.");
-        return this.client.rest.channels.editMessage(this.channelID, this.#originalMessageID, newMessage, { originalMessageID: this.#originalMessageID });
+        return this.client.rest.channels.editMessage<T>(this.channelID, this.#originalMessageID, newMessage, { originalMessageID: this.#originalMessageID });
     }
 
     /** Delete the message's original response message. */
