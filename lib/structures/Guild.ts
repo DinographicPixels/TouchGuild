@@ -77,8 +77,8 @@ export class Guild extends Base<string> {
             defaultChannelID: this.defaultChannelID,
             createdAt:        this.createdAt,
             verified:         this.verified,
-            channels:         this.channels,
-            members:          this.members
+            channels:         this.channels.map(channel => channel.toJSON()),
+            members:          this.members.map(member => member.toJSON())
         };
     }
 

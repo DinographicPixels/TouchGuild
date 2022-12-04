@@ -1,8 +1,7 @@
-import { CalendarEvent } from "../structures/CalendarEvent";
-import { Doc } from "../structures/Doc";
-import { ForumThread } from "../structures/ForumThread";
-import { Message } from "../structures/Message";
-import { APICalendarEvent, APIChatMessage, APIDoc, APIForumTopic } from "guildedapi-types.ts/v1";
+import { Member } from "../structures/Member";
+import { User } from "../structures/User";
+import { Guild } from "../structures/Guild";
+import { APICalendarEvent } from "guildedapi-types.ts/v1";
 
 export interface JSONBase<ID= string | number> {
     // createdAt: number;
@@ -117,23 +116,25 @@ export interface JSONGuildChannel extends JSONBase<string> {
 
 export interface JSONTextChannel extends JSONGuildChannel {
     /** Cached messages. */
-    messages: TypedCollection<string, APIChatMessage, Message>;
+    messages: Array<JSONMessage>;
 }
 
 export interface JSONForumChannel extends JSONGuildChannel {
     /** Cached threads. */
-    threads: TypedCollection<number, APIForumTopic, ForumThread>;
+    threads: Array<JSONForumThread>;
 }
 
 export interface JSONDocChannel extends JSONGuildChannel {
     /** Cached docs. */
-    docs: TypedCollection<number, APIDoc, Doc>;
+    docs: Array<JSONDoc>;
 }
 
 export interface JSONCalendarChannel extends JSONGuildChannel {
     /** Cached scheduled events. */
-    scheduledEvents: TypedCollection<number, APICalendarEvent, CalendarEvent>;
+    scheduledEvents: Array<JSONCalendarEvent>;
 }
+
+export type AnyJSONChannel = JSONTextChannel | JSONDocChannel | JSONForumChannel | JSONGuildChannel | JSONCalendarChannel;
 
 export interface JSONCalendarEvent extends JSONBase<number> {
     /** Raw data */
@@ -169,7 +170,7 @@ export interface JSONCalendarEvent extends JSONBase<number> {
     /** Details about event cancelation (if canceled) */
     cancelation: APICalendarEvent["cancellation"] | null;
     /** Cached RSVPS. */
-    rsvps: TypedCollection<number, APICalendarEventRSVP, CalendarEventRSVP>;
+    rsvps: Array<JSONCalendarEventRSVP>;
 }
 
 export interface JSONCalendarEventRSVP extends JSONBase<number> {
@@ -229,7 +230,7 @@ export interface JSONForumThread extends JSONBase<number> {
     /** Thread mentions */
     mentions: APIMentions | null;
     /** Cached comments. */
-    comments: TypedCollection<number, APIForumTopicComment, ForumThreadComment>;
+    comments: Array<JSONForumThreadComment>;
     /** If true, the thread is locked. */
     isLocked: boolean;
     /** If true, the thread is pinned. */
@@ -288,9 +289,9 @@ export interface JSONGuild extends JSONBase<string> {
     /** If true, the guild is verified. */
     verified: boolean;
     /** Cached guild channels. */
-    channels: TypedCollection<string, APIGuildChannel, Channel>;
+    channels: Array<AnyJSONChannel>;
     /** Cached guild members. */
-    members: TypedCollection<string, APIGuildMember, Member, [guildID: string]>;
+    members: Array<JSONMember>;
 }
 
 export interface JSONUserClient extends JSONBase<string> {

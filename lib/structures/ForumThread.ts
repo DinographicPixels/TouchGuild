@@ -82,7 +82,7 @@ export class ForumThread<T extends AnyChannel> extends Base<number> {
             bumpedAt:        this.bumpedAt,
             content:         this.content,
             mentions:        this.mentions,
-            comments:        this.comments,
+            comments:        this.comments.map(comment => comment.toJSON()),
             isLocked:        this.isLocked,
             isPinned:        this.isPinned
         };

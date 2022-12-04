@@ -25,7 +25,7 @@ export class ForumChannel extends GuildChannel {
     override toJSON(): JSONForumChannel {
         return {
             ...super.toJSON(),
-            threads: this.threads
+            threads: this.threads.map(thread => thread.toJSON())
         };
     }
 }

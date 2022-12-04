@@ -25,7 +25,7 @@ export class TextChannel extends GuildChannel {
     override toJSON(): JSONTextChannel {
         return {
             ...super.toJSON(),
-            messages: this.messages
+            messages: this.messages.map(message => message.toJSON())
         };
     }
 }
