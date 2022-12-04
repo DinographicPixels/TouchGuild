@@ -1,6 +1,7 @@
 /** @module ChannelHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 import { GatewayEvent_ServerChannelCreated, GatewayEvent_ServerChannelDeleted, GatewayEvent_ServerChannelUpdated } from "../../Constants";
+import { AnyChannel } from "../../types/channel";
 
 /** Internal component, emitting channel events. */
 export class ChannelHandler extends GatewayEventHandler{
@@ -12,8 +13,10 @@ export class ChannelHandler extends GatewayEventHandler{
 
     channelUpdate(data: GatewayEvent_ServerChannelUpdated): void {
         void this.addGuildChannel(data.serverId, data.channel.id);
+        const channel = this.client.getChannel<AnyChannel>(data.serverId, data.channel.id);
+        const CachedChannel = channel ? channel.toJSON() : null;
         const ChannelComponent = this.client.util.updateChannel(data.channel);
-        this.client.emit("channelUpdate", ChannelComponent);
+        this.client.emit("channelUpdate", ChannelComponent, CachedChannel);
     }
 
     channelDelete(data: GatewayEvent_ServerChannelDeleted): void {
