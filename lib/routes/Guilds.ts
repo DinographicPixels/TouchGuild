@@ -46,7 +46,7 @@ export class Guilds {
         return this.#manager.authRequest<GETGuildResponse>({
             method: "GET",
             path:   endpoints.GUILD(guildID)
-        }).then(data => new Guild(data.server, this.#manager.client));
+        }).then(data => this.#manager.client.util.updateGuild(data.server));
     }
 
     /** This method is used to get a specific webhook.
@@ -80,11 +80,11 @@ export class Guilds {
      * @param guildID The ID of the Guild.
      * @param memberID The ID of the Guild Member to get.
      */
-    async getMember(guildID: string, memberID: string): Promise<Member>{
+    async getMember(guildID: string, memberID: string): Promise<Member> {
         return this.#manager.authRequest<GETGuildMemberResponse>({
             method: "GET",
             path:   endpoints.GUILD_MEMBER(guildID, memberID)
-        }).then(data => new Member(data.member, this.#manager.client, guildID));
+        }).then(data => this.#manager.client.util.updateMember(guildID, memberID, data.member));
     }
 
     /** This method is used to get a list of guild member.
@@ -94,7 +94,7 @@ export class Guilds {
         return this.#manager.authRequest<GETGuildMembersResponse>({
             method: "GET",
             path:   endpoints.GUILD_MEMBERS(guildID)
-        }).then(data => data.members.map(d => new Member(d as APIGuildMember, this.#manager.client, guildID)));
+        }).then(data => data.members.map(d => this.#manager.client.util.updateMember(guildID, d.user.id, d as APIGuildMember)));
     }
 
     /** Get a ban.

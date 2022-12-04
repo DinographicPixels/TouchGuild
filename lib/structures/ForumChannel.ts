@@ -3,7 +3,6 @@ import { Client } from "./Client";
 
 import { ForumThread } from "./ForumThread";
 import { GuildChannel } from "./GuildChannel";
-import { AnyChannel } from "../types/channel";
 import type { APIForumTopic, APIGuildChannel } from "../Constants";
 import TypedCollection from "../util/TypedCollection";
 import { JSONForumChannel } from "../types/json";
@@ -11,7 +10,7 @@ import { JSONForumChannel } from "../types/json";
 /** Represents a forum channel. */
 export class ForumChannel extends GuildChannel {
     /** Cached threads. */
-    threads: TypedCollection<number, APIForumTopic, ForumThread<AnyChannel>>;
+    threads: TypedCollection<number, APIForumTopic, ForumThread<ForumChannel>>;
     /**
      * @param data raw data
      * @param client client

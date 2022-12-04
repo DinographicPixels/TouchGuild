@@ -1,7 +1,6 @@
 /** @module Routes/Channels */
 import type { RESTManager } from "../rest/RESTManager";
 import * as endpoints from "../rest/endpoints";
-import { Channel } from "../structures/Channel";
 import { Doc } from "../structures/Doc";
 import { ForumThread } from "../structures/ForumThread";
 import { CalendarEvent } from "../structures/CalendarEvent";
@@ -10,7 +9,6 @@ import { Message } from "../structures/Message";
 import { ForumThreadComment } from "../structures/ForumThreadComment";
 import { ListItem } from "../structures/ListItem";
 import {
-    APIForumTopic,
     APIListItem,
     ChannelReactionTypes,
     GETCalendarEventResponse,
@@ -54,6 +52,10 @@ import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions } from "../types/doc";
 import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
+import { DocChannel } from "../structures/DocChannel";
+import { ForumChannel } from "../structures/ForumChannel";
+import { CalendarChannel } from "../structures/CalendarChannel";
+import { TextChannel } from "../structures/TextChannel";
 
 export class Channels {
     #manager: RESTManager;
@@ -68,7 +70,7 @@ export class Channels {
         return this.#manager.authRequest<GETChannelResponse>({
             method: "GET",
             path:   endpoints.CHANNEL(channelID)
-        }).then(data => Channel.from(data.channel, this.#manager.client));
+        }).then(data => this.#manager.client.util.updateChannel(data.channel));
     }
 
     /** This method is used to get a channel message.
@@ -80,7 +82,7 @@ export class Channels {
         return this.#manager.authRequest<GETChannelMessageResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_MESSAGE(channelID, messageID)
-        }).then(data => new Message<T>(data.message, this.#manager.client, params));
+        }).then(data => this.#manager.client.getChannel<TextChannel>(data.message.serverId as string, channelID)?.messages.update(data.message) as Message<T> ?? new Message<T>(data.message, this.#manager.client, params));
     }
 
     /** This method is used to get a list of Message
@@ -88,31 +90,18 @@ export class Channels {
      * @param filter Object to filter the output.
      */
     async getMessages(channelID: string, filter?: GetChannelMessagesFilter): Promise<Array<Message<AnyTextableChannel>>> {
-        const _getMessages = async (): Promise<Array<Message<AnyTextableChannel>>> => {
-            const query = new URLSearchParams();
-            if (filter){
-                if (filter.before) query.set("before", filter.before.toString());
-                if (filter.after) query.set("after", filter.after.toString());
-                if (filter.includePrivate) query.set("includePrivate", filter.includePrivate.toString());
-                if (filter.limit) query.set("limit", filter.limit.toString());
-            }
-            return this.#manager.authRequest<GETChannelMessagesResponse>({
-                method: "GET",
-                path:   endpoints.CHANNEL_MESSAGES(channelID),
-                query
-            }).then(data => data.messages.map(d => new Message(d, this.#manager.client)));
-        };
-
-        const messages = await _getMessages();
-        for (const message of messages) {
-            const channelMessages = (this.#manager.client.guilds.get(messages[0].guildID as string)?.channels.get(channelID) as AnyTextableChannel)?.messages;
-            if (channelMessages?.get(message.id)) {
-                channelMessages.update(message);
-            } else {
-                channelMessages?.add(message);
-            }
+        const query = new URLSearchParams();
+        if (filter){
+            if (filter.before) query.set("before", filter.before.toString());
+            if (filter.after) query.set("after", filter.after.toString());
+            if (filter.includePrivate) query.set("includePrivate", filter.includePrivate.toString());
+            if (filter.limit) query.set("limit", filter.limit.toString());
         }
-        return messages;
+        return this.#manager.authRequest<GETChannelMessagesResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_MESSAGES(channelID),
+            query
+        }).then(data => data.messages.map(d => this.#manager.client.getChannel<TextChannel>(d.serverId as string, channelID)?.messages.update(d) ?? new Message(d, this.#manager.client)));
     }
 
     /** This method is used to get a channel doc.
@@ -125,7 +114,7 @@ export class Channels {
         return this.#manager.authRequest<GETDocResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_DOC(channelID, docID)
-        }).then(data => new Doc(data.doc, this.#manager.client));
+        }).then(data => this.#manager.client.getChannel<DocChannel>(data.doc.serverId, channelID)?.docs.update(data.doc) ?? new Doc(data.doc, this.#manager.client));
     }
 
     /** This method is used to get a list of "Channel" Doc.
@@ -142,7 +131,7 @@ export class Channels {
             method: "GET",
             path:   endpoints.CHANNEL_DOCS(channelID),
             query
-        }).then(data => data.docs.map(d => new Doc(d, this.#manager.client)) as never);
+        }).then(data => data.docs.map(d => this.#manager.client.getChannel<DocChannel>(d.serverId, channelID)?.docs.update(d) ?? new Doc(d, this.#manager.client)) as never);
     }
 
     /** This method is used to get a specific forum thread.
@@ -151,18 +140,18 @@ export class Channels {
      * @param channelID ID of a speific Forum channel.
      * @param threadID ID of the specific Forum Thread.
      */
-    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<AnyTextableChannel>> {
+    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<ForumChannel>> {
         return this.#manager.authRequest<GETForumTopicResponse>({
             method: "GET",
             path:   endpoints.FORUM_TOPIC(channelID, threadID)
-        }).then(data => new ForumThread(data.forumTopic, this.#manager.client));
+        }).then(data => this.#manager.client.util.updateForumThread(data.forumTopic));
     }
 
     /** This method is used to get a list of ForumThread.
      * @param channelID ID of a "Forum" channel.
      * @param filter Object to filter the output.
      */
-    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<AnyTextableChannel>>> {
+    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<ForumChannel>>> {
         const query = new URLSearchParams();
         if (filter){
             if (filter.before) query.set("before", filter.before.toString());
@@ -172,7 +161,7 @@ export class Channels {
             method: "GET",
             path:   endpoints.FORUM_TOPICS(channelID),
             query
-        }).then(data => data.forumTopics.map(d => new ForumThread(d as APIForumTopic, this.#manager.client)) as never);
+        }).then(data => data.forumTopics.map(d => this.#manager.client.util.updateForumThread(d)));
     }
 
     /** This method is used to get a specific forum thread comment.
@@ -208,7 +197,7 @@ export class Channels {
         return this.#manager.authRequest<GETCalendarEventResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_EVENT(channelID, eventID)
-        }).then(data => new CalendarEvent(data.calendarEvent, this.#manager.client));
+        }).then(data => this.#manager.client.getChannel<CalendarChannel>(data.calendarEvent.serverId, data.calendarEvent.channelId)?.scheduledEvents.update(data.calendarEvent) ?? new CalendarEvent(data.calendarEvent, this.#manager.client));
     }
 
     /** This method is used to get a list of CalendarEvent
@@ -226,7 +215,7 @@ export class Channels {
             method: "GET",
             path:   endpoints.CHANNEL_EVENTS(channelID),
             query
-        }).then(data => data.calendarEvents.map(d => new CalendarEvent(d, this.#manager.client)) as never);
+        }).then(data => data.calendarEvents.map(d => this.#manager.client.getChannel<CalendarChannel>(d.serverId, d.channelId)?.scheduledEvents.update(d) ?? new CalendarEvent(d, this.#manager.client)) as never);
     }
 
     /** This method is used to get a specific CalendarEventRSVP.
@@ -240,7 +229,7 @@ export class Channels {
         return this.#manager.authRequest<GETCalendarEventRSVPResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_EVENT_RSVP(channelID, eventID, memberID)
-        }).then(data => new CalendarEventRSVP(data.calendarEventRsvp, this.#manager.client));
+        }).then(data => this.#manager.client.getChannel<CalendarChannel>(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId)?.scheduledEvents.get(data.calendarEventRsvp.calendarEventId)?.rsvps.update(data.calendarEventRsvp) ?? new CalendarEventRSVP(data.calendarEventRsvp, this.#manager.client));
     }
 
     /** This method is used to get a list of CalendarEventRSVP.
@@ -251,7 +240,7 @@ export class Channels {
         return this.#manager.authRequest<GETCalendarEventRSVPSResponse>({
             method: "GET",
             path:   endpoints.CHANNEL_EVENT_RSVPS(channelID, eventID)
-        }).then(data => data.calendarEventRsvps.map(d => new CalendarEventRSVP(d, this.#manager.client)) as never);
+        }).then(data => data.calendarEventRsvps.map(d => this.#manager.client.getChannel<CalendarChannel>(d.serverId, d.channelId)?.scheduledEvents.get(d.calendarEventId)?.rsvps.update(d) ?? new CalendarEventRSVP(d, this.#manager.client)) as never);
     }
 
     /** This method is used to get a specific list item.
@@ -357,7 +346,7 @@ export class Channels {
      * @param channelID ID of a "Forums" channel.
      * @param options Thread's options including title & content.
      */
-    async createForumThread<T extends AnyChannel = AnyChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
+    async createForumThread<T extends ForumChannel = ForumChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
         if (typeof options !== "object") throw new Error("thread options should be an object.");
         return this.#manager.authRequest<POSTForumTopicResponse>({
             method: "POST",
@@ -371,7 +360,7 @@ export class Channels {
      * @param threadID ID of a forum thread.
      * @param options Edit options.
      */
-    async editForumThread<T extends AnyChannel = AnyChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>> {
+    async editForumThread<T extends ForumChannel = ForumChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>> {
         if (typeof options !== "object") throw new Error("thread options should be an object.");
         return this.#manager.authRequest<PATCHForumTopicResponse>({
             method: "PATCH",

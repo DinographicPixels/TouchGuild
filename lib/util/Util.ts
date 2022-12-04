@@ -4,7 +4,16 @@ import { Client } from "../structures/Client";
 import { Member } from "../structures/Member";
 import { AnyChannel } from "../types/channel";
 import { Channel } from "../structures/Channel";
-import { APIGuildChannel, APIGuildMember } from "guildedapi-types.ts/v1";
+import { ForumThread } from "../structures/ForumThread";
+import { ForumChannel } from "../structures/ForumChannel";
+import { Guild } from "../structures/Guild";
+import {
+    APIForumTopic,
+    APIForumTopicSummary,
+    APIGuild,
+    APIGuildChannel,
+    APIGuildMember
+} from "guildedapi-types.ts/v1";
 
 export class Util {
     #client: Client;
@@ -25,11 +34,30 @@ export class Util {
         return guild ? guild.members.update({ ...member, id: memberID }, guildID) : new Member({ ...member }, this.#client, guildID);
     }
 
+    updateForumThread(data: APIForumTopic | APIForumTopicSummary): ForumThread<ForumChannel> {
+        if (data.serverId) {
+            const guild = this.#client.guilds.get(data.serverId);
+            const channel = guild?.channels.get(data.channelId) as ForumChannel;
+            if (guild && channel) {
+                const thread = channel.threads.has(data.id) ? channel.threads.update(data) : channel.threads.add(new ForumThread(data as APIForumTopic, this.#client));
+                return thread;
+            }
+        }
+        return new ForumThread(data as APIForumTopic, this.#client);
+    }
+
+    updateGuild(data: APIGuild): Guild {
+        if (data.id) {
+            return this.#client.guilds.has(data.id) ? this.#client.guilds.update(data) : this.#client.guilds.add(new Guild(data, this.#client));
+        }
+        return new Guild(data, this.#client);
+    }
+
     updateChannel<T extends AnyChannel>(data: APIGuildChannel): T {
         if (data.serverId) {
             const guild = this.#client.guilds.get(data.serverId);
             if (guild) {
-                const channel = guild.channels.has(data.id) ? guild.channels.update(data as APIGuildChannel)  : guild.channels.add(Channel.from<AnyChannel>(data, this.#client));
+                const channel = guild.channels.has(data.id) ? guild.channels.update(data as APIGuildChannel) : guild.channels.add(Channel.from<AnyChannel>(data, this.#client));
                 return channel as T;
             }
         }
