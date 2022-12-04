@@ -2,7 +2,15 @@
 import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
 import { AnyChannel, AnyTextableChannel, PossiblyUncachedMessage } from "./channel";
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
-import { JSONMessage } from "./json";
+import {
+    JSONCalendarChannel,
+    JSONChannel,
+    JSONDocChannel,
+    JSONForumChannel,
+    JSONGuildChannel,
+    JSONMessage,
+    JSONTextChannel
+} from "./json";
 import type { BannedMember } from "../structures/BannedMember";
 import type { ForumThread } from "../structures/ForumThread";
 import type { ForumThreadComment } from "../structures/ForumThreadComment";
@@ -15,6 +23,12 @@ import type { CalendarEvent } from "../structures/CalendarEvent";
 import type { Doc } from "../structures/Doc";
 import type { Member } from "../structures/Member";
 import type { Webhook } from "../structures/Webhook";
+import { TextChannel } from "../structures/TextChannel";
+import { ForumChannel } from "../structures/ForumChannel";
+import { CalendarChannel } from "../structures/CalendarChannel";
+import { DocChannel } from "../structures/DocChannel";
+import { GuildChannel } from "../structures/GuildChannel";
+import { Channel } from "../structures/Channel";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 export interface ClientEvents {
@@ -40,7 +54,7 @@ export interface ClientEvents {
     /** @event Emitted when a guild channel is created. */
     channelCreate: [channel: AnyChannel];
     /** @event Emitted when a guild channel is updated. */
-    channelUpdate: [channel: AnyChannel];
+    channelUpdate: [channel: TextChannel, oldChannel: JSONTextChannel | null] | [channel: ForumChannel, oldChannel: JSONForumChannel | null] | [channel: CalendarChannel, oldChannel: JSONCalendarChannel | null] | [channel: DocChannel, oldChannel: JSONDocChannel | null] | [channel: GuildChannel, oldChannel: JSONGuildChannel | null] | [channel: Channel, oldChannel: JSONChannel | null];
     /** @event Emitted when a guild channel is deleted. */
     channelDelete: [channel: AnyChannel];
     /** @event Emitted when a forum thread is created. */
