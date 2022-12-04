@@ -5,15 +5,16 @@ import { Member } from "./Member";
 import { Base } from "./Base";
 import { User } from "./User";
 import { ForumThreadComment } from "./ForumThreadComment";
+import { ForumChannel } from "./ForumChannel";
 import { APIForumTopic, APIForumTopicComment, APIMentions } from "../Constants";
 import { EditForumThreadOptions } from "../types/forumThread";
 import { CreateForumCommentOptions } from "../types/forumThreadComment";
 import TypedCollection from "../util/TypedCollection";
 import { JSONForumThread } from "../types/json";
-import { AnyChannel, AnyTextableChannel } from "../types/channel";
+import { AnyTextableChannel } from "../types/channel";
 
 /** Represents a thread/topic coming from a "Forums" channel. */
-export class ForumThread<T extends AnyChannel> extends Base<number> {
+export class ForumThread<T extends ForumChannel> extends Base<number> {
     private _cachedChannel!: T extends AnyTextableChannel ? T : undefined;
     private _cachedGuild?: T extends Guild ? Guild : Guild | null;
     /** Guild ID */

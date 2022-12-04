@@ -18,6 +18,7 @@ import { ForumThreadComment } from "./ForumThreadComment";
 import { User } from "./User";
 import { BannedMember } from "./BannedMember";
 import { TextChannel } from "./TextChannel";
+import { ForumChannel } from "./ForumChannel";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -246,7 +247,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a "Forum" channel.
      * @param filter Object to filter the output.
      */
-    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<AnyTextableChannel>>>{
+    async getForumThreads(channelID: string, filter?: GetForumThreadsFilter): Promise<Array<ForumThread<ForumChannel>>>{
         return this.rest.channels.getForumThreads(channelID, filter);
     }
 
@@ -256,7 +257,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a speific Forum channel.
      * @param threadID ID of the specific Forum Thread.
      */
-    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<AnyTextableChannel>>{
+    async getForumThread(channelID: string, threadID: number): Promise<ForumThread<ForumChannel>>{
         return this.rest.channels.getForumThread(channelID, threadID);
     }
 
@@ -426,7 +427,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param channelID ID of a "Forums" channel.
      * @param options Thread's options including title & content.
      */
-    async createForumThread<T extends AnyChannel = AnyChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
+    async createForumThread<T extends ForumChannel = ForumChannel>(channelID: string, options: CreateForumThreadOptions): Promise<ForumThread<T>> {
         return this.rest.channels.createForumThread<T>(channelID, options);
     }
 
@@ -435,7 +436,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param threadID ID of a forum thread.
      * @param options Edit options.
      */
-    async editForumThread<T extends AnyChannel = AnyChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>>{
+    async editForumThread<T extends ForumChannel = ForumChannel>(channelID: string, threadID: number, options: EditForumThreadOptions): Promise<ForumThread<T>>{
         return this.rest.channels.editForumThread<T>(channelID, threadID, options);
     }
 
