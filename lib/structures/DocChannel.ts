@@ -24,7 +24,7 @@ export class DocChannel extends GuildChannel {
     override toJSON(): JSONDocChannel {
         return {
             ...super.toJSON(),
-            docs: this.docs
+            docs: this.docs.map(doc => doc.toJSON())
         };
     }
 }

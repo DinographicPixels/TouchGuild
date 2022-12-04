@@ -24,7 +24,7 @@ export class CalendarChannel extends GuildChannel {
     override toJSON(): JSONCalendarChannel {
         return {
             ...super.toJSON(),
-            scheduledEvents: this.scheduledEvents
+            scheduledEvents: this.scheduledEvents.map(event => event.toJSON())
         };
     }
 }

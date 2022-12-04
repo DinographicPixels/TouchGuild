@@ -94,7 +94,7 @@ export class CalendarEvent extends Base<number> {
             createdAt:   this.createdAt,
             ownerID:     this.ownerID,
             cancelation: this.cancelation,
-            rsvps:       this.rsvpLimit
+            rsvps:       this.rsvps.map(rsvp => rsvp.toJSON())
         };
     }
 
