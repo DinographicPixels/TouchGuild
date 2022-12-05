@@ -225,13 +225,13 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
     /** Edit the last message sent with the message itself.
      * @param newMessage New message's options.
      */
-    async editLastMessage(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message<T>>{
+    async editLast(newMessage: {content?: string; embeds?: Array<APIEmbedOptions>;}): Promise<Message<T>>{
         if (!this._lastMessageID) throw new TypeError("Can't edit last message if it does not exist.");
         return this.client.rest.channels.editMessage<T>(this.channelID, this._lastMessageID, newMessage);
     }
 
     /** Delete the last message sent with the message itself. */
-    async deleteLastMessage(): Promise<void>{
+    async deleteLast(): Promise<void>{
         if (!this._lastMessageID) throw new TypeError("Can't delete last message if it does not exist.");
         return this.client.rest.channels.deleteMessage(this.channelID, this._lastMessageID);
     }
@@ -239,13 +239,13 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
     /** Edit the message's original response message.
      * @param newMessage New message's options.
      */
-    async editOriginalMessage(newMessage: { content?: string; embeds?: Array<APIEmbedOptions>; }): Promise<Message<T>>{
+    async editOriginal(newMessage: { content?: string; embeds?: Array<APIEmbedOptions>; }): Promise<Message<T>>{
         if (!this.#originalMessageID) throw new TypeError("Can't edit original message if it does not exist.");
         return this.client.rest.channels.editMessage<T>(this.channelID, this.#originalMessageID, newMessage, { originalMessageID: this.#originalMessageID });
     }
 
     /** Delete the message's original response message. */
-    async deleteOriginalMessage(): Promise<void>{
+    async deleteOriginal(): Promise<void>{
         if (!this.#originalMessageID) throw new TypeError("Can't delete original message if it does not exist.");
         return this.client.rest.channels.deleteMessage(this.channelID, this.#originalMessageID);
     }
