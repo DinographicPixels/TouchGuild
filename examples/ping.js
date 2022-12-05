@@ -18,7 +18,7 @@ client.on("messageCreate", async (message) => {
 
         await message.createMessage({ content: GettingPing, replyMessageIds: [message.id] });
         const ping = Date.now() - message.createdAt.getTime();
-        await message.editOriginalMessage({ content: PingResultText1 + ping + PingResultText2 });
+        await message.editOriginal({ content: PingResultText1 + ping + PingResultText2 });
     }
 });
 
