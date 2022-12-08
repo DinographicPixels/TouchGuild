@@ -29,6 +29,8 @@ client.on("messageCreate", async (message) => {
             message.delete().then(() => console.log("Successfully deleted the swear.")).catch(err => console.log("Failed to delete the swear."));
             member.ban(`bad word: ${message.content}`).then(() => console.log("Successfully banned member.")).catch(() => console.log("Failed to ban member."));
         }
+    } else {
+        console.warn("Couldn't get Member.");
     }
 })
 
