@@ -117,7 +117,6 @@ export class ForumThreadHandler extends GatewayEventHandler {
             guild?.channels?.add(channel);
         }
         const conditions = this.client.getChannel(guildID, channelID) !== undefined && this.client.getChannel<ForumChannel>(guildID, channelID)?.threads.get(threadID as number) === undefined;
-        console.log(conditions);
         if (guildID && channelID && threadID && conditions) {
             const restThread = await this.client.rest.channels.getForumThread(channelID, threadID as number);
             const channel = guild?.channels.get(channelID) as ForumChannel;

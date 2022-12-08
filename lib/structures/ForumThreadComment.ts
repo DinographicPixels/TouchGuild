@@ -53,7 +53,6 @@ export class ForumThreadComment extends Base<number> {
     }
 
     protected override update(data: APIForumTopicComment): void {
-        console.log("update launched");
         if (data.channelId !== undefined) {
             this.channelID = data.channelId;
         }
