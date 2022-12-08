@@ -58,15 +58,15 @@ export interface ClientEvents {
     /** @event Emitted when a guild channel is deleted. */
     channelDelete: [channel: AnyChannel];
     /** @event Emitted when a forum thread is created. */
-    forumThreadCreate: [thread: ForumThread<AnyChannel>];
+    forumThreadCreate: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is edited. */
-    forumThreadUpdate: [thread: ForumThread<AnyChannel>];
+    forumThreadUpdate: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is deleted. */
-    forumThreadDelete: [thread: ForumThread<AnyChannel>];
+    forumThreadDelete: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is pinned. */
-    forumThreadPin: [thread: ForumThread<AnyChannel>];
+    forumThreadPin: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is unpinned. */
-    forumThreadUnpin: [thread: ForumThread<AnyChannel>];
+    forumThreadUnpin: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a thread comment is created. */
     forumCommentCreate: [comment: ForumThreadComment];
     /** @event Emitted when forum thread comment is edited. */
@@ -74,9 +74,9 @@ export interface ClientEvents {
     /** @event Emitted when forum thread is deleted. */
     forumCommentDelete: [comment: ForumThreadComment];
     /** @event Emitted when forum thread got locked. */
-    forumThreadLock: [ForumThread: ForumThread<AnyChannel>];
+    forumThreadLock: [ForumThread: ForumThread<ForumChannel>];
     /** @event Emitted when forum thread got unlocked. */
-    forumThreadUnlock: [ForumThread: ForumThread<AnyChannel>];
+    forumThreadUnlock: [ForumThread: ForumThread<ForumChannel>];
     /** @event Emitted when a guild member got banned. */
     guildBanAdd: [BannedMember: BannedMember];
     /** @event Emitted when guild member got unbanned. */
