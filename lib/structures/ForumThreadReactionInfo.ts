@@ -3,18 +3,25 @@ import { ReactionInfo } from "./ReactionInfo";
 import { Client } from "./Client";
 import { ForumChannel } from "./ForumChannel";
 import { ForumThreadReactionTypes } from "../types/types";
-import { GatewayEvent_ForumTopicReactionCreated, GatewayEvent_ForumTopicReactionDeleted } from "../Constants";
+import { GatewayEvent_ForumTopicCommentReactionCreated, GatewayEvent_ForumTopicCommentReactionDeleted, GatewayEvent_ForumTopicReactionCreated, GatewayEvent_ForumTopicReactionDeleted } from "../Constants";
 
 /** Information about a ForumThread's reaction. */
 export class ForumThreadReactionInfo extends ReactionInfo {
-    #threadID: number;
+    /** ID of the thread where the reaction is. */
+    threadID: number;
+    /** ID of the thread comment, if reaction was added/removed from a comment. */
+    commentID: number | null;
+    /** The type of the parent entity. */
+    type: string;
     /**
      * @param data raw data.
      * @param client client.
      */
-    constructor(data: GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted, client: Client){
+    constructor(data: GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_ForumTopicCommentReactionCreated | GatewayEvent_ForumTopicCommentReactionDeleted, client: Client){
         super(data, client);
-        this.#threadID = data.reaction.forumTopicId;
+        this.threadID = data.reaction.forumTopicId;
+        this.commentID = data.reaction["forumTopicCommentId" as keyof object] ?? null;
+        this.type = data.reaction["forumTopicCommentId" as keyof object] ? "comment" : "thread";
     }
 
     /** The forum thread where the reaction has been added.
@@ -22,12 +29,12 @@ export class ForumThreadReactionInfo extends ReactionInfo {
      * otherwise it'll return basic information about this thread.
      */
     get thread(): ForumThreadReactionTypes["thread"] {
-        return this.client.getChannel<ForumChannel>(this.data.serverId as string, this.data.reaction.channelId)?.threads.get(this.#threadID) ?? {
-            id:    this.#threadID,
-            guild: this.client.guilds.get(this.data.serverId as string) ?? {
-                id: this.data.serverId
+        return this.client.getChannel<ForumChannel>(this.raw.serverId as string, this.raw.reaction.channelId)?.threads.get(this.threadID) ?? {
+            id:    this.threadID,
+            guild: this.client.guilds.get(this.raw.serverId as string) ?? {
+                id: this.raw.serverId
             },
-            channelID: this.data.reaction.channelId
+            channelID: this.raw.reaction.channelId
         };
     }
 }
