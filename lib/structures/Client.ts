@@ -56,8 +56,6 @@ export class Client extends TypedEmitter<ClientEvents> {
     params: ClientOptions;
     /** Websocket Manager. */
     ws: WSManager;
-    /** Default event names to TouchGuild event names. */
-    identifiers;
     /** Client's user. */
     user?: UserClient;
     /** REST methods. */
@@ -92,7 +90,6 @@ export class Client extends TypedEmitter<ClientEvents> {
         this.ws = new WSManager(this, { token: this.token, client: this });
         this.guilds = new TypedCollection(Guild, this);
         this.users = new TypedCollection(User, this);
-        this.identifiers = this.ws.identifiers;
         this.rest = new RESTManager(this, params.RESTOptions);
         this.#gateway = new GatewayHandler(this);
         this.util = new Util(this);

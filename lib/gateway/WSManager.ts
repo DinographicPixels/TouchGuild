@@ -111,54 +111,6 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    get identifiers() {
-        return {
-            ChatMessageCreated:            "messageCreate",
-            ChatMessageUpdated:            "messageUpdate",
-            ChatMessageDeleted:            "messageDelete",
-            ChannelMessageReactionCreated: "messageReactionAdd",
-            ChannelMessageReactionDeleted: "messageReactionRemove",
-            ServerChannelCreated:          "channelCreate",
-            ServerChannelUpdated:          "channelUpdate",
-            ServerChannelDeleted:          "channelDelete",
-            ForumTopicCreated:             "forumThreadCreate",
-            ForumTopicUpdated:             "forumThreadUpdate",
-            ForumTopicDeleted:             "forumThreadDelete",
-            ForumTopicPinned:              "forumThreadPin",
-            ForumTopicUnpinned:            "forumThreadUnpin",
-            ForumTopicReactionCreated:     "forumThreadReactionAdd",
-            ForumTopicReactionDeleted:     "forumThreadReactionRemove",
-            ForumTopicCommentCreated:      "forumCommentCreate",
-            ForumTopicCommentUpdated:      "forumCommentUpdate",
-            ForumTopicCommentDeleted:      "forumCommentDelete",
-            ForumTopicLocked:              "forumThreadLock",
-            ForumTopicUnlocked:            "forumThreadUnlock",
-            BotServerMembershipCreated:    "guildCreate",
-            BotServerMembershipDeleted:    "guildDelete",
-            ServerMemberBanned:            "guildBanAdd",
-            ServerMemberUnbanned:          "guildBanRemove",
-            ServerMemberJoined:            "guildMemberAdd",
-            ServerMemberRemoved:           "guildMemberRemove",
-            ServerMemberUpdated:           "guildMemberUpdate",
-            ServerRolesUpdated:            "guildMemberRoleUpdate",
-            ServerWebhookCreated:          "webhooksCreate",
-            ServerWebhookUpdated:          "webhooksUpdate",
-            DocCreated:                    "docCreate",
-            DocUpdated:                    "docUpdate",
-            DocDeleted:                    "docDelete",
-            CalendarEventCreated:          "calendarEventCreate",
-            CalendarEventUpdated:          "calendarEventUpdate",
-            CalendarEventDeleted:          "calendarEventDelete",
-            CalendarEventRsvpUpdated:      "calendarRsvpUpdate",
-            CalendarEventRsvpDeleted:      "calendarRsvpDelete",
-            // CalendarEventRsvpManyUpdated
-            ListItemCreated:               "listItemCreate",
-            ListItemUpdated:               "listItemUpdate",
-            ListItemDeleted:               "listItemDelete",
-            ListItemCompleted:             "listItemComplete",
-            ListItemUncompleted:           "listItemUncomplete"
-        };
-    }
 
     get vAPI(): number {
         return this.apiversion as number;

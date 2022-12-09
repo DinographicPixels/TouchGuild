@@ -6,6 +6,8 @@ import { ForumThreadReactionInfo } from "../../structures/ForumThreadReactionInf
 import {
     GatewayEvent_ForumTopicCommentCreated,
     GatewayEvent_ForumTopicCommentDeleted,
+    GatewayEvent_ForumTopicCommentReactionCreated,
+    GatewayEvent_ForumTopicCommentReactionDeleted,
     GatewayEvent_ForumTopicCommentUpdated,
     GatewayEvent_ForumTopicCreated,
     GatewayEvent_ForumTopicDeleted,
@@ -105,6 +107,18 @@ export class ForumThreadHandler extends GatewayEventHandler {
     }
 
     forumThreadReactionRemove(data: GatewayEvent_ForumTopicReactionDeleted): boolean {
+        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+        const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
+        return this.client.emit("reactionRemove", ReactionInfo);
+    }
+
+    forumThreadCommentReactionAdd(data: GatewayEvent_ForumTopicCommentReactionCreated): boolean {
+        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+        const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
+        return this.client.emit("reactionAdd", ReactionInfo);
+    }
+
+    forumThreadCommentReactionRemove(data: GatewayEvent_ForumTopicCommentReactionDeleted): boolean {
         if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
         return this.client.emit("reactionRemove", ReactionInfo);
