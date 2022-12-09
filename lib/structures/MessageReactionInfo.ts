@@ -7,14 +7,18 @@ import { GatewayEvent_ChannelMessageReactionAdded, GatewayEvent_ChannelMessageRe
 
 /** Information about a Message's reaction. */
 export class MessageReactionInfo extends ReactionInfo {
-    #messageID: string;
+    /** ID of the message where the reaction was added/removed. */
+    messageID: string;
+    /** The type of the parent entity. */
+    type: string;
     /**
      * @param data raw data.
      * @param client client.
      */
     constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted, client: Client){
         super(data, client);
-        this.#messageID = data.reaction.messageId;
+        this.messageID = data.reaction.messageId;
+        this.type = "message";
     }
 
     /** The message where the reaction has been added.
@@ -22,13 +26,13 @@ export class MessageReactionInfo extends ReactionInfo {
      * otherwise it'll return basic information about this message.
      */
     get message(): MessageReactionTypes["message"] {
-        const channel = this.client.getChannel<TextChannel>(this.data.serverId as string, this.data.reaction.channelId);
-        return channel?.messages?.get(this.#messageID) ?? {
-            id:    this.#messageID,
-            guild: this.client.guilds.get(this.data.serverId as string) ?? {
-                id: this.data.serverId
+        const channel = this.client.getChannel<TextChannel>(this.raw.serverId as string, this.raw.reaction.channelId);
+        return channel?.messages?.get(this.messageID) ?? {
+            id:    this.messageID,
+            guild: this.client.guilds.get(this.raw.serverId as string) ?? {
+                id: this.raw.serverId
             },
-            channelID: this.data.reaction.channelId
+            channelID: this.raw.reaction.channelId
         };
     }
 }
