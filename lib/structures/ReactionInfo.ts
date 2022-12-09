@@ -12,7 +12,11 @@ import {
 /** Default information every other reaction has. */
 export class ReactionInfo {
     client!: Client;
-    data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted;
+    raw: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted;
+    /** Channel where the reaction was added/removed. */
+    channelID: string;
+    /** ID of the user who added the reaction. */
+    reactorID: string;
     /** Emote. */
     emoji: APIEmote;
     /**
@@ -20,7 +24,9 @@ export class ReactionInfo {
      * @param client client.
      */
     constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated | GatewayEvent_ForumTopicReactionDeleted, client: Client){
-        this.data = data;
+        this.raw = data;
+        this.channelID = data.reaction.channelId;
+        this.reactorID = data.reaction.createdBy;
         this.emoji = {
             id:   data.reaction.emote.id,
             name: data.reaction.emote.name,
@@ -36,8 +42,8 @@ export class ReactionInfo {
 
     /** Cached member. If member isn't cached will return an object with the member's id. */
     get reactor(): Member | { id: string; } {
-        return this.client.getGuild(this.data.serverId as string)?.members.get(this.data.reaction.createdBy) ?? {
-            id: this.data.reaction.createdBy
+        return this.client.getGuild(this.raw.serverId as string)?.members.get(this.raw.reaction.createdBy) ?? {
+            id: this.raw.reaction.createdBy
         };
     }
 }
