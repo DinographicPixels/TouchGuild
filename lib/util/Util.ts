@@ -7,18 +7,24 @@ import { Channel } from "../structures/Channel";
 import { ForumThread } from "../structures/ForumThread";
 import { ForumChannel } from "../structures/ForumChannel";
 import { Guild } from "../structures/Guild";
+import { User } from "../structures/User";
 import {
     APIForumTopic,
     APIForumTopicSummary,
     APIGuild,
     APIGuildChannel,
-    APIGuildMember
+    APIGuildMember,
+    APIUser
 } from "guildedapi-types.ts/v1";
 
 export class Util {
     #client: Client;
     constructor(client: Client) {
         this.#client = client;
+    }
+
+    updateUser(user: APIUser): User {
+        return this.#client.users.has(user.id) ? this.#client.users.update(user) : this.#client.users.add(new User(user, this.#client));
     }
 
     updateMember(guildID: string, memberID: string, member: APIGuildMember): Member {
