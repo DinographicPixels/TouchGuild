@@ -42,6 +42,6 @@ export class Miscellaneous {
         return this.#manager.authRequest<GETUserResponse>({
             method: "GET",
             path:   endpoints.USER(userID)
-        }).then(data => new User(data.user, this.#manager.client));
+        }).then(data => this.#manager.client.util.updateUser(data.user));
     }
 }
