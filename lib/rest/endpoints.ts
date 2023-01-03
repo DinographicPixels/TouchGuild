@@ -7,6 +7,7 @@ export const CHANNELS = () => `/channels`;
 export const CHANNEL = (channelID: string) => `/channels/${channelID}`;
 
 export const GUILD = (guildID: string) => `/servers/${guildID}`;
+export const USER = (userID: string) => `/users/${userID}`;
 
 export const CHANNEL_MESSAGES = (channelID: string) => `/channels/${channelID}/messages`;
 export const CHANNEL_MESSAGE = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}`;
