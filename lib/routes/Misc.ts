@@ -1,8 +1,9 @@
 /** @module Routes/Guilds */
 import type { RESTManager } from "../rest/RESTManager";
 import * as endpoints from "../rest/endpoints";
-import { GETGuildMemberSocialsResponse } from "../Constants";
+import { GETGuildMemberSocialsResponse, GETUserResponse } from "../Constants";
 import { GetSocialLink } from "../types/types";
+import { User } from "../structures/User";
 
 /** Miscellaneous routes. */
 export class Miscellaneous {
@@ -28,5 +29,19 @@ export class Miscellaneous {
             serviceID:      data.socialLink.serviceId as string,
             type:           data.socialLink.type
         }));
+    }
+
+    /**
+     * Get a user.
+     *
+     * Note: when getting the bot's user, only the information specific to 'User' will be returned.
+     * If you'd like to get the UserClient (the bot itself), use Client#user.
+     * @param userID The ID of the user to get.
+     */
+    async getUser(userID: string): Promise<User> {
+        return this.#manager.authRequest<GETUserResponse>({
+            method: "GET",
+            path:   endpoints.USER(userID)
+        }).then(data => new User(data.user, this.#manager.client));
     }
 }
