@@ -219,6 +219,17 @@ export class Client extends TypedEmitter<ClientEvents> {
         }
     }
 
+    /**
+     * Get a user.
+     *
+     * Note: when getting the bot's user, only the information specific to 'User' will be returned.
+     * If you'd like to get the UserClient (the bot itself), use Client#user.
+     * @param userID The ID of the user to get.
+     */
+    async getUser(userID: string): Promise<User> {
+        return this.rest.misc.getUser(userID);
+    }
+
     // docs
     /** This method is used to get a list of "Channel" Doc.
      * @param channelID ID of a "Docs" channel.
