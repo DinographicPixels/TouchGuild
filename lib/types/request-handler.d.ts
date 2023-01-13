@@ -14,6 +14,7 @@ export interface RequestOptions {
     query?: URLSearchParams;
     reason?: string;
     route?: string;
+    editBaseURL?: string;
 }
 
 export interface File {
