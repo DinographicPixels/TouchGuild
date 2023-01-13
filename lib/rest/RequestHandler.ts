@@ -113,7 +113,7 @@ export class RequestHandler {
                         headers.Host = this.options.host;
                     }
 
-                    const url = `${pkgconfig.GuildedAPI.APIURL}${options.path}${options.query && Array.from(options.query.keys()).length !== 0 ? `?${options.query.toString()}` : ""}`;
+                    const url = `${options.editBaseURL ?? this.options.baseURL}${options.path}${options.query && Array.from(options.query.keys()).length !== 0 ? `?${options.query.toString()}` : ""}`;
                     let latency = Date.now();
 
                     let timeout: NodeJS.Timeout | undefined;
