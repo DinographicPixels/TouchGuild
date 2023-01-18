@@ -2,4 +2,4 @@
 
 ## Supported Versions
 
-Only the latest version is safe to use as we don't check vulnerabilities for older versions.
+Only the latest version is safe to use as we don't check vulnerabilities of older versions.
