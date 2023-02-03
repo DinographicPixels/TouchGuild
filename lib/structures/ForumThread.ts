@@ -29,8 +29,6 @@ export class ForumThread<T extends ForumChannel> extends Base<number> {
     owner: T extends Guild ? Member : Member | User | Promise<Member> | undefined;
     /** The ID of the owner of this thread. */
     ownerID: string;
-    /** ID of the webhook that created the thread (if created by webhook) */
-    webhookID: string | null;
     /** Timestamp at which this channel was last edited. */
     editedTimestamp: Date | null;
     /** Timestamp (unix epoch time) that the forum thread was bumped at. */
@@ -58,7 +56,6 @@ export class ForumThread<T extends ForumChannel> extends Base<number> {
         this.createdAt = new Date(data.createdAt);
         this.ownerID = data.createdBy;
         this.owner =  (this.client.getMember(data.serverId, data.createdBy) ?? this.client.users.get(data.createdBy) ?? this.client.rest.guilds.getMember(data.serverId, data.createdBy)) as T extends Guild ? Member : Member | User | Promise<Member> | undefined;
-        this.webhookID = data.createdByWebhookId ?? null;
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.bumpedAt = data.bumpedAt ? new Date(data.bumpedAt) : null;
         this.content = data.content;
@@ -78,7 +75,6 @@ export class ForumThread<T extends ForumChannel> extends Base<number> {
             createdAt:       this.createdAt,
             owner:           this.owner,
             ownerID:         this.ownerID,
-            webhookID:       this.webhookID,
             editedTimestamp: this.editedTimestamp,
             bumpedAt:        this.bumpedAt,
             content:         this.content,
@@ -104,9 +100,6 @@ export class ForumThread<T extends ForumChannel> extends Base<number> {
         }
         if (data.createdBy !== undefined) {
             this.ownerID = data.createdBy;
-        }
-        if (data.createdByWebhookId !== undefined) {
-            this.webhookID = data.createdByWebhookId;
         }
         if (data.id !== undefined) {
             this.id = data.id;
@@ -142,11 +135,6 @@ export class ForumThread<T extends ForumChannel> extends Base<number> {
     /** The forum channel this thread was created in.  */
     get channel(): T extends AnyTextableChannel ? T : undefined {
         return this._cachedChannel ?? (this._cachedChannel = this.client.getChannel(this.guildID, this.channelID) as T extends AnyTextableChannel ? T : undefined);
-    }
-
-    /** If true, this forum thread was created by a webhook. */
-    get createdByWebhook(): boolean {
-        return this.webhookID ? true : false;
     }
 
     /** Add a comment to this forum thread.

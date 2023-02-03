@@ -1,7 +1,8 @@
 import { Member } from "../structures/Member";
 import { User } from "../structures/User";
 import { Guild } from "../structures/Guild";
-import { APICalendarEvent } from "guildedapi-types.ts/v1";
+import { UserTypes } from "../Constants";
+import { APICalendarEvent, APICalendarEventComment } from "guildedapi-types.ts/v1";
 
 export interface JSONBase<ID= string | number> {
     // createdAt: number;
@@ -219,8 +220,6 @@ export interface JSONForumThread extends JSONBase<number> {
     owner: T extends Guild ? Member : Member | User | Promise<Member> | undefined;
     /** The ID of the owner of this thread. */
     ownerID: string;
-    /** ID of the webhook that created the thread (if created by webhook) */
-    webhookID: string | null;
     /** Timestamp at which this channel was last edited. */
     editedTimestamp: Date | null;
     /** Timestamp (unix epoch time) that the forum thread was bumped at. */
@@ -294,13 +293,9 @@ export interface JSONGuild extends JSONBase<string> {
     members: Array<JSONMember>;
 }
 
-export interface JSONUserClient extends JSONBase<string> {
+export interface JSONUserClient extends JSONUser {
     /** Client User Bot ID */
     botID: string;
-    /** User type (user, bot) */
-    type: string;
-    /** User's name */
-    username: string;
     /** When the bot client was created. */
     createdAt: Date;
     /** ID of the bot's owner. */
@@ -348,4 +343,21 @@ export interface JSONListItem extends JSONBase<string> {
     completedAt: Date | null;
     /** ID of the member that completed the item, if completed. */
     completedBy: string | null;
+}
+
+export interface JSONCalendarEventComment extends JSONBase<number> {
+    /** Raw data */
+    data: APICalendarEventComment;
+    /** The content of the comment. */
+    content: string;
+    /** The ISO 8601 timestamp that this comment was created at. */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that this comment was updated at. */
+    updatedAt: Date | null;
+    /** The ID of the event containing this comment. (parent) */
+    eventID: number;
+    /** The ID of the channel containing this comment. */
+    channelID: string;
+    /** The ID of the member who sent this comment. */
+    memberID: string;
 }

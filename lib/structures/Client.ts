@@ -19,6 +19,7 @@ import { User } from "./User";
 import { BannedMember } from "./BannedMember";
 import { TextChannel } from "./TextChannel";
 import { ForumChannel } from "./ForumChannel";
+import { CalendarEventComment } from "./CalendarEventComment";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -34,7 +35,8 @@ import {
     GATEWAY_EVENTS,
     ChannelReactionTypes,
     APIGuild,
-    APIUser
+    APIUser,
+    ChannelSubcategoryReactionTypes
 } from "../Constants";
 import {
     AnyChannel,
@@ -46,7 +48,14 @@ import {
 import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions, GetDocsFilter } from "../types/doc";
-import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
+import {
+    CreateCalendarCommentOptions,
+    CreateCalendarEventOptions,
+    EditCalendarCommentOptions,
+    EditCalendarEventOptions,
+    EditCalendarRSVPOptions,
+    GetCalendarEventsFilter
+} from "../types/calendarEvent";
 import { EditMemberOptions } from "../types/guilds";
 import { Util } from "../util/Util";
 
@@ -84,7 +93,8 @@ export class Client extends TypedEmitter<ClientEvents> {
                 threadComments:       params.collectionLimits?.threadComments       ?? 100,
                 docs:                 params.collectionLimits?.docs                 ?? 100,
                 scheduledEvents:      params.collectionLimits?.scheduledEvents      ?? 100,
-                scheduledEventsRSVPS: params.collectionLimits?.scheduledEventsRSVPS ?? 100
+                scheduledEventsRSVPS: params.collectionLimits?.scheduledEventsRSVPS ?? 100,
+                calendarComments:     params.collectionLimits?.calendarComments     ?? 100
             }
         };
         this.ws = new WSManager(this, { token: this.token, client: this });
@@ -109,7 +119,7 @@ export class Client extends TypedEmitter<ClientEvents> {
     connect(): void {
         this.ws.connect();
         this.ws.on("GATEWAY_WELCOME", data => {
-            this.user = new UserClient(data.user, this);
+            this.user = new UserClient(data, this);
             console.log("> Connection established.");
             this.startTime = Date.now();
             this.emit("ready");
@@ -305,6 +315,25 @@ export class Client extends TypedEmitter<ClientEvents> {
         return this.rest.channels.getCalendarEvent(channelID, eventID);
     }
 
+    /** This method is used to get a specific event comment coming from a calendar.
+     * Note: this method doesn't cache scheduled events due to the API's restrictions.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of an event containing the comment to get.
+     * @param commentID ID of the comment to get.
+     */
+    async getCalendarEventComment(channelID: string, eventID: number, commentID: number): Promise<CalendarEventComment> {
+        return this.rest.channels.getCalendarEventComment(channelID, eventID, commentID);
+    }
+
+    /** This method is used to get a list of CalendarEventComment
+     * Note: due to API's restrictions, we're not able to cache scheduled events from this method.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of the event containing comments.
+     */
+    async getCalendarEventComments(channelID: string, eventID: number): Promise<Array<CalendarEventComment>> {
+        return this.rest.channels.getCalendarEventComments(channelID, eventID);
+    }
+
     /** This method is used to get a specific CalendarEventRSVP.
      *
      * Note: this method requires a Calendar channel.
@@ -427,6 +456,28 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async removeReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void>{
         return this.rest.channels.deleteReaction(channelID, channelType, objectID, reaction);
+    }
+
+    /** Add a reaction to an object from a subcategory (e.g: a comment from Forum Thread)
+     * @param channelID ID of a channel that supports reaction.
+     * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
+     * @param subcategoryID ID of the subcategory you selected.
+     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a comment id)
+     * @param reaction ID of the reaction to add.
+     */
+    async createReactionToSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
+        return this.rest.channels.createReactionToSubcategory(channelID, subcategoryType, subcategoryID, targetID, reaction);
+    }
+
+    /** Remove a reaction from an object from a subcategory (e.g: a comment from Forum Thread)
+     * @param channelID ID of a channel that supports reaction.
+     * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
+     * @param subcategoryID ID of the subcategory you selected.
+     * @param targetID ID of the object you'd like to remove the reaction to. (e.g: a comment id)
+     * @param reaction ID of the reaction to add.
+     */
+    async deleteReactionFromSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
+        return this.rest.channels.deleteReactionFromSubcategory(channelID, subcategoryType, subcategoryID, targetID, reaction);
     }
 
     // ForumThread
@@ -566,6 +617,34 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteCalendarEvent(channelID: string, eventID: number): Promise<void>{
         return this.rest.channels.deleteCalendarEvent(channelID, eventID);
+    }
+
+    /** Create a comment inside a calendar event.
+     * @param channelID The ID of a "Calendar" channel.
+     * @param eventID The ID of a calendar event.
+     * @param options Comment options, includes content, and more.
+     */
+    async createCalendarComment(channelID: string, eventID: number, options: CreateCalendarCommentOptions): Promise<CalendarEventComment> {
+        return this.rest.channels.createCalendarComment(channelID, eventID, options);
+    }
+
+    /** Edit an existing calendar event comment.
+     * @param channelID The ID of a "Calendar" channel.
+     * @param eventID The ID of an event from the channel.
+     * @param commentID The ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editCalendarComment(channelID: string, eventID: number, commentID: number, options: EditCalendarCommentOptions): Promise<CalendarEventComment> {
+        return this.rest.channels.editCalendarComment(channelID, eventID, commentID, options);
+    }
+
+    /** Delete a comment from a calendar event.
+     * @param channelID ID of the channel containing the event.
+     * @param eventID ID of the event containing the comment.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteCalendarComment(channelID: string, eventID: number, commentID: number): Promise<void> {
+        return this.rest.channels.deleteCalendarComment(channelID, eventID, commentID);
     }
 
     /** Add/Edit a RSVP in a calendar event.

@@ -11,6 +11,9 @@ import { ListItem } from "../structures/ListItem";
 import {
     APIListItem,
     ChannelReactionTypes,
+    ChannelSubcategoryReactionTypes,
+    GETCalendarEventCommentResponse,
+    GETCalendarEventCommentsResponse,
     GETCalendarEventResponse,
     GETCalendarEventRSVPResponse,
     GETCalendarEventRSVPSResponse,
@@ -26,9 +29,11 @@ import {
     GETForumTopicResponse,
     GETForumTopicsResponse,
     GETListItemResponse,
+    PATCHCalendarEventCommentResponse,
     PATCHCalendarEventResponse,
     PATCHForumTopicCommentResponse,
     PATCHForumTopicResponse,
+    POSTCalendarEventCommentResponse,
     POSTCalendarEventResponse,
     POSTChannelMessageResponse,
     POSTDocResponse,
@@ -51,11 +56,19 @@ import {
 import { CreateForumThreadOptions, EditForumThreadOptions, GetForumThreadsFilter } from "../types/forumThread";
 import { CreateForumCommentOptions, EditForumCommentOptions } from "../types/forumThreadComment";
 import { CreateDocOptions, EditDocOptions } from "../types/doc";
-import { CreateCalendarEventOptions, EditCalendarEventOptions, EditCalendarRSVPOptions, GetCalendarEventsFilter } from "../types/calendarEvent";
+import {
+    CreateCalendarCommentOptions,
+    CreateCalendarEventOptions,
+    EditCalendarCommentOptions,
+    EditCalendarEventOptions,
+    EditCalendarRSVPOptions,
+    GetCalendarEventsFilter
+} from "../types/calendarEvent";
 import { DocChannel } from "../structures/DocChannel";
 import { ForumChannel } from "../structures/ForumChannel";
 import { CalendarChannel } from "../structures/CalendarChannel";
 import { TextChannel } from "../structures/TextChannel";
+import { CalendarEventComment } from "../structures/CalendarEventComment";
 
 export class Channels {
     #manager: RESTManager;
@@ -218,6 +231,31 @@ export class Channels {
         }).then(data => data.calendarEvents.map(d => this.#manager.client.getChannel<CalendarChannel>(d.serverId, d.channelId)?.scheduledEvents.update(d) ?? new CalendarEvent(d, this.#manager.client)) as never);
     }
 
+    /** This method is used to get a specific event comment coming from a calendar.
+     * Note: this method doesn't cache scheduled events due to the API's restrictions.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of an event containing the comment to get.
+     * @param commentID ID of the comment to get.
+     */
+    async getCalendarEventComment(channelID: string, eventID: number, commentID: number): Promise<CalendarEventComment> {
+        return this.#manager.authRequest<GETCalendarEventCommentResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_EVENT_COMMENT(channelID, eventID, commentID)
+        }).then(data => new CalendarEventComment(data.calendarEventComment, this.#manager.client));
+    }
+
+    /** This method is used to get a list of CalendarEventComment
+     * Note: due to API's restrictions, we're not able to cache scheduled events from this method.
+     * @param channelID ID of a "Calendar" channel.
+     * @param eventID ID of the event containing comments.
+     */
+    async getCalendarEventComments(channelID: string, eventID: number): Promise<Array<CalendarEventComment>> {
+        return this.#manager.authRequest<GETCalendarEventCommentsResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_EVENT_COMMENTS(channelID, eventID)
+        }).then(data => data.calendarEventComments.map(d => new CalendarEventComment(d, this.#manager.client)));
+    }
+
     /** This method is used to get a specific CalendarEventRSVP.
      *
      * Note: this method requires a Calendar channel.
@@ -306,21 +344,22 @@ export class Channels {
         });
     }
 
-    /** Add a reaction to a specified object.
+    /** Add a reaction to a specified object from a channel.
      * @param channelID ID of a channel that supports reaction.
      * @param channelType Type of the selected channel. (e.g: "ChannelMessage")
-     * @param objectID ID of the object you'd like to add the reaction to. (e.g: a message id)
-     * @param reaction ID of the reaction.
+     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a message id)
+     * @param reaction ID of the reaction to add.
      */
-    async createReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | undefined;
+    async createReaction(channelID: string, channelType: ChannelReactionTypes, targetID: string | number, reaction: number): Promise<void> {
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
+        if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "PUT",
-            path:   endpoints[endpointType as keyof typeof endpoints](channelID, objectID as never, reaction as never)
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, targetID as never, reaction as never, 0)
         });
     }
 
@@ -331,14 +370,53 @@ export class Channels {
      * @param reaction ID of the reaction.
      */
     async deleteReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | undefined;
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
+        if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
-            path:   endpoints[endpointType as keyof typeof endpoints](channelID, objectID as never, reaction as never)
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, objectID as never, reaction as never, 0)
+        });
+    }
+
+    /** Add a reaction to an object from a subcategory (e.g: a comment from Forum Thread)
+     * @param channelID ID of a channel that supports reaction.
+     * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
+     * @param subcategoryID ID of the subcategory you selected.
+     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a comment id)
+     * @param reaction ID of the reaction to add.
+     */
+    async createReactionToSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | undefined;
+        if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
+        if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
+
+        return this.#manager.authRequest<void>({
+            method: "PUT",
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, subcategoryID as never, targetID as never, reaction)
+        });
+    }
+
+    /** Remove a reaction from an object from a subcategory (e.g: a comment from Forum Thread)
+     * @param channelID ID of a channel that supports reaction.
+     * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
+     * @param subcategoryID ID of the subcategory you selected.
+     * @param targetID ID of the object you'd like to remove the reaction to. (e.g: a comment id)
+     * @param reaction ID of the reaction to add.
+     */
+    async deleteReactionFromSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | undefined;
+        if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
+        if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
+
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, subcategoryID as never, targetID as never, reaction)
         });
     }
 
@@ -530,6 +608,47 @@ export class Channels {
             path:   endpoints.CHANNEL_EVENT(channelID, eventID),
             json:   options
         }).then(data => new CalendarEvent(data.calendarEvent, this.#manager.client));
+    }
+
+    /** Create a comment inside a calendar event.
+     * @param channelID The ID of a "Calendar" channel.
+     * @param eventID The ID of a calendar event.
+     * @param options Comment options, includes content, and more.
+     */
+    async createCalendarComment(channelID: string, eventID: number, options: CreateCalendarCommentOptions): Promise<CalendarEventComment> {
+        if (typeof options !== "object") throw new Error("comment options should be an object.");
+        return this.#manager.authRequest<POSTCalendarEventCommentResponse>({
+            method: "POST",
+            path:   endpoints.CHANNEL_EVENT_COMMENTS(channelID, eventID),
+            json:   options
+        }).then(data => new CalendarEventComment(data.calendarEventComment, this.#manager.client));
+    }
+
+    /** Edit an existing calendar event comment.
+     * @param channelID The ID of a "Calendar" channel.
+     * @param eventID The ID of an event from the channel.
+     * @param commentID The ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editCalendarComment(channelID: string, eventID: number, commentID: number, options: EditCalendarCommentOptions): Promise<CalendarEventComment> {
+        if (typeof options !== "object") throw new Error("comment options should be an object.");
+        return this.#manager.authRequest<PATCHCalendarEventCommentResponse>({
+            method: "PATCH",
+            path:   endpoints.CHANNEL_EVENT_COMMENT(channelID, eventID, commentID),
+            json:   options
+        }).then(data => new CalendarEventComment(data.calendarEventComment, this.#manager.client));
+    }
+
+    /** Delete a comment from a calendar event.
+     * @param channelID ID of the channel containing the event.
+     * @param eventID ID of the event containing the comment.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteCalendarComment(channelID: string, eventID: number, commentID: number): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_EVENT_COMMENT(channelID, eventID, commentID)
+        });
     }
 
     /** Delete an event from a "Calendar" channel.

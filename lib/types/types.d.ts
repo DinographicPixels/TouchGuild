@@ -6,6 +6,8 @@ import { Message } from "../structures/Message";
 import type { MessageReactionInfo } from "../structures/MessageReactionInfo";
 import type { ForumThreadReactionInfo } from "../structures/ForumThreadReactionInfo";
 import type { APIEmote, APIMentions } from "../Constants";
+import { CalendarEvent } from "../structures/CalendarEvent";
+import { CalendarReactionInfo } from "../structures/CalendarReactionInfo";
 
 export interface MessageReactionTypes {
     message: Message | {
@@ -23,6 +25,20 @@ export interface MessageReactionTypes {
 
 export interface ForumThreadReactionTypes {
     thread: ForumThread | {
+        id: number;
+        guild: Guild | {
+            id?: string;
+        };
+        channelID: string;
+    };
+    emoji: APIEmote;
+    reactor: Member | {
+        id: string;
+    };
+}
+
+export interface CalendarReactionTypes {
+    event: CalendarEvent | {
         id: number;
         guild: Guild | {
             id?: string;
@@ -84,5 +100,5 @@ export interface GuildDeleteInfo {
     removerID: string;
 }
 
-export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo;
+export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo;
 export interface Uncached<ID = string | number> { id: ID; }

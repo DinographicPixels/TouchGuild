@@ -55,3 +55,13 @@ export interface EditCalendarRSVPOptions {
     /** The status of the RSVP */
     status: APICalendarEventRSVPStatuses;
 }
+
+export interface CreateCalendarCommentOptions {
+    /** The content of the comment. */
+    content: string;
+}
+
+export interface EditCalendarCommentOptions {
+    /** The new content of the comment. */
+    content: string;
+}

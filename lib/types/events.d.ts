@@ -4,9 +4,15 @@ import { AnyChannel, AnyTextableChannel, PossiblyUncachedMessage } from "./chann
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
 import {
     JSONCalendarChannel,
+    JSONCalendarEvent,
+    JSONCalendarEventComment,
+    JSONCalendarEventRSVP,
     JSONChannel,
+    JSONDoc,
     JSONDocChannel,
     JSONForumChannel,
+    JSONForumThread,
+    JSONForumThreadComment,
     JSONGuildChannel,
     JSONMessage,
     JSONTextChannel
@@ -29,6 +35,7 @@ import { CalendarChannel } from "../structures/CalendarChannel";
 import { DocChannel } from "../structures/DocChannel";
 import { GuildChannel } from "../structures/GuildChannel";
 import { Channel } from "../structures/Channel";
+import { CalendarEventComment } from "../structures/CalendarEventComment";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 export interface ClientEvents {
@@ -60,7 +67,7 @@ export interface ClientEvents {
     /** @event Emitted when a forum thread is created. */
     forumThreadCreate: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is edited. */
-    forumThreadUpdate: [thread: ForumThread<ForumChannel>];
+    forumThreadUpdate: [thread: ForumThread<ForumChannel>, oldThread: JSONForumThread | null];
     /** @event Emitted when a forum thread is deleted. */
     forumThreadDelete: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is pinned. */
@@ -70,7 +77,7 @@ export interface ClientEvents {
     /** @event Emitted when a thread comment is created. */
     forumCommentCreate: [comment: ForumThreadComment];
     /** @event Emitted when forum thread comment is edited. */
-    forumCommentUpdate: [comment: ForumThreadComment];
+    forumCommentUpdate: [comment: ForumThreadComment, oldComment: JSONForumThreadComment | null];
     /** @event Emitted when forum thread is deleted. */
     forumCommentDelete: [comment: ForumThreadComment];
     /** @event Emitted when forum thread got locked. */
@@ -96,19 +103,25 @@ export interface ClientEvents {
     /** @event Emitted when a doc is created. */
     docCreate: [Doc: Doc];
     /** @event Emitted when a doc is edited. */
-    docUpdate: [Doc: Doc];
+    docUpdate: [Doc: Doc , oldDoc: JSONDoc | null];
     /** @event Emitted when a doc is deleted. */
     docDelete: [DeletedDoc: Doc];
     /** @event Emitted when an event was added to a calendar. */
     calendarEventCreate: [CalendarEvent: CalendarEvent];
     /** @event Emitted when a calendar event got updated. */
-    calendarEventUpdate: [CalendarEvent: CalendarEvent];
+    calendarEventUpdate: [CalendarEvent: CalendarEvent, oldEvent: JSONCalendarEvent | null];
     /** @event Emitted when a calendar event is deleted. */
     calendarEventDelete: [CalendarEvent: CalendarEvent];
     /** @event Emitted when an event RSVP is updated. */
-    calendarEventRsvpUpdate: [CalendarRSVP: CalendarEventRSVP];
+    calendarEventRsvpUpdate: [CalendarRSVP: CalendarEventRSVP, oldRSVP: JSONCalendarEventRSVP | null];
     /** @event Emitted when an event RSVP is deleted. */
     calendarEventRsvpDelete: [CalendarRSVP: CalendarEventRSVP];
+    /** @event Emitted when a calendar event comment is created. */
+    calendarCommentCreate: [comment: CalendarEventComment];
+    /** @event Emitted when a calendar event comment is edited. */
+    calendarCommentUpdate: [comment: CalendarEventComment, oldComment: JSONCalendarEventComment | null];
+    /** @event Emitted when a calendar event comment is deleted. */
+    calendarCommentDelete: [comment: CalendarEventComment];
     /** @event Emitted when a list item is created. */
     listItemCreate: [item: ListItem];
     /** @event Emitted when a list item is edited. */

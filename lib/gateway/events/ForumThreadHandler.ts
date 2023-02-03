@@ -34,8 +34,9 @@ export class ForumThreadHandler extends GatewayEventHandler {
     forumThreadUpdate(data: GatewayEvent_ForumTopicUpdated): boolean {
         void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
+        const CachedThread = channel?.threads.get(data.forumTopic.id)?.toJSON() ?? null;
         const Thread = channel?.threads?.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadUpdate", Thread);
+        return this.client.emit("forumThreadUpdate", Thread, CachedThread);
     }
 
     forumThreadDelete(data: GatewayEvent_ForumTopicDeleted): boolean {
@@ -72,9 +73,10 @@ export class ForumThreadHandler extends GatewayEventHandler {
     forumThreadCommentUpdate(data: GatewayEvent_ForumTopicCommentUpdated): boolean {
         void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopicComment.channelId);
+        const CachedComment = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.get(data.forumTopicComment.id)?.toJSON() ?? null;
         const cachedTC = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.update(data.forumTopicComment);
         const ThreadComment = cachedTC ?? new ForumThreadComment(data.forumTopicComment, this.client, { guildID: data.serverId });
-        return this.client.emit("forumCommentUpdate", ThreadComment);
+        return this.client.emit("forumCommentUpdate", ThreadComment, CachedComment);
     }
 
     forumThreadCommentDelete(data: GatewayEvent_ForumTopicCommentDeleted): boolean {

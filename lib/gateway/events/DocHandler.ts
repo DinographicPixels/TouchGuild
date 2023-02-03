@@ -16,8 +16,9 @@ export class DocHandler extends GatewayEventHandler {
     docUpdate(data: GatewayEvent_DocUpdated): void {
         void this.addGuildChannel(data.serverId, data.doc.channelId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.doc.channelId);
+        const CachedDoc = channel?.docs.get(data.doc.id)?.toJSON() ?? null;
         const DocComponent = channel?.docs.update(data.doc) ?? new Doc(data.doc, this.client);
-        this.client.emit("docUpdate", DocComponent);
+        this.client.emit("docUpdate", DocComponent, CachedDoc);
     }
 
     docDelete(data: GatewayEvent_DocDeleted): void {

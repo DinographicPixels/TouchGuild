@@ -95,6 +95,20 @@ export class ForumThreadComment extends Base<number> {
         return this.client.rest.channels.createForumComment(this.channelID, this.threadID, options);
     }
 
+    /** Add a reaction to the comment.
+     * @param reaction The ID of the reaction to add.
+     */
+    async createReaction(reaction: number): Promise<void> {
+        return this.client.rest.channels.createReactionToSubcategory(this.channelID, "ForumThreadComment", this.threadID, this.id, reaction);
+    }
+
+    /** Remove a reaction from the comment.
+     * @param reaction The ID of the reaction to remove.
+     */
+    async deleteReaction(reaction: number): Promise<void> {
+        return this.client.rest.channels.deleteReactionFromSubcategory(this.channelID, "ForumThreadComment", this.threadID, this.id, reaction);
+    }
+
     /** Edit this forum thread's comment.
      * @param options Edit options.
      */

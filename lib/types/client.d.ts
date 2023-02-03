@@ -24,6 +24,7 @@ export interface ClientOptions {
         docs?: number;
         scheduledEvents?: number;
         scheduledEventsRSVPS?: number;
+        calendarComments?: number;
     };
 }
 

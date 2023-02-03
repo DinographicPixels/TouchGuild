@@ -5,7 +5,8 @@ import { Base } from "./Base";
 
 import { User } from "./User";
 import { CalendarEventRSVP } from "./CalendarRSVP";
-import { APICalendarEvent, APICalendarEventRSVP, APIMentions } from "../Constants";
+import { CalendarEventComment } from "./CalendarEventComment";
+import { APICalendarEvent, APICalendarEventComment, APICalendarEventRSVP, APIMentions } from "../Constants";
 import { EditCalendarEventOptions } from "../types/calendarEvent";
 import TypedCollection from "../util/TypedCollection";
 import { JSONCalendarEvent } from "../types/json";
@@ -46,6 +47,8 @@ export class CalendarEvent extends Base<number> {
     cancelation: APICalendarEvent["cancellation"] | null;
     /** Cached RSVPS. */
     rsvps: TypedCollection<number, APICalendarEventRSVP, CalendarEventRSVP>;
+    /** Cached Comments */
+    comments: TypedCollection<number, APICalendarEventComment, CalendarEventComment>;
 
     /**
      * @param data raw data.
@@ -71,6 +74,7 @@ export class CalendarEvent extends Base<number> {
         this.ownerID = data.createdBy;
         this.cancelation = data.cancellation ?? null;
         this.rsvps = new TypedCollection(CalendarEventRSVP, client, client.params.collectionLimits?.scheduledEventsRSVPS);
+        this.comments = new TypedCollection(CalendarEventComment, client, client.params.collectionLimits?.calendarComments);
         this.update(data);
     }
 

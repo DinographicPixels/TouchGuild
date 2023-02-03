@@ -11,6 +11,7 @@ export const USER = (userID: string) => `/users/${userID}`;
 
 export const CHANNEL_MESSAGES = (channelID: string) => `/channels/${channelID}/messages`;
 export const CHANNEL_MESSAGE = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}`;
+export const CHANNEL_MESSAGE_CONTENT_EMOTES = (channelID: string, messageID: string) => `/channels/${channelID}/content/${messageID}/emotes`;
 export const CHANNEL_MESSAGE_CONTENT_EMOTE = (channelID: string, messageID: string, emoteID: number) => `/channels/${channelID}/content/${messageID}/emotes/${emoteID}`;
 
 export const MEMBER_NICKNAME = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/nickname`;
@@ -38,6 +39,8 @@ export const FORUM_TOPIC_LOCK = (channelID: string, topicID: number) => `/channe
 export const FORUM_TOPIC_EMOTE = (channelID: string, topicID: number, emoteID: number) => `/channels/${channelID}/topics/${topicID}/emotes/${emoteID}`;
 export const FORUM_TOPIC_COMMENTS = (channelID: string, topicID: number) => `/channels/${channelID}/topics/${topicID}/comments`;
 export const FORUM_TOPIC_COMMENT = (channelID: string, topicID: number, commentID: number) => `/channels/${channelID}/topics/${topicID}/comments/${commentID}`;
+export const FORUM_TOPIC_COMMENT_EMOTES = (channelID: string, topicID: number, commentID: number) => `/channels/${channelID}/topics/${topicID}/comments/${commentID}/emotes`;
+export const FORUM_TOPIC_COMMENT_EMOTE = (channelID: string, topicID: number, commentID: number, emoteID: number) => `/channels/${channelID}/topics/${topicID}/comments/${commentID}/emotes/${emoteID}`;
 
 export const LIST_ITEMS = (channelID: string)=> `/channels/${channelID}/items`;
 export const LIST_ITEM = (channelID: string, itemID: string)=> `/channels/${channelID}/items/${itemID}`;
@@ -48,8 +51,15 @@ export const CHANNEL_DOC = (channelID: string, docID: number)=> `/channels/${cha
 
 export const CHANNEL_EVENTS = (channelID: string)=> `/channels/${channelID}/events`;
 export const CHANNEL_EVENT = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}`;
+export const CHANNEL_EVENT_EMOTES = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}/emotes`;
+export const CHANNEL_EVENT_EMOTE = (channelID: string, eventID: number, emoteID: number)=> `/channels/${channelID}/events/${eventID}/emotes/${emoteID}`;
 export const CHANNEL_EVENT_RSVP = (channelID: string, eventID: number, memberID: string)=> `/channels/${channelID}/events/${eventID}/rsvps/${memberID}`;
-export const CHANNEL_EVENT_RSVPS = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}/rsvps`;
+export const CHANNEL_EVENT_RSVPS = (channelID: string, eventID: number) => `/channels/${channelID}/events/${eventID}/rsvps`;
+export const CHANNEL_EVENT_COMMENTS = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}/comments`;
+export const CHANNEL_EVENT_COMMENT = (channelID: string, eventID: number, commentID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}`;
+export const CHANNEL_EVENT_COMMENT_EMOTES = (channelID: string, eventID: number, commentID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}/emotes`;
+export const CHANNEL_EVENT_COMMENT_EMOTE = (channelID: string, eventID: number, commentID: number, emoteID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}/emotes/${emoteID}`;
+
 
 export const GUILD_WEBHOOKS = (guildID: string)=> `/servers/${guildID}/webhooks`;
 export const GUILD_WEBHOOK = (guildID: string, webhookID: string)=> `/servers/${guildID}/webhooks/${webhookID}`;
