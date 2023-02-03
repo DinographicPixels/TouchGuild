@@ -1,4 +1,4 @@
-/** @module CalendarEvent */
+/** @module CalendarEventComment */
 import { Client } from "./Client";
 import { Base } from "./Base";
 

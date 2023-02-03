@@ -1,4 +1,4 @@
-/** @module ForumThreadReactionInfo */
+/** @module CalendarReactionInfo */
 import { ReactionInfo } from "./ReactionInfo";
 import { Client } from "./Client";
 import { CalendarChannel } from "./CalendarChannel";
