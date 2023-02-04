@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://touchguild.com/"><img width=80% src="https://cdn.glitch.global/bc68313e-6abb-488c-a1e3-e6d10817c2bd/touchguild-cradius.png?v=1665311272247"></a>
+<a href="https://touchguild.com/"><img width=80% src="./images/touchguild-banner-2023.png"></a>
   <br>
   <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=flat-square&color=informational"></a>
    <a href="https://github.com/DinographicPixels/TouchGuild/stargazers"><img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=flat-square"></a>
