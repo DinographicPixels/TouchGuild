@@ -235,7 +235,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
                     clearInterval(this.#connectTimeout);
                 }
                 this.#heartbeatInterval = setInterval(() => this.heartbeat(), packet.d["heartbeatIntervalMs" as keyof object] as number);
-                this.emit("GATEWAY_WELCOME", packet.d as APIBotUser);
+                this.emit("GATEWAY_WELCOME", packet.d["user" as keyof object] as APIBotUser);
                 this.emit("GATEWAY_WELCOME_PACKET", packet as WelcomePacket);
                 this.connected = true;
                 break;
