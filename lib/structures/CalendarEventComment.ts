@@ -37,7 +37,7 @@ export class CalendarEventComment extends Base<number> {
         this.content = data.content;
         this.createdAt = new Date(data.createdAt);
         this.updatedAt = data.updatedAt ? new Date(data.updatedAt) : null;
-        this.eventID = data.calendarEventId;
+        this.eventID = Number(data.calendarEventId);
         this.channelID = data.channelId;
         this.memberID = data.createdBy;
         this.update(data);
@@ -58,7 +58,7 @@ export class CalendarEventComment extends Base<number> {
 
     protected override update(data: APICalendarEventComment): void {
         if (data.calendarEventId !== undefined) {
-            this.eventID = data.calendarEventId;
+            this.eventID = Number(data.calendarEventId);
         }
         if (data.channelId !== undefined) {
             this.channelID = data.channelId;

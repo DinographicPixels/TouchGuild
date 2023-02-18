@@ -58,26 +58,26 @@ export class CalendarHandler extends GatewayEventHandler {
     }
 
     calendarCommentCreate(data: GatewayEvent_CalendarEventCommentCreated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId);
+        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
-        const CalendarEventComponent = channel?.scheduledEvents.get(data.calendarEventComment.calendarEventId);
+        const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CalendarComment = CalendarEventComponent?.comments.update(data.calendarEventComment) ?? new CalendarEventComment(data.calendarEventComment, this.client, { guildID: data.serverId });
         this.client.emit("calendarCommentCreate", CalendarComment);
     }
 
     calendarCommentUpdate(data: GatewayEvent_CalendarEventCommentUpdated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId);
+        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
-        const CalendarEventComponent = channel?.scheduledEvents.get(data.calendarEventComment.calendarEventId);
+        const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CachedComment = CalendarEventComponent?.comments.get(data.calendarEventComment.id)?.toJSON() ?? null;
         const CalendarComment = CalendarEventComponent?.comments.update(data.calendarEventComment) ?? new CalendarEventComment(data.calendarEventComment, this.client, { guildID: data.serverId });
         this.client.emit("calendarCommentUpdate", CalendarComment, CachedComment);
     }
 
     calendarCommentDelete(data: GatewayEvent_CalendarEventCommentDeleted): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId);
+        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
-        const CalendarEventComponent = channel?.scheduledEvents.get(data.calendarEventComment.calendarEventId);
+        const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CalendarComment = CalendarEventComponent?.comments.update(data.calendarEventComment) ?? new CalendarEventComment(data.calendarEventComment, this.client, { guildID: data.serverId });
         CalendarEventComponent?.comments.delete(data.calendarEventComment.id);
         this.client.emit("calendarCommentDelete", CalendarComment);
