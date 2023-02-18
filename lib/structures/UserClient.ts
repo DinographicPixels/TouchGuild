@@ -8,8 +8,6 @@ import { JSONUserClient } from "../types/json";
 export class UserClient extends User {
     /** Client User Bot ID */
     botID: string;
-    /** ID of the user who created the bot. */
-    createdBy: string;
     /** ID of the bot's owner. */
     ownerID: string;
 
@@ -26,7 +24,6 @@ export class UserClient extends User {
         this.botID = data.botId;
         this.type = "bot";
         this.bot = true;
-        this.createdBy = data.createdBy;
         this.ownerID = data.createdBy;
         this.update(data);
     }
