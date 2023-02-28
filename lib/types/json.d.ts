@@ -361,3 +361,16 @@ export interface JSONCalendarEventComment extends JSONBase<number> {
     /** The ID of the member who sent this comment. */
     memberID: string;
 }
+
+export interface JSONSocialLink {
+    /** Social media name. */
+    type: "twitch" | "bnet" | "psn" | "xbox" | "steam" | "origin" | "youtube" | "twitter" | "facebook" | "switch" | "patreon" | "roblox" | "epic";
+    /** ID of the user having this social linked to their profile. */
+    userID: string;
+    /** The handle of the user within the external service */
+    handle: string | null;
+    /** The unique ID that represents this member's social link within the external service */
+    serviceID: string | null;
+    /** The date the social link was created at */
+    createdAt: Date;
+}
