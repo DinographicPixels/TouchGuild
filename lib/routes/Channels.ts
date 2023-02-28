@@ -33,6 +33,7 @@ import {
     PATCHCalendarEventResponse,
     PATCHForumTopicCommentResponse,
     PATCHForumTopicResponse,
+    POSTCalendarEventBody,
     POSTCalendarEventCommentResponse,
     POSTCalendarEventResponse,
     POSTChannelMessageResponse,
@@ -588,10 +589,13 @@ export class Channels {
     /** Create an event into a "Calendar" channel.
      * @param channelID ID of a "Calendar" channel.
      * @param options Event options.
+     * @param createSeries (optional) Create a series. (event's repetition)
      */
-    async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions): Promise<CalendarEvent> {
+    async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions, createSeries?: POSTCalendarEventBody["repeatInfo"]): Promise<CalendarEvent> {
         if (typeof options !== "object") throw new Error("event options should be an object.");
         if (options.duration && typeof options.duration === "number") options.duration = options.duration / 60000; // ms to min.
+        const reqOptions: object = options;
+        if (createSeries) Object.assign(reqOptions, { repeatInfo: createSeries });
         return this.#manager.authRequest<POSTCalendarEventResponse>({
             method: "POST",
             path:   endpoints.CHANNEL_EVENTS(channelID),
@@ -612,6 +616,44 @@ export class Channels {
             path:   endpoints.CHANNEL_EVENT(channelID, eventID),
             json:   options
         }).then(data => new CalendarEvent(data.calendarEvent, this.#manager.client));
+    }
+
+    /**
+     * The Guilded API only allows series on the event's creation.
+     *
+     * **Use createCalendarEvent and set the createSeries property to create a series.**
+     */
+    createCalendarEventSeries(): Error {
+        return new Error("The Guilded API only allows series on the event's creation. Use createCalendarEvent and set the createSeries property to create a series.");
+    }
+
+    /**
+     * Edit a CalendarEventSeries.
+     * @param channelID ID of the channel.
+     * @param eventID ID of the event.
+     * @param seriesID ID of the series.
+     * @param options Edit repetition options.
+     */
+    async editCalendarEventSeries(channelID: string, eventID: number, seriesID: string, options: POSTCalendarEventBody["repeatInfo"]): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "PATCH",
+            path:   endpoints.CHANNEL_EVENT_EVENT_SERIES_ENTITY(channelID, seriesID),
+            json:   { calendarEventId: eventID, repeatInfo: options }
+        });
+    }
+
+    /**
+     * Delete a CalendarEventSeries.
+     * @param channelID ID of the channel.
+     * @param eventID ID of the event.
+     * @param seriesID ID of the series.
+     */
+    async deleteCalendarEventSeries(channelID: string, eventID: number, seriesID: string): Promise<void> {
+        return this.#manager.authRequest({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_EVENT_EVENT_SERIES_ENTITY(channelID, seriesID),
+            json:   { calendarEventId: eventID }
+        });
     }
 
     /** Create a comment inside a calendar event.

@@ -36,7 +36,8 @@ import {
     ChannelReactionTypes,
     APIGuild,
     APIUser,
-    ChannelSubcategoryReactionTypes
+    ChannelSubcategoryReactionTypes,
+    POSTCalendarEventBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -597,9 +598,10 @@ export class Client extends TypedEmitter<ClientEvents> {
     /** Create an event into a "Calendar" channel.
      * @param channelID ID of a "Calendar" channel.
      * @param options Event options.
+     * @param createSeries (optional) Create a series. (event's repetition)
      */
-    async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions): Promise<CalendarEvent>{
-        return this.rest.channels.createCalendarEvent(channelID, options);
+    async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions, createSeries?: POSTCalendarEventBody["repeatInfo"]): Promise<CalendarEvent>{
+        return this.rest.channels.createCalendarEvent(channelID, options, createSeries);
     }
 
     /** Edit an event from a "Calendar" channel.
@@ -617,6 +619,36 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteCalendarEvent(channelID: string, eventID: number): Promise<void>{
         return this.rest.channels.deleteCalendarEvent(channelID, eventID);
+    }
+
+    /**
+     * The Guilded API only allows series on the event's creation.
+     *
+     * **Use createCalendarEvent and set the createSeries property to create a series.**
+     */
+    createCalendarEventSeries(): Error {
+        return this.rest.channels.createCalendarEventSeries();
+    }
+
+    /**
+     * Edit a CalendarEventSeries.
+     * @param channelID ID of the channel.
+     * @param eventID ID of the event.
+     * @param seriesID ID of the series.
+     * @param options Edit repetition options.
+     */
+    async editCalendarEventSeries(channelID: string, eventID: number, seriesID: string, options: POSTCalendarEventBody["repeatInfo"]): Promise<void> {
+        return this.rest.channels.editCalendarEventSeries(channelID, eventID, seriesID, options);
+    }
+
+    /**
+     * Delete a CalendarEventSeries.
+     * @param channelID ID of the channel.
+     * @param eventID ID of the event.
+     * @param seriesID ID of the series.
+     */
+    async deleteCalendarEventSeries(channelID: string, eventID: number, seriesID: string): Promise<void> {
+        return this.rest.channels.deleteCalendarEventSeries(channelID, eventID, seriesID);
     }
 
     /** Create a comment inside a calendar event.

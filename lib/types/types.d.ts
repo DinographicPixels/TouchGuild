@@ -101,5 +101,15 @@ export interface GuildDeleteInfo {
     removerID: string;
 }
 
+/** [The CalendarEventSeries model from the Guilded API](https://www.guilded.gg/docs/api/calendarEventSeries/CalendarEventSeries) */
+export interface CalendarEventSeries {
+    /** ID of the event series. */
+    id: string;
+    /** ID of the guild. */
+    guildID: string;
+    /** ID of the channel. */
+    channelID: string;
+}
+
 export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo;
 export interface Uncached<ID = string | number> { id: ID; }
