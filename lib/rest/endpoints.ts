@@ -48,6 +48,13 @@ export const LIST_ITEM_COMPLETE = (channelID: string, itemID: string)=> `/channe
 
 export const CHANNEL_DOCS = (channelID: string)=> `/channels/${channelID}/docs`;
 export const CHANNEL_DOC = (channelID: string, docID: number)=> `/channels/${channelID}/docs/${docID}`;
+export const CHANNEL_DOC_EMOTES = (channelID: string, docID: number)=> `/channels/${channelID}/docs/${docID}/emotes`;
+export const CHANNEL_DOC_EMOTE = (channelID: string, docID: number, emoteID: number)=> `/channels/${channelID}/docs/${docID}/emote/${emoteID}`;
+export const CHANNEL_DOC_COMMENTS = (channelID: string, docID: number)=> `/channels/${channelID}/docs/${docID}/comments`;
+export const CHANNEL_DOC_COMMENT = (channelID: string, docID: number, commentID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}`;
+export const CHANNEL_DOC_COMMENT_EMOTES = (channelID: string, docID: number, commentID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}/emotes`;
+export const CHANNEL_DOC_COMMENT_EMOTE = (channelID: string, docID: number, commentID: number, emoteID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}/emotes/${emoteID}`;
+
 
 export const CHANNEL_EVENTS = (channelID: string)=> `/channels/${channelID}/events`;
 export const CHANNEL_EVENT = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}`;
@@ -59,6 +66,8 @@ export const CHANNEL_EVENT_COMMENTS = (channelID: string, eventID: number)=> `/c
 export const CHANNEL_EVENT_COMMENT = (channelID: string, eventID: number, commentID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}`;
 export const CHANNEL_EVENT_COMMENT_EMOTES = (channelID: string, eventID: number, commentID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}/emotes`;
 export const CHANNEL_EVENT_COMMENT_EMOTE = (channelID: string, eventID: number, commentID: number, emoteID: number)=> `/channels/${channelID}/events/${eventID}/comments/${commentID}/emotes/${emoteID}`;
+export const CHANNEL_EVENT_EVENT_SERIES = (channelID: string) => `/channels/${channelID}/event_series/`;
+export const CHANNEL_EVENT_EVENT_SERIES_ENTITY = (channelID: string, seriesID: string) => `/channels/${channelID}/event_series/${seriesID}`;
 
 
 export const GUILD_WEBHOOKS = (guildID: string)=> `/servers/${guildID}/webhooks`;

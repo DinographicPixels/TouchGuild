@@ -351,11 +351,12 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async createReaction(channelID: string, channelType: ChannelReactionTypes, targetID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | undefined;
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
+        if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "PUT",
@@ -370,11 +371,12 @@ export class Channels {
      * @param reaction ID of the reaction.
      */
     async deleteReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | undefined;
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
+        if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
@@ -390,10 +392,11 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async createReactionToSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
-        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment") throw new Error("Invalid channel subcategory.");
-        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | undefined;
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | undefined;
         if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
         if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
+        if (subcategoryType === "DocComment") endpointType = "CHANNEL_DOC_COMMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "PUT",
@@ -409,10 +412,11 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async deleteReactionFromSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
-        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment") throw new Error("Invalid channel subcategory.");
-        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | undefined;
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | undefined;
         if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
         if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
+        if (subcategoryType === "DocComment") endpointType = "CHANNEL_DOC_COMMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
