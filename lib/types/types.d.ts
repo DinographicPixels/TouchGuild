@@ -82,6 +82,7 @@ export interface ListItemNoteTypes {
     content: string;
 }
 
+/** DEPRECATED, use SocialLink. */
 export interface GetSocialLink {
     memberUsername: string;
     serviceID: string;
