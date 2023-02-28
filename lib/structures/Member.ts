@@ -3,7 +3,7 @@ import { Client } from "./Client";
 import { User } from "./User";
 import { Guild } from "./Guild";
 import { BannedMember } from "./BannedMember";
-import { GetSocialLink } from "../types/types";
+import { SocialLink } from "./SocialLink";
 import { APIGuildMember } from "../Constants";
 import { EditMemberOptions } from "../types/guilds";
 import { JSONMember } from "../types/json";
@@ -111,7 +111,7 @@ export class Member extends User {
     /** Get a specified social link from the member, if member is connected to them through Guilded.
      * @param socialMediaName Name of a social media linked to this member.
      */
-    async getSocialLink(socialMediaName: string): Promise<GetSocialLink>{
+    async getSocialLink(socialMediaName: string): Promise<SocialLink>{
         return this.client.rest.misc.getSocialLink(this.guildID, this.id as string, socialMediaName);
     }
 

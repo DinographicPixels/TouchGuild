@@ -2,8 +2,8 @@
 import type { RESTManager } from "../rest/RESTManager";
 import * as endpoints from "../rest/endpoints";
 import { GETGuildMemberSocialsResponse, GETUserResponse } from "../Constants";
-import { GetSocialLink } from "../types/types";
 import { User } from "../structures/User";
+import { SocialLink } from "../structures/SocialLink";
 
 /** Miscellaneous routes. */
 export class Miscellaneous {
@@ -20,15 +20,11 @@ export class Miscellaneous {
      * @param memberID The ID of the member to get their social link.
      * @param socialMediaName Name of a social media linked to this member.
      */
-    async getSocialLink(guildID: string, memberID: string, socialMediaName: string): Promise<GetSocialLink> {
+    async getSocialLink(guildID: string, memberID: string, socialMediaName: string): Promise<SocialLink> {
         return this.#manager.authRequest<GETGuildMemberSocialsResponse>({
             method: "GET",
             path:   endpoints.GUILD_MEMBER_SOCIALS(guildID, memberID, socialMediaName)
-        }).then(data => ({
-            memberUsername: data.socialLink.handle as string,
-            serviceID:      data.socialLink.serviceId as string,
-            type:           data.socialLink.type
-        }));
+        }).then(data => new SocialLink(data.socialLink, this.#manager.client));
     }
 
     /**
