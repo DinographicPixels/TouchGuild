@@ -9,7 +9,7 @@ jobs:
     - name: Installing dependencies.
       run: npm i
     - name: Installing TS-Node
-      run: npm install -D ts-node
+      run: npm install -g ts-node
     - name: Simple bot
       run: ts-node scripts/tests/simpleBot.ts
       env: 
