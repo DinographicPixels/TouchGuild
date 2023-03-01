@@ -2,7 +2,7 @@
 import type { Client } from "./Client";
 import type { Guild } from "./Guild";
 import type { Member } from "./Member";
-import type { GatewayEvent_ServerMemberUpdated as GWMUpdated, GatewayEvent_ServerRolesUpdated as GWMRolesUpdated, GatewayEvent_ServerMemberRemoved as GWMRemoved } from "../Constants";
+import type { GatewayEvent_ServerMemberUpdated as GWMUpdated, GatewayEvent_ServerRolesUpdated as GWMRolesUpdated, GatewayEvent_ServerMemberRemoved as GWMRemoved, GatewayEvent_ServerMemberSocialLinkUpdated as GWSocialLink } from "../Constants";
 
 /** Base class for member information classes. */
 export abstract class MemberInfo {
@@ -12,7 +12,7 @@ export abstract class MemberInfo {
     guildID: string;
     /** ID of the member. */
     memberID: string;
-    constructor(data: GWMUpdated | GWMRemoved | GWMRolesUpdated, memberID: string, client: Client) {
+    constructor(data: GWMUpdated | GWMRemoved | GWMRolesUpdated | GWSocialLink, memberID: string, client: Client) {
         this.client! = client;
         this.guildID = data.serverId;
         this.memberID = memberID;
