@@ -20,10 +20,18 @@ export * from "./structures/ForumThread";
 export * from "./structures/ForumThreadComment";
 export * from "./structures/ListItem";
 export * from "./structures/Webhook";
+export * from "./structures/DocComment";
+export * from "./structures/SocialLink";
+export * from "./structures/CalendarEventComment";
 
 export * from "./structures/ReactionInfo";
 export * from "./structures/MessageReactionInfo";
 export * from "./structures/ForumThreadReactionInfo";
+export * from "./structures/MemberInfo";
+export * from "./structures/DocReactionInfo";
+export * from "./structures/MemberRemoveInfo";
+export * from "./structures/MemberUpdateInfo";
+export * from "./structures/CalendarReactionInfo";
 
 export * as APITypes from "guildedapi-types.ts/v1";
 export * as Constants from "./Constants";
