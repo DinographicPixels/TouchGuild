@@ -9,6 +9,10 @@ import {
     GatewayEvent_CalendarEventReactionDeleted,
     GatewayEvent_ChannelMessageReactionAdded,
     GatewayEvent_ChannelMessageReactionDeleted,
+    GatewayEvent_DocCommentReactionCreated,
+    GatewayEvent_DocCommentReactionDeleted,
+    GatewayEvent_DocReactionCreated,
+    GatewayEvent_DocReactionDeleted,
     GatewayEvent_ForumTopicReactionCreated,
     GatewayEvent_ForumTopicReactionDeleted
 } from "../Constants";
@@ -18,7 +22,8 @@ export class ReactionInfo {
     client!: Client;
     raw: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
-    GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted;
+    GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
+    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted;
     /** Channel where the reaction was added/removed. */
     channelID: string;
     /** ID of the user who added the reaction. */
@@ -31,7 +36,8 @@ export class ReactionInfo {
      */
     constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
-    GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted, client: Client) {
+    GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
+    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted, client: Client) {
         this.raw = data;
         this.channelID = data.reaction.channelId;
         this.reactorID = data.reaction.createdBy;

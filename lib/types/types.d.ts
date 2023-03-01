@@ -8,6 +8,8 @@ import type { ForumThreadReactionInfo } from "../structures/ForumThreadReactionI
 import type { APIEmote, APIMentions } from "../Constants";
 import { CalendarEvent } from "../structures/CalendarEvent";
 import { CalendarReactionInfo } from "../structures/CalendarReactionInfo";
+import { Doc } from "../structures/Doc";
+import { DocReactionInfo } from "../structures/DocReactionInfo";
 
 export interface MessageReactionTypes {
     message: Message | {
@@ -39,6 +41,20 @@ export interface ForumThreadReactionTypes {
 
 export interface CalendarReactionTypes {
     event: CalendarEvent | {
+        id: number;
+        guild: Guild | {
+            id?: string;
+        };
+        channelID: string;
+    };
+    emoji: APIEmote;
+    reactor: Member | {
+        id: string;
+    };
+}
+
+export interface DocReactionTypes {
+    doc: Doc | {
         id: number;
         guild: Guild | {
             id?: string;
@@ -111,5 +127,5 @@ export interface CalendarEventSeries {
     channelID: string;
 }
 
-export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo;
+export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo | DocReactionInfo;
 export interface Uncached<ID = string | number> { id: ID; }
