@@ -15,7 +15,7 @@ export interface CreateCalendarEventOptions {
     color?: number;
     /** Limit of member joining this event. */
     rsvpLimit?: number;
-    /** Event's duration. */
+    /** Event's duration in ms. */
     duration?: number;
     /** If the event is private or not. */
     isPrivate?: boolean;
@@ -38,7 +38,7 @@ export interface EditCalendarEventOptions {
     color?: number;
     /** Limit of member joining this event. */
     rsvpLimit?: number;
-    /** Event's duration. */
+    /** Event's duration in ms. */
     duration?: number;
     /** If the event is private or not. */
     isPrivate?: boolean;

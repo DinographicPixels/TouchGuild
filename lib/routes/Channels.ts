@@ -666,7 +666,10 @@ export class Channels {
      */
     async createCalendarEvent(channelID: string, options: CreateCalendarEventOptions, createSeries?: POSTCalendarEventBody["repeatInfo"]): Promise<CalendarEvent> {
         if (typeof options !== "object") throw new Error("event options should be an object.");
-        if (options.duration && typeof options.duration === "number") options.duration = options.duration / 60000; // ms to min.
+        if (options.duration && typeof options.duration === "number") {
+            if (options.duration < 1000) throw new Error("The duration should be higher than 1000 ms.");
+            options.duration = options.duration / 10000; // ms to min.
+        }
         const reqOptions: object = options;
         if (createSeries) Object.assign(reqOptions, { repeatInfo: createSeries });
         return this.#manager.authRequest<POSTCalendarEventResponse>({
@@ -683,7 +686,10 @@ export class Channels {
      */
     async editCalendarEvent(channelID: string, eventID: number, options: EditCalendarEventOptions): Promise<CalendarEvent> {
         if (typeof options !== "object") throw new Error("event options should be an object.");
-        if (options.duration && typeof options.duration === "number") options.duration = options.duration / 60000; // ms to min.
+        if (options.duration && typeof options.duration === "number") {
+            if (options.duration < 1000) throw new Error("The duration should be higher than 1000 ms.");
+            options.duration = options.duration / 10000; // ms to min.
+        }
         return this.#manager.authRequest<PATCHCalendarEventResponse>({
             method: "PATCH",
             path:   endpoints.CHANNEL_EVENT(channelID, eventID),
