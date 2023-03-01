@@ -668,7 +668,7 @@ export class Channels {
         if (typeof options !== "object") throw new Error("event options should be an object.");
         if (options.duration && typeof options.duration === "number") {
             if (options.duration < 1000) throw new Error("The duration should be higher than 1000 ms.");
-            options.duration = options.duration / 10000; // ms to min.
+            options.duration = options.duration / 1000; // ms to min.
         }
         const reqOptions: object = options;
         if (createSeries) Object.assign(reqOptions, { repeatInfo: createSeries });
@@ -688,7 +688,7 @@ export class Channels {
         if (typeof options !== "object") throw new Error("event options should be an object.");
         if (options.duration && typeof options.duration === "number") {
             if (options.duration < 1000) throw new Error("The duration should be higher than 1000 ms.");
-            options.duration = options.duration / 10000; // ms to min.
+            options.duration = options.duration / 1000; // ms to min.
         }
         return this.#manager.authRequest<PATCHCalendarEventResponse>({
             method: "PATCH",
