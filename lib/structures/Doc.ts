@@ -3,9 +3,11 @@ import { Client } from "./Client";
 import { Member } from "./Member";
 import { Base } from "./Base";
 
-import { APIDoc, APIMentions } from "../Constants";
+import { DocComment } from "./DocComment";
+import { APIDoc, APIDocComment, APIMentions } from "../Constants";
 import { EditDocOptions } from "../types/doc";
 import { JSONDoc } from "../types/json";
+import TypedCollection from "../util/TypedCollection";
 
 /** Doc represents an item of a "Docs" channel. */
 export class Doc extends Base<number> {
@@ -27,6 +29,7 @@ export class Doc extends Base<number> {
     editedTimestamp: Date | null;
     /** ID of the member who updated the doc. */
     updatedBy: string | null;
+    comments: TypedCollection<number, APIDocComment, DocComment>;
 
     /**
      * @param data raw data
@@ -43,6 +46,7 @@ export class Doc extends Base<number> {
         this.memberID = data.createdBy;
         this.editedTimestamp = data.updatedAt ? new Date(data.updatedAt) : null;
         this.updatedBy = data.updatedBy ?? null;
+        this.comments = new TypedCollection(DocComment, client, client.params.collectionLimits?.docComments);
         this.update(data);
     }
 
