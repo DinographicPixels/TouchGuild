@@ -374,3 +374,24 @@ export interface JSONSocialLink {
     /** The date the social link was created at */
     createdAt: Date;
 }
+
+export interface JSONDocComment extends JSONBase<number> {
+    /** Raw data */
+    raw: APIDocComment;
+    /** The content of the comment. */
+    content: string;
+    /** The date of the comment's creation. */
+    createdAt: Date;
+    /** ID of the member who created this comment. */
+    memberID: string;
+    /** The date when the comment was last updated. */
+    updatedAt: Date | null;
+    /** ID of the channel the comment is in. */
+    channelID: string;
+    /** The ID of the doc the comment is in. */
+    docID: number;
+    /** Mentions. */
+    mentions: APIMentions | null;
+    /** ID of the guild, if provided. */
+    guildID: string | null;
+}
