@@ -16,5 +16,7 @@ client.on('error', (err) => {
 client.connect();
 
 setTimeout(() => {
-    throw new Error("Test failed.");
-}, 30*1000);
+    if (ready == false) {
+        throw new Error("Test failed.");
+    }
+}, 10*1000);
