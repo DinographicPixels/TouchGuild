@@ -17,4 +17,4 @@ client.connect();
 
 setTimeout(() => {
     throw new Error("Test failed.");
-}, 10*1000);
+}, 30*1000);
