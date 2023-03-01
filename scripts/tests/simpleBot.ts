@@ -6,6 +6,7 @@ let ready = false;
 client.on("ready", () => {
     console.log(`Logged as ${client.user?.username}`);
     ready = true;
+    client.disconnect();
 });
 
 client.on('error', (err) => {
@@ -15,7 +16,5 @@ client.on('error', (err) => {
 client.connect();
 
 setTimeout(() => {
-    if (ready == false) {
-        throw new Error("Test failed.");
-    } else client.disconnect();
+    throw new Error("Test failed.");
 }, 10*1000);

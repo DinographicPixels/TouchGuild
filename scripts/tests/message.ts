@@ -1,5 +1,5 @@
 import { Client } from "../../lib";
-const client = new Client({ token: process.env.TOKEN as string })
+const client = new Client({ token: process.env.TOKEN as string });
 
 let success = 0;
 let maxSuccess = 5;
@@ -16,6 +16,7 @@ client.on('error', (err) => {
 });
 
 client.on("messageCreate", async (message) => {
+    console.log(client.user?.id);
     if (message.memberID === client.user?.id) {
         message.edit({ content: "edited testmessage" });
         success++;
@@ -23,7 +24,7 @@ client.on("messageCreate", async (message) => {
 });
 
 client.on("messageUpdate", (message, oldMessage) => {
-    if (message.member === client.user?.id) {
+    if (message.memberID === client.user?.id) {
         message.delete();
         success++;
     }
