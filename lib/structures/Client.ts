@@ -20,6 +20,7 @@ import { BannedMember } from "./BannedMember";
 import { TextChannel } from "./TextChannel";
 import { ForumChannel } from "./ForumChannel";
 import { CalendarEventComment } from "./CalendarEventComment";
+import { DocComment } from "./DocComment";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -59,6 +60,7 @@ import {
 } from "../types/calendarEvent";
 import { EditMemberOptions } from "../types/guilds";
 import { Util } from "../util/Util";
+import { CreateDocCommentOptions, EditDocCommentOptions } from "../types/docComment";
 
 /** Represents the bot's client. */
 export class Client extends TypedEmitter<ClientEvents> {
@@ -95,7 +97,8 @@ export class Client extends TypedEmitter<ClientEvents> {
                 docs:                 params.collectionLimits?.docs                 ?? 100,
                 scheduledEvents:      params.collectionLimits?.scheduledEvents      ?? 100,
                 scheduledEventsRSVPS: params.collectionLimits?.scheduledEventsRSVPS ?? 100,
-                calendarComments:     params.collectionLimits?.calendarComments     ?? 100
+                calendarComments:     params.collectionLimits?.calendarComments     ?? 100,
+                docComments:          params.collectionLimits?.docComments          ?? 100
             }
         };
         this.ws = new WSManager(this, { token: this.token, client: this });
@@ -258,6 +261,25 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async getDoc(channelID: string, docID: number): Promise<Doc>{
         return this.rest.channels.getDoc(channelID, docID);
+    }
+
+    /**
+     * Get every comments from a doc.
+     * @param channelID ID of the channel containing the doc.
+     * @param docID ID of the doc the comment is in.
+     */
+    async getDocComments(channelID: string, docID: number): Promise<Array<DocComment>> {
+        return this.rest.channels.getDocComments(channelID, docID);
+    }
+
+    /**
+     * Get a specific comment from a doc.
+     * @param channelID ID of the channel containing the doc.
+     * @param docID ID of the doc the comment is in.
+     * @param commentID ID of the comment to get.
+     */
+    async getDocComment(channelID: string, docID: number, commentID: number): Promise<DocComment> {
+        return this.rest.channels.getDocComment(channelID, docID, commentID);
     }
 
     //  ForumThread
@@ -592,6 +614,37 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteDoc(channelID: string, docID: number): Promise<void> {
         return this.rest.channels.deleteDoc(channelID, docID);
+    }
+
+    /**
+     * Create a comment in a doc.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param options Create options.
+     */
+    async createDocComment(channelID: string, docID: number, options: CreateDocCommentOptions): Promise<DocComment> {
+        return this.rest.channels.createDocComment(channelID, docID, options);
+    }
+
+    /**
+     * Edit a doc comment.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param commentID ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editDocComment(channelID: string, docID: number, commentID: number, options: EditDocCommentOptions): Promise<DocComment> {
+        return this.rest.channels.editDocComment(channelID, docID, commentID, options);
+    }
+
+    /**
+     * Delete a doc comment.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteDocComment(channelID: string, docID: number, commentID: number): Promise<void> {
+        return this.rest.channels.deleteDocComment(channelID, docID, commentID);
     }
 
     // calendar events

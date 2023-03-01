@@ -22,6 +22,8 @@ import {
     GETChannelMessageResponse,
     GETChannelMessagesResponse,
     GETChannelResponse,
+    GETDocCommentResponse,
+    GETDocCommentsResponse,
     GETDocResponse,
     GETDocsResponse,
     GETForumTopicCommentResponse,
@@ -31,12 +33,14 @@ import {
     GETListItemResponse,
     PATCHCalendarEventCommentResponse,
     PATCHCalendarEventResponse,
+    PATCHDocCommentResponse,
     PATCHForumTopicCommentResponse,
     PATCHForumTopicResponse,
     POSTCalendarEventBody,
     POSTCalendarEventCommentResponse,
     POSTCalendarEventResponse,
     POSTChannelMessageResponse,
+    POSTDocCommentResponse,
     POSTDocResponse,
     POSTForumTopicCommentResponse,
     POSTForumTopicResponse,
@@ -70,6 +74,8 @@ import { ForumChannel } from "../structures/ForumChannel";
 import { CalendarChannel } from "../structures/CalendarChannel";
 import { TextChannel } from "../structures/TextChannel";
 import { CalendarEventComment } from "../structures/CalendarEventComment";
+import { CreateDocCommentOptions, EditDocCommentOptions } from "../types/docComment";
+import { DocComment } from "../structures/DocComment";
 
 export class Channels {
     #manager: RESTManager;
@@ -146,6 +152,31 @@ export class Channels {
             path:   endpoints.CHANNEL_DOCS(channelID),
             query
         }).then(data => data.docs.map(d => this.#manager.client.getChannel<DocChannel>(d.serverId, channelID)?.docs.update(d) ?? new Doc(d, this.#manager.client)) as never);
+    }
+
+    /**
+     * Get every comments from a doc.
+     * @param channelID ID of the channel containing the doc.
+     * @param docID ID of the doc the comment is in.
+     */
+    async getDocComments(channelID: string, docID: number): Promise<Array<DocComment>> {
+        return this.#manager.authRequest<GETDocCommentsResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_DOC_COMMENTS(channelID, docID)
+        }).then(data => data.docComments.map(d => new DocComment(d, this.#manager.client)));
+    }
+
+    /**
+     * Get a specific comment from a doc.
+     * @param channelID ID of the channel containing the doc.
+     * @param docID ID of the doc the comment is in.
+     * @param commentID ID of the comment to get.
+     */
+    async getDocComment(channelID: string, docID: number, commentID: number): Promise<DocComment> {
+        return this.#manager.authRequest<GETDocCommentResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_DOC_COMMENT(channelID, docID, commentID)
+        }).then(data => new DocComment(data.docComment, this.#manager.client));
     }
 
     /** This method is used to get a specific forum thread.
@@ -583,6 +614,48 @@ export class Channels {
         return this.#manager.authRequest<void>({
             method: "DELETE",
             path:   endpoints.CHANNEL_DOC(channelID, docID)
+        });
+    }
+
+    /**
+     * Create a comment in a doc.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param options Create options.
+     */
+    async createDocComment(channelID: string, docID: number, options: CreateDocCommentOptions): Promise<DocComment> {
+        return this.#manager.authRequest<POSTDocCommentResponse>({
+            method: "POST",
+            path:   endpoints.CHANNEL_DOC_COMMENTS(channelID, docID),
+            json:   options
+        }).then(data => new DocComment(data.docComment, this.#manager.client));
+    }
+
+    /**
+     * Edit a doc comment.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param commentID ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editDocComment(channelID: string, docID: number, commentID: number, options: EditDocCommentOptions): Promise<DocComment> {
+        return this.#manager.authRequest<PATCHDocCommentResponse>({
+            method: "PATCH",
+            path:   endpoints.CHANNEL_DOC_COMMENT(channelID, docID, commentID),
+            json:   options
+        }).then(data => new DocComment(data.docComment, this.#manager.client));
+    }
+
+    /**
+     * Delete a doc comment.
+     * @param channelID ID of the docs channel.
+     * @param docID ID of the doc.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteDocComment(channelID: string, docID: number, commentID: number): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_DOC_COMMENT(channelID, docID, commentID)
         });
     }
 
