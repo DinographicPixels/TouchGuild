@@ -10,6 +10,7 @@ import {
     JSONChannel,
     JSONDoc,
     JSONDocChannel,
+    JSONDocComment,
     JSONForumChannel,
     JSONForumThread,
     JSONForumThreadComment,
@@ -36,6 +37,7 @@ import { DocChannel } from "../structures/DocChannel";
 import { GuildChannel } from "../structures/GuildChannel";
 import { Channel } from "../structures/Channel";
 import { CalendarEventComment } from "../structures/CalendarEventComment";
+import { DocComment } from "../structures/DocComment";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 export interface ClientEvents {
@@ -106,6 +108,12 @@ export interface ClientEvents {
     docUpdate: [Doc: Doc , oldDoc: JSONDoc | null];
     /** @event Emitted when a doc is deleted. */
     docDelete: [DeletedDoc: Doc];
+    /** @event Emitted when a doc comment is created. */
+    docCommentCreate: [comment: DocComment];
+    /** @event Emitted when a doc comment is edited. */
+    docCommentUpdate: [comment: DocComment, oldComment: JSONDocComment | null];
+    /** @event Emitted when a doc comment is deleted. */
+    docCommentDelete: [comment: DocComment];
     /** @event Emitted when an event was added to a calendar. */
     calendarEventCreate: [CalendarEvent: CalendarEvent];
     /** @event Emitted when a calendar event got updated. */

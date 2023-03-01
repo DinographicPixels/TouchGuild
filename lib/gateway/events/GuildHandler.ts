@@ -10,6 +10,9 @@ import {
     GatewayEvent_ServerMemberBanned,
     GatewayEvent_ServerMemberJoined,
     GatewayEvent_ServerMemberRemoved,
+    GatewayEvent_ServerMemberSocialLinkCreated,
+    GatewayEvent_ServerMemberSocialLinkDeleted,
+    GatewayEvent_ServerMemberSocialLinkUpdated,
     GatewayEvent_ServerMemberUnbanned,
     GatewayEvent_ServerMemberUpdated,
     GatewayEvent_ServerRolesUpdated
@@ -59,7 +62,7 @@ export class GuildHandler extends GatewayEventHandler {
         this.client.emit("guildCreate", output as GuildCreateInfo);
     }
 
-    guildDelete(data: GatewayEvent_BotServerMembershipDeleted): void{
+    guildDelete(data: GatewayEvent_BotServerMembershipDeleted): void {
         const GuildComponent = new Guild(data.server, this.client);
         this.client.guilds.delete(GuildComponent.id as string);
         const output = {
@@ -67,5 +70,17 @@ export class GuildHandler extends GatewayEventHandler {
             removerID: data.createdBy
         };
         this.client.emit("guildDelete", output as GuildDeleteInfo);
+    }
+
+    guildMemberSocialLinkCreate(data: GatewayEvent_ServerMemberSocialLinkCreated): void {
+        this.client.emit("guildMemberUpdate", new MemberUpdateInfo(data, data.socialLink.userId, this.client));
+    }
+
+    guildMemberSocialLinkUpdate(data: GatewayEvent_ServerMemberSocialLinkUpdated): void {
+        this.client.emit("guildMemberUpdate", new MemberUpdateInfo(data, data.socialLink.userId, this.client));
+    }
+
+    guildMemberSocialLinkDelete(data: GatewayEvent_ServerMemberSocialLinkDeleted): void {
+        this.client.emit("guildMemberUpdate", new MemberUpdateInfo(data, data.socialLink.userId, this.client));
     }
 }

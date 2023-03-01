@@ -63,7 +63,17 @@ import type {
     GatewayEvent_CalendarEventReactionDeleted,
     GatewayEvent_CalendarEventCommentCreated,
     GatewayEvent_CalendarEventCommentDeleted,
-    GatewayEvent_CalendarEventCommentUpdated
+    GatewayEvent_CalendarEventCommentUpdated,
+    GatewayEvent_ServerMemberSocialLinkCreated,
+    GatewayEvent_ServerMemberSocialLinkUpdated,
+    GatewayEvent_ServerMemberSocialLinkDeleted,
+    GatewayEvent_DocReactionCreated,
+    GatewayEvent_DocReactionDeleted,
+    GatewayEvent_DocCommentReactionCreated,
+    GatewayEvent_DocCommentReactionDeleted,
+    GatewayEvent_DocCommentDeleted,
+    GatewayEvent_DocCommentUpdated,
+    GatewayEvent_DocCommentCreated
 } from "../Constants";
 
 /** Gateway handler filters every ws events. */
@@ -111,6 +121,9 @@ export class GatewayHandler {
         ServerMemberRemoved:                 data => this.guildHandler.guildMemberRemove(data as GatewayEvent_ServerMemberRemoved),
         ServerMemberUpdated:                 data => this.guildHandler.guildMemberUpdate(data as GatewayEvent_ServerMemberUpdated),
         ServerRolesUpdated:                  data => this.guildHandler.guildMemberRoleUpdate(data as GatewayEvent_ServerRolesUpdated),
+        ServerMemberSocialLinkCreated:       data => this.guildHandler.guildMemberSocialLinkCreate(data as GatewayEvent_ServerMemberSocialLinkCreated),
+        ServerMemberSocialLinkUpdated:       data => this.guildHandler.guildMemberSocialLinkUpdate(data as GatewayEvent_ServerMemberSocialLinkUpdated),
+        ServerMemberSocialLinkDeleted:       data => this.guildHandler.guildMemberSocialLinkDelete(data as GatewayEvent_ServerMemberSocialLinkDeleted),
         BotServerMembershipCreated:          data => this.guildHandler.guildCreate(data as GatewayEvent_BotServerMembershipCreated),
         BotServerMembershipDeleted:          data => this.guildHandler.guildDelete(data as GatewayEvent_BotServerMembershipDeleted),
         // Webhooks
@@ -120,6 +133,13 @@ export class GatewayHandler {
         DocCreated:                          data => this.docHandler.docCreate(data as GatewayEvent_DocCreated),
         DocUpdated:                          data => this.docHandler.docUpdate(data as GatewayEvent_DocUpdated),
         DocDeleted:                          data => this.docHandler.docDelete(data as GatewayEvent_DocDeleted),
+        DocReactionCreated:                  data => this.docHandler.docReactionAdd(data as GatewayEvent_DocReactionCreated),
+        DocReactionDeleted:                  data => this.docHandler.docReactionRemove(data as GatewayEvent_DocReactionDeleted),
+        DocCommentCreated:                   data => this.docHandler.docCommentCreate(data as GatewayEvent_DocCommentCreated),
+        DocCommentUpdated:                   data => this.docHandler.docCommentUpdate(data as GatewayEvent_DocCommentUpdated),
+        DocCommentDeleted:                   data => this.docHandler.docCommentDelete(data as GatewayEvent_DocCommentDeleted),
+        DocCommentReactionCreated:           data => this.docHandler.docCommentReactionAdd(data as GatewayEvent_DocCommentReactionCreated),
+        DocCommentReactionDeleted:           data => this.docHandler.docCommentReactionRemove(data as GatewayEvent_DocCommentReactionDeleted),
         // Calendars
         CalendarEventCreated:                data => this.calendarHandler.calendarEventCreate(data as GatewayEvent_CalendarEventCreated),
         CalendarEventUpdated:                data => this.calendarHandler.calendarEventUpdate(data as GatewayEvent_CalendarEventUpdated),

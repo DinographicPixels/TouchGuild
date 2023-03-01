@@ -129,14 +129,14 @@ export class ForumThreadHandler extends GatewayEventHandler {
     private async addGuildChannel(guildID: string, channelID: string, threadID?: number): Promise<void> {
         const guild = this.client.guilds.get(guildID);
         if (this.client.getChannel(guildID, channelID) === undefined) {
-            const channel = await this.client.rest.channels.getChannel(channelID);
-            guild?.channels?.add(channel);
+            const channel = await this.client.rest.channels.getChannel(channelID).catch(err => this.client.emit("warn", `Cannot register channel to cache due to: (${String(err)})`));
+            if (typeof channel !== "boolean") guild?.channels?.add(channel);
         }
         const conditions = this.client.getChannel(guildID, channelID) !== undefined && this.client.getChannel<ForumChannel>(guildID, channelID)?.threads.get(threadID as number) === undefined;
         if (guildID && channelID && threadID && conditions) {
-            const restThread = await this.client.rest.channels.getForumThread(channelID, threadID as number);
+            const restThread = await this.client.rest.channels.getForumThread(channelID, threadID as number).catch(err => this.client.emit("warn", `Cannot register thread to cache due to: (${String(err)})`));
             const channel = guild?.channels.get(channelID) as ForumChannel;
-            channel?.threads.add(restThread);
+            if (typeof restThread !== "boolean") channel?.threads.add(restThread);
         }
         // const guild = this.client.guilds.get(guildID);
         // const restThread = await this.client.rest.channels.getForumThread(channelID, threadID as number);

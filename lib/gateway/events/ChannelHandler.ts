@@ -28,8 +28,8 @@ export class ChannelHandler extends GatewayEventHandler{
 
     private async addGuildChannel(guildID: string, channelID: string): Promise<void> {
         if (this.client.getChannel(guildID, channelID) !== undefined) return;
-        const channel = await this.client.rest.channels.getChannel(channelID);
+        const channel = await this.client.rest.channels.getChannel(channelID).catch(err => this.client.emit("warn", `Cannot register channel to cache due to: (${String(err)})`));
         const guild = this.client.guilds.get(guildID);
-        guild?.channels?.add(channel);
+        if (typeof channel !== "boolean") guild?.channels?.add(channel);
     }
 }

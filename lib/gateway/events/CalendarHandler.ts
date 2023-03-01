@@ -119,13 +119,13 @@ export class CalendarHandler extends GatewayEventHandler {
     private async addGuildChannel(guildID: string, channelID: string, eventID?: number): Promise<void> {
         const guild = this.client.guilds.get(guildID);
         if (this.client.getChannel(guildID, channelID) === undefined) {
-            const channel = await this.client.rest.channels.getChannel(channelID);
-            guild?.channels?.add(channel);
+            const channel = await this.client.rest.channels.getChannel(channelID).catch(err => this.client.emit("warn", `Cannot register channel to cache due to: (${String(err)})`));
+            if (typeof channel !== "boolean") guild?.channels?.add(channel);
         }
         const conditions = this.client.getChannel(guildID, channelID) !== undefined && this.client.getChannel<CalendarChannel>(guildID, channelID)?.scheduledEvents.get(eventID as number) === undefined;
         if (guildID && channelID && eventID && conditions) {
-            const restEvent = await this.client.rest.channels.getCalendarEvent(channelID, eventID);
-            (guild?.channels.get(channelID) as CalendarChannel)?.scheduledEvents.add(restEvent);
+            const restEvent = await this.client.rest.channels.getCalendarEvent(channelID, eventID).catch(err => this.client.emit("warn", `Cannot register event to cache due to: (${String(err)})`));
+            if (typeof restEvent !== "boolean") (guild?.channels.get(channelID) as CalendarChannel)?.scheduledEvents.add(restEvent);
         }
     }
 }
