@@ -15,7 +15,7 @@ export class User extends Base<string> {
     /** Current banned url of the user. */
     bannerURL: string | null;
     /** When the user account was created. */
-    createdAt: Date; // user
+    createdAt: Date; // user.
     /** If true, the user is a bot. */
     bot: boolean;
 
