@@ -1,8 +1,8 @@
 message: "If you use this software publicly, please mention those information."
 authors:
-    - PakkoGraphic
-    github-profile: "https://github.com/pakkographic"
-    email: support@dinographicpixels.com
+- username: PakkoGraphic
+  github-profile: "https://github.com/pakkographic"
+  email: support@dinographicpixels.com
 title: "TouchGuild"
 website: https://touchguild.com
 date-released: 09/18/2022
