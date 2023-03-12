@@ -122,6 +122,8 @@ export interface ClientEvents {
     calendarEventDelete: [CalendarEvent: CalendarEvent];
     /** @event Emitted when an event RSVP is updated. */
     calendarEventRsvpUpdate: [CalendarRSVP: CalendarEventRSVP, oldRSVP: JSONCalendarEventRSVP | null];
+    /** @event Emitted when multiple event RSVPs are updated. */
+    calendarEventRsvpBulkUpdate: [CalendarRSVPs: Array<CalendarEventRSVP>, oldRSVPs: Array<JSONCalendarEventRSVP | null>];
     /** @event Emitted when an event RSVP is deleted. */
     calendarEventRsvpDelete: [CalendarRSVP: CalendarEventRSVP];
     /** @event Emitted when a calendar event comment is created. */

@@ -13,6 +13,7 @@ import {
     GatewayEvent_CalendarEventReactionCreated,
     GatewayEvent_CalendarEventReactionDeleted,
     GatewayEvent_CalendarEventRsvpDeleted,
+    GatewayEvent_CalendarEventRsvpManyUpdated,
     GatewayEvent_CalendarEventRsvpUpdated,
     GatewayEvent_CalendarEventUpdated
 } from "../../Constants";
@@ -102,6 +103,15 @@ export class CalendarHandler extends GatewayEventHandler {
         const updateFromCache = channel?.scheduledEvents.get(data.calendarEventRsvp.calendarEventId)?.rsvps.update(data.calendarEventRsvp);
         const CalendarERSVPComponent = updateFromCache ?? new CalendarEventRSVP(data.calendarEventRsvp, this.client);
         this.client.emit("calendarEventRsvpUpdate", CalendarERSVPComponent, CachedRSVP);
+    }
+
+    calendarRsvpBulkUpdate(data: GatewayEvent_CalendarEventRsvpManyUpdated): void {
+        void this.addGuildChannel(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId, data.calendarEventRsvps[0].calendarEventId);
+        const channel = this.client.getChannel<CalendarChannel>(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId);
+        const CachedRSVPS = data.calendarEventRsvps.map(rsvp => channel?.scheduledEvents.get(rsvp.calendarEventId)?.rsvps.get(rsvp.calendarEventId)?.toJSON() ?? null);
+        const updateFromCache = data.calendarEventRsvps.map(rsvp => channel?.scheduledEvents.get(rsvp.calendarEventId)?.rsvps.update(rsvp) ?? new CalendarEventRSVP(rsvp, this.client));
+        const CalendarRSVPMap = updateFromCache ?? data.calendarEventRsvps.map(rsvp => new CalendarEventRSVP(rsvp, this.client));
+        this.client.emit("calendarEventRsvpBulkUpdate", CalendarRSVPMap, CachedRSVPS);
     }
 
     calendarRsvpDelete(data: GatewayEvent_CalendarEventRsvpDeleted): void {
