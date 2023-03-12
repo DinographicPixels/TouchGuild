@@ -814,6 +814,24 @@ export class Channels {
         });
     }
 
+    /**
+     * Bulk create/update calendar rsvps.
+     * @param channelID ID of the Calendar channel.
+     * @param eventID ID of a calendar event.
+     * @param memberIDs List of multiple member ids.
+     * @param options Update options.
+     */
+    async bulkCalendarRsvpUpdate(channelID: string, eventID: number, memberIDs: Array<string>, options: EditCalendarRSVPOptions): Promise<void> {
+        return this.#manager.authRequest({
+            method: "PUT",
+            path:   endpoints.CHANNEL_EVENT_RSVPS(channelID, eventID),
+            json:   {
+                userIds: memberIDs,
+                status:  options.status
+            }
+        });
+    }
+
     /** Create a new item in a list channel.
      * @param channelID ID of a "Lists" channel.
      * @param content String content of the new item.

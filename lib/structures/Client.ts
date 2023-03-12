@@ -751,6 +751,17 @@ export class Client extends TypedEmitter<ClientEvents> {
         return this.rest.channels.deleteCalendarRsvp(channelID, eventID, memberID);
     }
 
+    /**
+     * Bulk create/update calendar rsvps.
+     * @param channelID ID of the Calendar channel.
+     * @param eventID ID of a calendar event.
+     * @param memberIDs List of multiple member ids.
+     * @param options Update options.
+     */
+    async bulkCalendarRsvpUpdate(channelID: string, eventID: number, memberIDs: Array<string>, options: EditCalendarRSVPOptions): Promise<void> {
+        return this.rest.channels.bulkCalendarRsvpUpdate(channelID, eventID, memberIDs, options);
+    }
+
     // list item
     /** Create a new item in a list channel.
      * @param channelID ID of a "Lists" channel.
