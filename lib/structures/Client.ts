@@ -31,14 +31,14 @@ import { ClientOptions } from "../types/client";
 import {
     APIChannelCategories,
     PUTGuildWebhookBody,
-    PUTListItemBody,
     POSTListItemBody,
     GATEWAY_EVENTS,
     ChannelReactionTypes,
     APIGuild,
     APIUser,
     ChannelSubcategoryReactionTypes,
-    POSTCalendarEventBody
+    POSTCalendarEventBody,
+    PATCHListItemBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -775,11 +775,10 @@ export class Client extends TypedEmitter<ClientEvents> {
     /** Edit an item from a list channel.
      * @param channelID ID of a "Lists" channel.
      * @param itemID ID of a list item.
-     * @param content New item's content.
-     * @param note Add a note to the item.
+     * @param options Edit options.
      */
-    async editListItem(channelID: string, itemID: string, content: PUTListItemBody["message"], note?: PUTListItemBody["note"]): Promise<ListItem>{
-        return this.rest.channels.editListItem(channelID, itemID, content, note);
+    async editListItem(channelID: string, itemID: string, options?: { content?: PATCHListItemBody["message"]; note?: PATCHListItemBody["note"]; }): Promise<ListItem> {
+        return this.rest.channels.editListItem(channelID, itemID, options);
     }
 
     /** Delete an item from a list channel.

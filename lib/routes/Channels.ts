@@ -36,6 +36,8 @@ import {
     PATCHDocCommentResponse,
     PATCHForumTopicCommentResponse,
     PATCHForumTopicResponse,
+    PATCHListItemBody,
+    PATCHListItemResponse,
     POSTCalendarEventBody,
     POSTCalendarEventCommentResponse,
     POSTCalendarEventResponse,
@@ -47,9 +49,7 @@ import {
     POSTListItemBody,
     POSTListItemResponse,
     PUTCalendarEventRSVPResponse,
-    PUTDocResponse,
-    PUTListItemBody,
-    PUTListItemResponse
+    PUTDocResponse
 } from "../Constants";
 import {
     AnyChannel,
@@ -848,14 +848,13 @@ export class Channels {
     /** Edit an item from a list channel.
      * @param channelID ID of a "Lists" channel.
      * @param itemID ID of a list item.
-     * @param content New item's content.
-     * @param note Add a note to the item.
+     * @param options Edit options.
      */
-    async editListItem(channelID: string, itemID: string, content: PUTListItemBody["message"], note?: PUTListItemBody["note"]): Promise<ListItem> {
-        return this.#manager.authRequest<PUTListItemResponse>({
-            method: "PUT",
+    async editListItem(channelID: string, itemID: string, options?: { content?: PATCHListItemBody["message"]; note?: PATCHListItemBody["note"]; }): Promise<ListItem> {
+        return this.#manager.authRequest<PATCHListItemResponse>({
+            method: "PATCH",
             path:   endpoints.LIST_ITEM(channelID, itemID),
-            json:   { message: content, note }
+            json:   { message: options?.content, note: options?.note }
         }).then(data => new ListItem(data.listItem, this.#manager.client));
     }
 
