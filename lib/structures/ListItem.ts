@@ -3,8 +3,7 @@ import { Client } from "./Client";
 import { Member } from "./Member";
 import { Base } from "./Base";
 import { ListItemNoteTypes } from "../types/types";
-import { APIListItem, APIMentions } from "../Constants";
-import { ListItemEditOptions } from "../types/listItem";
+import { APIListItem, APIMentions, PATCHListItemBody } from "../Constants";
 import { JSONListItem } from "../types/json";
 
 /** Represents an item of a "Lists" channel. */
@@ -140,11 +139,10 @@ export class ListItem extends Base<string> {
     }
 
     /** Edit this item.
-     * @param content Item content
-     * @param note Add/edit a note to this item.
+     * @param options Edit options.
      */
-    async edit(content: string, note?: ListItemEditOptions): Promise<ListItem> {
-        return this.client.rest.channels.editListItem(this.channelID, this.id as string, content, note);
+    async edit(options?: { content?: PATCHListItemBody["message"]; note?: PATCHListItemBody["note"]; }): Promise<ListItem> {
+        return this.client.rest.channels.editListItem(this.channelID, this.id as string, options);
     }
 
     /** Delete this item. */

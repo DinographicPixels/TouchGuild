@@ -1,4 +1,2 @@
-export interface ListItemEditOptions {
-    /** Item's note content. */
-    content: string;
-}
+/* eslint-disable unicorn/no-empty-file */
+// empty.
