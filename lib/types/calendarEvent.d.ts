@@ -52,6 +52,10 @@ export interface EditCalendarEventOptions {
     isPrivate?: boolean;
     /** The role IDs to restrict the event to (min items 1; must have unique items true) */
     roleIds?: Array<number>;
+    cancellation?: {
+        /** The description of event cancellation (min length 1; max length 140) */
+        description?: string;
+    };
 }
 
 export interface GetCalendarEventsFilter {
