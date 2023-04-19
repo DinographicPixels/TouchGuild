@@ -21,6 +21,8 @@ import { TextChannel } from "./TextChannel";
 import { ForumChannel } from "./ForumChannel";
 import { CalendarEventComment } from "./CalendarEventComment";
 import { DocComment } from "./DocComment";
+import { AnnouncementComment } from "./AnnouncementComment";
+import { Announcement } from "./Announcement";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -38,7 +40,12 @@ import {
     APIUser,
     ChannelSubcategoryReactionTypes,
     POSTCalendarEventBody,
-    PATCHListItemBody
+    PATCHListItemBody,
+    PATCHChannelAnnouncementCommentBody,
+    POSTChannelAnnouncementCommentBody,
+    GETChannelAnnouncementsQuery,
+    PATCHChannelAnnouncementBody,
+    POSTChannelAnnouncementBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -98,7 +105,9 @@ export class Client extends TypedEmitter<ClientEvents> {
                 scheduledEvents:      params.collectionLimits?.scheduledEvents      ?? 100,
                 scheduledEventsRSVPS: params.collectionLimits?.scheduledEventsRSVPS ?? 100,
                 calendarComments:     params.collectionLimits?.calendarComments     ?? 100,
-                docComments:          params.collectionLimits?.docComments          ?? 100
+                docComments:          params.collectionLimits?.docComments          ?? 100,
+                announcements:        params.collectionLimits?.announcements        ?? 100,
+                announcementComments: params.collectionLimits?.announcementComments ?? 100
             }
         };
         this.ws = new WSManager(this, { token: this.token, client: this });
@@ -242,6 +251,14 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async getUser(userID: string): Promise<User> {
         return this.rest.misc.getUser(userID);
+    }
+
+    /**
+     * Retrieve user's joined servers.
+     * @param userID ID of the user. (`@me` can be used to select your instance)
+     */
+    async getUserGuilds(userID: string): Promise<Array<Guild>> {
+        return this.rest.misc.getUserGuilds(userID);
     }
 
     // docs
@@ -760,6 +777,103 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async bulkCalendarRsvpUpdate(channelID: string, eventID: number, memberIDs: Array<string>, options: EditCalendarRSVPOptions): Promise<void> {
         return this.rest.channels.bulkCalendarRsvpUpdate(channelID, eventID, memberIDs, options);
+    }
+
+    // Announcement
+    /**
+     * Create a new announcement within an announcement channel.
+     * @param channelID ID of the Announcement channel.
+     * @param options Announcement creation options.
+     */
+    async createAnnouncement(channelID: string, options: POSTChannelAnnouncementBody): Promise<Announcement> {
+        return this.rest.channels.createAnnouncement(channelID, options);
+    }
+
+    /**
+     * Edit an existing announcement.
+     * @param channelID ID of the Announcement channel.
+     * @param announcementID ID of the announcement to edit.
+     * @param options Edit options
+     */
+    async editAnnouncement(channelID: string, announcementID: string, options: PATCHChannelAnnouncementBody): Promise<Announcement> {
+        return this.rest.channels.editAnnouncement(channelID, announcementID, options);
+    }
+
+    /**
+     * Delete an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement to delete.
+     */
+    async deleteAnnouncement(channelID: string, announcementID: string): Promise<void> {
+        return this.rest.channels.deleteAnnouncement(channelID, announcementID);
+    }
+
+    /**
+     * Get a list of announcements from a channel.
+     * @param channelID ID of an Announcement channel.
+     * @param filter Filter to apply.
+     */
+    async getAnnouncements(channelID: string, filter?: GETChannelAnnouncementsQuery): Promise<Array<Announcement>> {
+        return this.rest.channels.getAnnouncements(channelID, filter);
+    }
+
+    /**
+     * Get a specific announcement from a channel.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement to get.
+     */
+    async getAnnouncement(channelID: string, announcementID: string): Promise<Announcement> {
+        return this.rest.channels.getAnnouncement(channelID, announcementID);
+    }
+
+    /**
+     * Create a comment inside an announcement.
+     * @param channelID ID of the Announcement channel.
+     * @param announcementID ID of the announcement to create the comment in.
+     * @param options Comment creation options.
+     */
+    async createAnnouncementComment(channelID: string, announcementID: string, options: POSTChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.rest.channels.createAnnouncementComment(channelID, announcementID, options);
+    }
+
+    /**
+     * Edit an announcement comment.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of an announcement where the comment is in.
+     * @param commentID ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editAnnouncementComment(channelID: string, announcementID: string, commentID: number, options: PATCHChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.rest.channels.editAnnouncementComment(channelID, announcementID, commentID, options);
+    }
+
+    /**
+     * Delete an announcement comment.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement where the comment is in.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteAnnouncementComment(channelID: string, announcementID: string, commentID: number): Promise<void> {
+        return this.rest.channels.deleteAnnouncementComment(channelID, announcementID, commentID);
+    }
+
+    /**
+     * Get comments from an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of an announcement.
+     */
+    async getAnnouncementComments(channelID: string, announcementID: string): Promise<Array<AnnouncementComment>> {
+        return this.rest.channels.getAnnouncementComments(channelID, announcementID);
+    }
+
+    /**
+     * Get a specific comment from an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement where the comment is in.
+     * @param commentID ID of the comment to get.
+     */
+    async getAnnouncementComment(channelID: string, announcementID: string, commentID: number): Promise<AnnouncementComment> {
+        return this.rest.channels.getAnnouncementComment(channelID, announcementID, commentID);
     }
 
     // list item

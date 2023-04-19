@@ -4,6 +4,7 @@ import { TextChannel } from "../structures/TextChannel";
 import { ForumChannel } from "../structures/ForumChannel";
 import { DocChannel } from "../structures/DocChannel";
 import { CalendarChannel } from "../structures/CalendarChannel";
+import { AnnouncementChannel } from "../structures/AnnouncementChannel";
 import type { APIEmbedField } from "guildedapi-types.ts/v1";
 
 export interface CreateMessageOptions {
@@ -122,5 +123,5 @@ export type PossiblyUncachedMessage = Message<AnyTextableChannel> | {
 };
 
 export type AnyTextableChannel = TextChannel;
-export type AnyChannel = GuildChannel | TextChannel | ForumChannel | DocChannel | CalendarChannel;
+export type AnyChannel = GuildChannel | TextChannel | ForumChannel | DocChannel | CalendarChannel | AnnouncementChannel;
 export type AnyGuildChannel = Exclude<AnyChannel, GuildChannel>;

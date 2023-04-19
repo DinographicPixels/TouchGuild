@@ -7,7 +7,7 @@ import { GatewayEvent_CalendarEventCommentReactionCreated, GatewayEvent_Calendar
 
 /** Information about a CalendarEvent's reaction. */
 export class CalendarReactionInfo extends ReactionInfo {
-    /** ID of the event where the reaction is. */
+    /** ID of the event where the reaction is added to. */
     eventID: number;
     /** ID of the event comment, if reaction was added/removed from a comment. */
     commentID: number | null;

@@ -3,16 +3,26 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint no-use-before-define: 0 */
 
+// Endpoints (credits to TouchGuild)
 export const CHANNELS = () => `/channels`;
 export const CHANNEL = (channelID: string) => `/channels/${channelID}`;
 
 export const GUILD = (guildID: string) => `/servers/${guildID}`;
 export const USER = (userID: string) => `/users/${userID}`;
+export const USER_SERVERS = (userID: string) => `/users/${userID}/servers`;
 
 export const CHANNEL_MESSAGES = (channelID: string) => `/channels/${channelID}/messages`;
 export const CHANNEL_MESSAGE = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}`;
 export const CHANNEL_MESSAGE_CONTENT_EMOTES = (channelID: string, messageID: string) => `/channels/${channelID}/content/${messageID}/emotes`;
 export const CHANNEL_MESSAGE_CONTENT_EMOTE = (channelID: string, messageID: string, emoteID: number) => `/channels/${channelID}/content/${messageID}/emotes/${emoteID}`;
+export const CHANNEL_ANNOUNCEMENTS = (channelID: string) => `/channels/${channelID}/announcements`;
+export const CHANNEL_ANNOUNCEMENT = (channelID: string, announcementID: string) => `/channels/${channelID}/announcements/${announcementID}`;
+export const CHANNEL_ANNOUNCEMENT_EMOTES = (channelID: string, announcementID: string) => `/channels/${channelID}/announcements/${announcementID}/emotes`;
+export const CHANNEL_ANNOUNCEMENT_EMOTE = (channelID: string, announcementID: string, emoteID: number) => `/channels/${channelID}/announcements/${announcementID}/emotes/${emoteID}`;
+export const CHANNEL_ANNOUNCEMENT_COMMENTS = (channelID: string, announcementID: string) => `/channels/${channelID}/announcements/${announcementID}/comments`;
+export const CHANNEL_ANNOUNCEMENT_COMMENT = (channelID: string, announcementID: string, commentID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}`;
+export const CHANNEL_ANNOUNCEMENT_COMMENT_EMOTES = (channelID: string, announcementID: string, commentID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}/emotes`;
+export const CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE = (channelID: string, announcementID: string, commentID: number, emoteID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}/emotes/${emoteID}`;
 
 export const MEMBER_NICKNAME = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/nickname`;
 
@@ -51,10 +61,9 @@ export const CHANNEL_DOC = (channelID: string, docID: number)=> `/channels/${cha
 export const CHANNEL_DOC_EMOTES = (channelID: string, docID: number)=> `/channels/${channelID}/docs/${docID}/emotes`;
 export const CHANNEL_DOC_EMOTE = (channelID: string, docID: number, emoteID: number)=> `/channels/${channelID}/docs/${docID}/emote/${emoteID}`;
 export const CHANNEL_DOC_COMMENTS = (channelID: string, docID: number)=> `/channels/${channelID}/docs/${docID}/comments`;
-export const CHANNEL_DOC_COMMENT = (channelID: string, docID: number, commentID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}`;
+export const CHANNEL_DOC_COMMENT = (channelID: string, docID: number, commentID: number)=> `/channels/${channelID}/docs/${docID}/comments/${commentID}`;
 export const CHANNEL_DOC_COMMENT_EMOTES = (channelID: string, docID: number, commentID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}/emotes`;
 export const CHANNEL_DOC_COMMENT_EMOTE = (channelID: string, docID: number, commentID: number, emoteID: number) => `/channels/${channelID}/docs/${docID}/comments/${commentID}/emotes/${emoteID}`;
-
 
 export const CHANNEL_EVENTS = (channelID: string)=> `/channels/${channelID}/events`;
 export const CHANNEL_EVENT = (channelID: string, eventID: number)=> `/channels/${channelID}/events/${eventID}`;
@@ -72,3 +81,4 @@ export const CHANNEL_EVENT_EVENT_SERIES_ENTITY = (channelID: string, seriesID: s
 
 export const GUILD_WEBHOOKS = (guildID: string)=> `/servers/${guildID}/webhooks`;
 export const GUILD_WEBHOOK = (guildID: string, webhookID: string)=> `/servers/${guildID}/webhooks/${webhookID}`;
+

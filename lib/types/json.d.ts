@@ -135,6 +135,11 @@ export interface JSONCalendarChannel extends JSONGuildChannel {
     scheduledEvents: Array<JSONCalendarEvent>;
 }
 
+export interface JSONAnnouncementChannel extends JSONGuildChannel {
+    /** Cached messages. */
+    announcements: Array<JSONAnnouncement>;
+}
+
 export type AnyJSONChannel = JSONTextChannel | JSONDocChannel | JSONForumChannel | JSONGuildChannel | JSONCalendarChannel;
 
 export interface JSONCalendarEvent extends JSONBase<number> {
@@ -393,5 +398,41 @@ export interface JSONDocComment extends JSONBase<number> {
     /** Mentions. */
     mentions: APIMentions | null;
     /** ID of the guild, if provided. */
+    guildID: string | null;
+}
+
+export interface JSONAnnouncement extends JSONBase<string> {
+    /** ID of the guild. */
+    guildID: string;
+    /** ID of the channel the announcement is in */
+    channelID: string;
+    /** The ISO 8601 timestamp that the announcement was created at */
+    createdAt: Date;
+    /** The ID of the member who created this announcement */
+    memberID: string;
+    /** The announcement's content */
+    content: string;
+    /** Mentions. */
+    mentions: APIMentions | null;
+    /** The announcement's title. */
+    title: string;
+}
+
+export interface JSONAnnouncementComment extends JSONBase<number> {
+    /** Announcement content */
+    content: string;
+    /** The date when the comment was created. */
+    createdAt: Date;
+    /** The date when the comment was edited, if edited. */
+    editedTimestamp: Date | null;
+    /** ID of the member who sent this announcement. */
+    memberID: string;
+    /** ID of the channel where the comment is in. */
+    channelID: string;
+    /** ID of the parent announcement. */
+    announcementID: string;
+    /** Mentions */
+    mentions: APIMentions | null;
+    /** ID of the guild, if received. */
     guildID: string | null;
 }

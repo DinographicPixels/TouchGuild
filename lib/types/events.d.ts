@@ -3,6 +3,8 @@ import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types"
 import { AnyChannel, AnyTextableChannel, PossiblyUncachedMessage } from "./channel";
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
 import {
+    JSONAnnouncement,
+    JSONAnnouncementComment,
     JSONCalendarChannel,
     JSONCalendarEvent,
     JSONCalendarEventComment,
@@ -38,6 +40,8 @@ import { GuildChannel } from "../structures/GuildChannel";
 import { Channel } from "../structures/Channel";
 import { CalendarEventComment } from "../structures/CalendarEventComment";
 import { DocComment } from "../structures/DocComment";
+import { Announcement } from "../structures/Announcement";
+import type { AnnouncementComment } from "../structures/AnnouncementComment";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 export interface ClientEvents {
@@ -142,6 +146,18 @@ export interface ClientEvents {
     listItemComplete: [item: ListItem];
     /** @event Emitted when a list item is uncompleted. */
     listItemUncomplete: [item: ListItem];
+    /** @event Emitted when an announcement coming from an Announcement channel is created. */
+    announcementCreate: [announcement: Announcement];
+    /** @event Emitted when an announcement coming from an Announcement channel is updated. */
+    announcementUpdate: [announcement: Announcement, oldAnnouncement: JSONAnnouncement | null];
+    /** @event Emitted when an announcement coming from an Announcement channel is deleted. */
+    announcementDelete: [announcement: Announcement];
+    /** @event Emitted when a comment is created inside an announcement. */
+    announcementCommentCreate: [comment: AnnouncementComment];
+    /** @event Emitted when a comment within an announcement is updated. */
+    announcementCommentUpdate: [comment: AnnouncementComment, oldComment: JSONAnnouncementComment | null];
+    /** @event Emitted when a comment within an announcement is deleted. */
+    announcementCommentDelete: [comment: AnnouncementComment];
     /** @event Emitted when a webhook got created. */
     webhooksCreate: [webhook: Webhook];
     /** @event Emitted when a webhook is deleted. */

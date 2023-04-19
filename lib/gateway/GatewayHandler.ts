@@ -8,6 +8,7 @@ import { WebhookHandler } from "./events/WebhookHandler";
 import { DocHandler } from "./events/DocHandler";
 import { CalendarHandler } from "./events/CalendarHandler";
 import { ListItemHandler } from "./events/ListItemHandler";
+import { AnnouncementHandler } from "./events/AnnouncementHandler";
 import { Client } from "../structures/Client";
 
 import type {
@@ -73,7 +74,17 @@ import type {
     GatewayEvent_DocCommentReactionDeleted,
     GatewayEvent_DocCommentDeleted,
     GatewayEvent_DocCommentUpdated,
-    GatewayEvent_DocCommentCreated
+    GatewayEvent_DocCommentCreated,
+    GatewayEvent_AnnouncementCreated,
+    GatewayEvent_AnnouncementDeleted,
+    GatewayEvent_AnnouncementUpdated,
+    GatewayEvent_AnnouncementCommentDeleted,
+    GatewayEvent_AnnouncementCommentUpdated,
+    GatewayEvent_AnnouncementCommentCreated,
+    GatewayEvent_AnnouncementReactionCreated,
+    GatewayEvent_AnnouncementReactionDeleted,
+    GatewayEvent_AnnouncementCommentReactionDeleted,
+    GatewayEvent_AnnouncementCommentReactionCreated
 } from "../Constants";
 
 /** Gateway handler filters every ws events. */
@@ -87,6 +98,7 @@ export class GatewayHandler {
     docHandler = new DocHandler(this.client);
     calendarHandler = new CalendarHandler(this.client);
     listItemHandler = new ListItemHandler(this.client);
+    announcementHandler = new AnnouncementHandler(this.client);
 
     readonly toHandlerMap: Record<keyof GATEWAY_EVENTS, (data: object) => void> = {
         // Messages
@@ -159,7 +171,18 @@ export class GatewayHandler {
         ListItemUpdated:                     data => this.listItemHandler.listItemUpdate(data as GatewayEvent_ListItemUpdated),
         ListItemDeleted:                     data => this.listItemHandler.listItemDelete(data as GatewayEvent_ListItemDeleted),
         ListItemCompleted:                   data => this.listItemHandler.listItemComplete(data as GatewayEvent_ListItemCompleted),
-        ListItemUncompleted:                 data => this.listItemHandler.listItemUncomplete(data as GatewayEvent_ListItemUncompleted)
+        ListItemUncompleted:                 data => this.listItemHandler.listItemUncomplete(data as GatewayEvent_ListItemUncompleted),
+        // Announcements (messages & comments)
+        AnnouncementCreated:                 data => this.announcementHandler.announcementCreate(data as GatewayEvent_AnnouncementCreated),
+        AnnouncementUpdated:                 data => this.announcementHandler.announcementUpdate(data as GatewayEvent_AnnouncementUpdated),
+        AnnouncementDeleted:                 data => this.announcementHandler.announcementDelete(data as GatewayEvent_AnnouncementDeleted),
+        AnnouncementCommentCreated:          data => this.announcementHandler.announcementCommentCreate(data as GatewayEvent_AnnouncementCommentCreated),
+        AnnouncementCommentUpdated:          data => this.announcementHandler.announcementCommentUpdate(data as GatewayEvent_AnnouncementCommentUpdated),
+        AnnouncementCommentDeleted:          data => this.announcementHandler.announcementCommentDelete(data as GatewayEvent_AnnouncementCommentDeleted),
+        AnnouncementReactionCreated:         data => this.announcementHandler.announcementReactionAdd(data as GatewayEvent_AnnouncementReactionCreated),
+        AnnouncementReactionDeleted:         data => this.announcementHandler.announcementReactionRemove(data as GatewayEvent_AnnouncementReactionDeleted),
+        AnnouncementCommentReactionCreated:  data => this.announcementHandler.announcementCommentReactionAdd(data as GatewayEvent_AnnouncementCommentReactionCreated),
+        AnnouncementCommentReactionDeleted:  data => this.announcementHandler.announcementCommentReactionRemove(data as GatewayEvent_AnnouncementCommentReactionDeleted)
     };
 
     async handleMessage(eventType: keyof GATEWAY_EVENTS, eventData: object): Promise<void> {

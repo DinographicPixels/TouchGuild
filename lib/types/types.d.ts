@@ -10,6 +10,8 @@ import { CalendarEvent } from "../structures/CalendarEvent";
 import { CalendarReactionInfo } from "../structures/CalendarReactionInfo";
 import { Doc } from "../structures/Doc";
 import { DocReactionInfo } from "../structures/DocReactionInfo";
+import { Announcement } from "../structures/Announcement";
+import type { AnnouncementReactionInfo } from "../structures/AnnouncementReactionInfo";
 
 export interface MessageReactionTypes {
     message: Message | {
@@ -56,6 +58,20 @@ export interface CalendarReactionTypes {
 export interface DocReactionTypes {
     doc: Doc | {
         id: number;
+        guild: Guild | {
+            id?: string;
+        };
+        channelID: string;
+    };
+    emoji: APIEmote;
+    reactor: Member | {
+        id: string;
+    };
+}
+
+export interface AnnouncementReactionTypes {
+    announcement: Announcement | {
+        id: string;
         guild: Guild | {
             id?: string;
         };
@@ -127,5 +143,5 @@ export interface CalendarEventSeries {
     channelID: string;
 }
 
-export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo | DocReactionInfo;
+export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo | DocReactionInfo | AnnouncementReactionInfo;
 export interface Uncached<ID = string | number> { id: ID; }

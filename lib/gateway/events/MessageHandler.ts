@@ -54,6 +54,7 @@ export class MessageHandler extends GatewayEventHandler {
         return this.client.emit("reactionRemove", ReactionInfo);
     }
 
+
     private async addGuildChannel(guildID: string, channelID: string): Promise<void> {
         if (this.client.getChannel(guildID, channelID) !== undefined) return;
         const channel = await this.client.rest.channels.getChannel(channelID).catch(err => this.client.emit("warn", `Cannot register channel to cache due to: (${String(err)})`));

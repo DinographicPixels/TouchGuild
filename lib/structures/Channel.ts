@@ -7,6 +7,7 @@ import { CalendarChannel } from "./CalendarChannel";
 import { DocChannel } from "./DocChannel";
 import { ForumChannel } from "./ForumChannel";
 import { TextChannel } from "./TextChannel";
+import { AnnouncementChannel } from "./AnnouncementChannel";
 import { JSONChannel } from "../types/json";
 import type { APIGuildChannel } from "../Constants";
 import { AnyChannel, EditChannelOptions } from "../types/channel";
@@ -30,7 +31,7 @@ export class Channel extends Base<string> {
     static from<T extends AnyChannel = AnyChannel>(data: APIGuildChannel, client: Client): T {
         switch (data.type) {
             case "announcement": {
-                return new GuildChannel(data, client) as T;
+                return new AnnouncementChannel(data, client) as T;
             }
             case "calendar": {
                 return new CalendarChannel(data, client) as T;

@@ -3,6 +3,10 @@ import { Member } from "./Member";
 import { Client } from "./Client";
 import {
     APIEmote,
+    GatewayEvent_AnnouncementCommentReactionCreated,
+    GatewayEvent_AnnouncementCommentReactionDeleted,
+    GatewayEvent_AnnouncementReactionCreated,
+    GatewayEvent_AnnouncementReactionDeleted,
     GatewayEvent_CalendarEventCommentReactionCreated,
     GatewayEvent_CalendarEventCommentReactionDeleted,
     GatewayEvent_CalendarEventReactionCreated,
@@ -23,7 +27,8 @@ export class ReactionInfo {
     raw: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
     GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
-    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted;
+    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted | GatewayEvent_AnnouncementReactionCreated
+    | GatewayEvent_AnnouncementReactionDeleted | GatewayEvent_AnnouncementCommentReactionCreated | GatewayEvent_AnnouncementCommentReactionDeleted;
     /** Channel where the reaction was added/removed. */
     channelID: string;
     /** ID of the user who added the reaction. */
@@ -37,7 +42,9 @@ export class ReactionInfo {
     constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
     GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
-    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted, client: Client) {
+    GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted |
+    GatewayEvent_AnnouncementReactionCreated | GatewayEvent_AnnouncementReactionDeleted | GatewayEvent_AnnouncementCommentReactionCreated
+    | GatewayEvent_AnnouncementCommentReactionDeleted, client: Client) {
         this.raw = data;
         this.channelID = data.reaction.channelId;
         this.reactorID = data.reaction.createdBy;

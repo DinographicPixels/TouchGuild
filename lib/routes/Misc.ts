@@ -1,9 +1,10 @@
 /** @module Routes/Guilds */
 import type { RESTManager } from "../rest/RESTManager";
 import * as endpoints from "../rest/endpoints";
-import { GETGuildMemberSocialsResponse, GETUserResponse } from "../Constants";
+import { GETGuildMemberSocialsResponse, GETUserResponse, GETUserServersResponse } from "../Constants";
 import { User } from "../structures/User";
 import { SocialLink } from "../structures/SocialLink";
+import { Guild } from "../structures/Guild";
 
 /** Miscellaneous routes. */
 export class Miscellaneous {
@@ -39,5 +40,16 @@ export class Miscellaneous {
             method: "GET",
             path:   endpoints.USER(userID)
         }).then(data => this.#manager.client.util.updateUser(data.user));
+    }
+
+    /**
+     * Retrieve user's joined servers.
+     * @param userID ID of the user. (`@me` can be used to select your instance)
+     */
+    async getUserGuilds(userID: string): Promise<Array<Guild>> {
+        return this.#manager.authRequest<GETUserServersResponse>({
+            method: "GET",
+            path:   endpoints.USER_SERVERS(userID)
+        }).then(data => data.servers.map(d => new Guild(d, this.#manager.client)));
     }
 }

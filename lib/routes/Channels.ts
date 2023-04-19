@@ -18,6 +18,11 @@ import {
     GETCalendarEventRSVPResponse,
     GETCalendarEventRSVPSResponse,
     GETCalendarEventsResponse,
+    GETChannelAnnouncementCommentResponse,
+    GETChannelAnnouncementCommentsResponse,
+    GETChannelAnnouncementResponse,
+    GETChannelAnnouncementsQuery,
+    GETChannelAnnouncementsResponse,
     GETChannelListItemsResponse,
     GETChannelMessageResponse,
     GETChannelMessagesResponse,
@@ -33,6 +38,10 @@ import {
     GETListItemResponse,
     PATCHCalendarEventCommentResponse,
     PATCHCalendarEventResponse,
+    PATCHChannelAnnouncementBody,
+    PATCHChannelAnnouncementCommentBody,
+    PATCHChannelAnnouncementCommentResponse,
+    PATCHChannelAnnouncementResponse,
     PATCHDocCommentResponse,
     PATCHForumTopicCommentResponse,
     PATCHForumTopicResponse,
@@ -41,6 +50,10 @@ import {
     POSTCalendarEventBody,
     POSTCalendarEventCommentResponse,
     POSTCalendarEventResponse,
+    POSTChannelAnnouncementBody,
+    POSTChannelAnnouncementCommentBody,
+    POSTChannelAnnouncementCommentResponse,
+    POSTChannelAnnouncementResponse,
     POSTChannelMessageResponse,
     POSTDocCommentResponse,
     POSTDocResponse,
@@ -76,6 +89,8 @@ import { TextChannel } from "../structures/TextChannel";
 import { CalendarEventComment } from "../structures/CalendarEventComment";
 import { CreateDocCommentOptions, EditDocCommentOptions } from "../types/docComment";
 import { DocComment } from "../structures/DocComment";
+import { Announcement } from "../structures/Announcement";
+import { AnnouncementComment } from "../structures/AnnouncementComment";
 
 export class Channels {
     #manager: RESTManager;
@@ -383,12 +398,13 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async createReaction(channelID: string, channelType: ChannelReactionTypes, targetID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | undefined;
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc" && channelType !== "ChannelAnnouncement") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
         if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
+        if (channelType === "ChannelAnnouncement") endpointType = "CHANNEL_ANNOUNCEMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "PUT",
@@ -403,12 +419,13 @@ export class Channels {
      * @param reaction ID of the reaction.
      */
     async deleteReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
-        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | undefined;
+        if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc" && channelType !== "ChannelAnnouncement") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
         if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
         if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
+        if (channelType === "ChannelAnnouncement") endpointType = "CHANNEL_ANNOUNCEMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
@@ -424,11 +441,12 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async createReactionToSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
-        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment") throw new Error("Invalid channel subcategory.");
-        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | undefined;
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment" && subcategoryType !== "AnnouncementComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | "CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE" | undefined;
         if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
         if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
         if (subcategoryType === "DocComment") endpointType = "CHANNEL_DOC_COMMENT_EMOTE";
+        if (subcategoryType === "AnnouncementComment") endpointType = "CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "PUT",
@@ -444,11 +462,12 @@ export class Channels {
      * @param reaction ID of the reaction to add.
      */
     async deleteReactionFromSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
-        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment") throw new Error("Invalid channel subcategory.");
-        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | undefined;
+        if (subcategoryType !== "CalendarEventComment" && subcategoryType !== "ForumThreadComment" && subcategoryType !== "DocComment" && subcategoryType !== "AnnouncementComment") throw new Error("Invalid channel subcategory.");
+        let endpointType: "FORUM_TOPIC_COMMENT_EMOTE" | "CHANNEL_EVENT_COMMENT_EMOTE" | "CHANNEL_DOC_COMMENT_EMOTE" | "CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE" | undefined;
         if (subcategoryType === "CalendarEventComment") endpointType = "CHANNEL_EVENT_COMMENT_EMOTE";
         if (subcategoryType === "ForumThreadComment") endpointType = "FORUM_TOPIC_COMMENT_EMOTE";
         if (subcategoryType === "DocComment") endpointType = "CHANNEL_DOC_COMMENT_EMOTE";
+        if (subcategoryType === "AnnouncementComment") endpointType = "CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE";
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
@@ -889,5 +908,139 @@ export class Channels {
             method: "DELETE",
             path:   endpoints.LIST_ITEM_COMPLETE(channelID, itemID)
         });
+    }
+
+    /**
+     * Create a new announcement within an announcement channel.
+     * @param channelID ID of the Announcement channel.
+     * @param options Announcement creation options.
+     */
+    async createAnnouncement(channelID: string, options: POSTChannelAnnouncementBody): Promise<Announcement> {
+        return this.#manager.authRequest<POSTChannelAnnouncementResponse>({
+            method: "POST",
+            path:   endpoints.CHANNEL_ANNOUNCEMENTS(channelID),
+            json:   options
+        }).then(data => new Announcement(data.announcement, this.#manager.client));
+    }
+
+    /**
+     * Edit an existing announcement.
+     * @param channelID ID of the Announcement channel.
+     * @param announcementID ID of the announcement to edit.
+     * @param options Edit options
+     */
+    async editAnnouncement(channelID: string, announcementID: string, options: PATCHChannelAnnouncementBody): Promise<Announcement> {
+        return this.#manager.authRequest<PATCHChannelAnnouncementResponse>({
+            method: "PATCH",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT(channelID, announcementID),
+            json:   options
+        }).then(data => new Announcement(data.announcement, this.#manager.client));
+    }
+
+    /**
+     * Delete an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement to delete.
+     */
+    async deleteAnnouncement(channelID: string, announcementID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT(channelID, announcementID)
+        });
+    }
+
+    /**
+     * Get a list of announcements from a channel.
+     * @param channelID ID of an Announcement channel.
+     * @param filter Filter to apply.
+     */
+    async getAnnouncements(channelID: string, filter?: GETChannelAnnouncementsQuery): Promise<Array<Announcement>> {
+        const query = new URLSearchParams();
+        if (filter?.before) query.set("before", filter.before.toString());
+        if (filter?.limit) query.set("limit", filter.limit.toString());
+        return this.#manager.authRequest<GETChannelAnnouncementsResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_ANNOUNCEMENTS(channelID),
+            query
+        }).then(data => data.announcements.map(d => new Announcement(d, this.#manager.client)));
+    }
+
+    /**
+     * Get a specific announcement from a channel.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement to get.
+     */
+    async getAnnouncement(channelID: string, announcementID: string): Promise<Announcement> {
+        return this.#manager.authRequest<GETChannelAnnouncementResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT(channelID, announcementID)
+        }).then(data => new Announcement(data.announcement, this.#manager.client));
+    }
+
+    /**
+     * Create a comment inside an announcement.
+     * @param channelID ID of the Announcement channel.
+     * @param announcementID ID of the announcement to create the comment in.
+     * @param options Comment creation options.
+     */
+    async createAnnouncementComment(channelID: string, announcementID: string, options: POSTChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.#manager.authRequest<POSTChannelAnnouncementCommentResponse>({
+            method: "POST",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENTS(channelID, announcementID),
+            json:   options
+        }).then(data => new AnnouncementComment(data.announcementComment, this.#manager.client));
+    }
+
+    /**
+     * Edit an announcement comment.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of an announcement where the comment is in.
+     * @param commentID ID of the comment to edit.
+     * @param options Edit options.
+     */
+    async editAnnouncementComment(channelID: string, announcementID: string, commentID: number, options: PATCHChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.#manager.authRequest<PATCHChannelAnnouncementCommentResponse>({
+            method: "PATCH",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENT(channelID, announcementID, commentID),
+            json:   options
+        }).then(data => new AnnouncementComment(data.announcementComment, this.#manager.client));
+    }
+
+    /**
+     * Delete an announcement comment.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement where the comment is in.
+     * @param commentID ID of the comment to delete.
+     */
+    async deleteAnnouncementComment(channelID: string, announcementID: string, commentID: number): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENT(channelID, announcementID, commentID)
+        });
+    }
+
+    /**
+     * Get comments from an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of an announcement.
+     */
+    async getAnnouncementComments(channelID: string, announcementID: string): Promise<Array<AnnouncementComment>> {
+        return this.#manager.authRequest<GETChannelAnnouncementCommentsResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENTS(channelID, announcementID)
+        }).then(data => data.announcementComments.map(d => new AnnouncementComment(d, this.#manager.client)));
+    }
+
+    /**
+     * Get a specific comment from an announcement.
+     * @param channelID ID of an Announcement channel.
+     * @param announcementID ID of the announcement where the comment is in.
+     * @param commentID ID of the comment to get.
+     */
+    async getAnnouncementComment(channelID: string, announcementID: string, commentID: number): Promise<AnnouncementComment> {
+        return this.#manager.authRequest<GETChannelAnnouncementCommentResponse>({
+            method: "GET",
+            path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENT(channelID, announcementID, commentID)
+        }).then(data => new AnnouncementComment(data.announcementComment, this.#manager.client));
     }
 }
