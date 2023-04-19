@@ -494,7 +494,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param objectID ID of the object you'd like to add the reaction to. (e.g: a message id)
      * @param reaction ID of the reaction.
      */
-    async removeReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void>{
+    async deleteReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void>{
         return this.rest.channels.deleteReaction(channelID, channelType, objectID, reaction);
     }
 

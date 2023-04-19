@@ -3,7 +3,7 @@ import { Client } from "./Client";
 import { Base } from "./Base";
 
 import { Member } from "./Member";
-import { APIAnnouncementComment, APIMentions } from "../Constants";
+import { APIAnnouncementComment, APIMentions, PATCHChannelAnnouncementCommentBody, POSTChannelAnnouncementCommentBody } from "../Constants";
 import { ConstructorCalendarEventCommentOptions } from "../types/calendarEventComment";
 import { JSONAnnouncementComment } from "../types/json";
 
@@ -91,5 +91,44 @@ export class AnnouncementComment extends Base<number> {
     get member(): Member | Promise<Member> | undefined {
         if (this.guildID === null) throw new Error("Couldn't get member because API didn't return guildID.");
         return this.client.getGuild(this.guildID as string)?.members.get(this.memberID) ?? this.guildID ? this.client.rest.guilds.getMember(this.guildID as string, this.memberID) : undefined;
+    }
+
+    /**
+     * Edit this comment.
+     * @param options Edit options
+     */
+    async edit(options: PATCHChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.client.rest.channels.editAnnouncementComment(this.channelID, this.announcementID, this.id, options);
+    }
+
+    /**
+     * Delete this comment.
+     */
+    async delete(): Promise<void> {
+        return this.client.rest.channels.deleteAnnouncementComment(this.channelID, this.announcementID, this.id);
+    }
+
+    /**
+     * Create a comment in the same announcement as this one.
+     * @param options Create options.
+     */
+    async createComment(options: POSTChannelAnnouncementCommentBody): Promise<AnnouncementComment> {
+        return this.client.rest.channels.createAnnouncementComment(this.channelID, this.announcementID, options);
+    }
+
+    /**
+     * Add a reaction to this comment.
+     * @param reactionID ID of the emote to add
+     */
+    async createReaction(emoteID: number): Promise<void> {
+        return this.client.rest.channels.createReactionToSubcategory(this.channelID, "AnnouncementComment", this.announcementID, this.id, emoteID);
+    }
+
+    /**
+     * Remove a reaction from this comment.
+     * @param reactionID ID of the emote to remove
+     */
+    async deleteReaction(emoteID: number): Promise<void> {
+        return this.client.rest.channels.deleteReactionFromSubcategory(this.channelID, "AnnouncementComment", this.announcementID, this.id, emoteID);
     }
 }

@@ -2,7 +2,13 @@
 import { Client } from "./Client";
 import { Base } from "./Base";
 import { AnnouncementComment } from "./AnnouncementComment";
-import { APIAnnouncement, APIAnnouncementComment, APIMentions } from "../Constants";
+import {
+    APIAnnouncement,
+    APIAnnouncementComment,
+    APIMentions,
+    PATCHChannelAnnouncementBody,
+    POSTChannelAnnouncementBody
+} from "../Constants";
 import { JSONAnnouncement } from "../types/json";
 import TypedCollection from "../util/TypedCollection";
 
@@ -80,5 +86,44 @@ export class Announcement extends Base<string> {
         if (data.title !== undefined) {
             this.title = data.title;
         }
+    }
+
+    /**
+     * Edit this announcement.
+     * @param options Edit options
+     */
+    async edit(options: PATCHChannelAnnouncementBody): Promise<Announcement> {
+        return this.client.rest.channels.editAnnouncement(this.channelID, this.id, options);
+    }
+
+    /**
+     * Delete this announcement.
+     */
+    async delete(): Promise<void> {
+        return this.client.rest.channels.deleteAnnouncement(this.channelID, this.id);
+    }
+
+    /**
+     * Create an announcement in the same Announcement channel as this one.
+     * @param options Create options.
+     */
+    async createAnnouncement(options: POSTChannelAnnouncementBody): Promise<Announcement> {
+        return this.client.rest.channels.createAnnouncement(this.channelID, options);
+    }
+
+    /**
+     * Add a reaction to this announcement.
+     * @param reactionID ID of the emote to add
+     */
+    async createReaction(emoteID: number): Promise<void> {
+        return this.client.rest.channels.createReaction(this.channelID, "ChannelAnnouncement", this.id, emoteID);
+    }
+
+    /**
+     * Remove a reaction from this announcement.
+     * @param reactionID ID of the emote to remove
+     */
+    async deleteReaction(emoteID: number): Promise<void> {
+        return this.client.rest.channels.deleteReaction(this.channelID, "ChannelAnnouncement", this.id, emoteID);
     }
 }
