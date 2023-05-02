@@ -33,5 +33,8 @@ export * from "./structures/MemberRemoveInfo";
 export * from "./structures/MemberUpdateInfo";
 export * from "./structures/CalendarReactionInfo";
 
+export * from "./util/Collection";
+export * from "./util/TypedCollection";
+
 export * as APITypes from "guildedapi-types.ts/v1";
 export * as Constants from "./Constants";
