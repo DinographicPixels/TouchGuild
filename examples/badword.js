@@ -3,8 +3,7 @@ const { Client, Member } = require("touchguild");
 
 // Creating client & connecting.
 const client = new Client({
-    token: "TOKEN",
-    REST: true
+    token: "TOKEN"
 });
 
 client.on("ready", () => {
