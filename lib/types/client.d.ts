@@ -6,11 +6,16 @@ export interface ClientOptions {
      */
     token: string;
     /**
+     * **NOT RECOMMENDED, CAN BREAK THINGS**
+     *
      * REST methods are used to communicate with the Guilded by sending requests.
-     * You can disable those methods by setting this boolean to `false`.
-     * @defaultValue true
+     * This feature was included in previous TouchGuild versions but we've changed how we manage REST requests.
+     *
+     * Forcing disabling REST methods may crash the library when receiving events, reorganizing cache hierarchy, which means that they are used internally,
+     * you can still disable those methods by setting this boolean to `true`, be aware that **it isn't recommended**.
+     * @defaultValue false
      */
-    REST?: boolean;
+    ForceDisableREST?: boolean;
     /**
      * REST Options are used for REST requests. You can change some properties there.
      * This includes some properties like the baseURL and much more.

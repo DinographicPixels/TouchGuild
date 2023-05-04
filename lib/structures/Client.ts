@@ -97,7 +97,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         super();
         this.params = {
             token:            params.token,
-            REST:             params.REST ?? true,
+            ForceDisableREST: params.ForceDisableREST ?? false,
             RESTOptions:      params.RESTOptions,
             collectionLimits: {
                 messages:             params.collectionLimits?.messages             ?? 100,
@@ -115,7 +115,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         this.ws = new WSManager(this, { token: this.token, client: this });
         this.guilds = new TypedCollection(Guild, this);
         this.users = new TypedCollection(User, this);
-        this.rest = new RESTManager(this, params.RESTOptions);
+        this.rest = (!this.params.ForceDisableREST ? new RESTManager(this, params.RESTOptions) : null) as RESTManager;
         this.#gateway = new GatewayHandler(this);
         this.util = new Util(this);
         this.startTime = 0;
