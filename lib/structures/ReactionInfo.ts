@@ -11,7 +11,7 @@ import {
     GatewayEvent_CalendarEventCommentReactionDeleted,
     GatewayEvent_CalendarEventReactionCreated,
     GatewayEvent_CalendarEventReactionDeleted,
-    GatewayEvent_ChannelMessageReactionAdded,
+    GatewayEvent_ChannelMessageReactionCreated,
     GatewayEvent_ChannelMessageReactionDeleted,
     GatewayEvent_DocCommentReactionCreated,
     GatewayEvent_DocCommentReactionDeleted,
@@ -24,7 +24,7 @@ import {
 /** Default information every other reaction has. */
 export class ReactionInfo {
     client!: Client;
-    raw: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
+    raw: GatewayEvent_ChannelMessageReactionCreated | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
     GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
     GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted | GatewayEvent_AnnouncementReactionCreated
@@ -39,7 +39,7 @@ export class ReactionInfo {
      * @param data raw data.
      * @param client client.
      */
-    constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
+    constructor(data: GatewayEvent_ChannelMessageReactionCreated | GatewayEvent_ChannelMessageReactionDeleted | GatewayEvent_ForumTopicReactionCreated |
     GatewayEvent_ForumTopicReactionDeleted | GatewayEvent_CalendarEventReactionCreated | GatewayEvent_CalendarEventReactionDeleted |
     GatewayEvent_CalendarEventCommentReactionCreated | GatewayEvent_CalendarEventCommentReactionDeleted | GatewayEvent_DocReactionCreated |
     GatewayEvent_DocReactionDeleted | GatewayEvent_DocCommentReactionCreated | GatewayEvent_DocCommentReactionDeleted |

@@ -10,8 +10,10 @@ import { ForumThreadComment } from "../structures/ForumThreadComment";
 import { ListItem } from "../structures/ListItem";
 import {
     APIListItem,
+    ChannelReactionTypeBulkDeleteSupported,
     ChannelReactionTypes,
     ChannelSubcategoryReactionTypes,
+    DELETEMessageReactionQuery,
     GETCalendarEventCommentResponse,
     GETCalendarEventCommentsResponse,
     GETCalendarEventResponse,
@@ -394,13 +396,13 @@ export class Channels {
     /** Add a reaction to a specified object from a channel.
      * @param channelID ID of a channel that supports reaction.
      * @param channelType Type of the selected channel. (e.g: "ChannelMessage")
-     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a message id)
+     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a message ID)
      * @param reaction ID of the reaction to add.
      */
     async createReaction(channelID: string, channelType: ChannelReactionTypes, targetID: string | number, reaction: number): Promise<void> {
         if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc" && channelType !== "ChannelAnnouncement") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
-        if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
+        let endpointType: "CHANNEL_MESSAGE_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
+        if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
         if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
@@ -415,13 +417,13 @@ export class Channels {
     /** Remove a reaction from a specified message.
      * @param channelID ID of a channel that supports reaction.
      * @param channelType Type of the selected channel. (e.g: "ChannelMessage")
-     * @param objectID ID of the object you'd like to add the reaction to. (e.g: a message id)
+     * @param targetID ID of the target you'd like to add the reaction to. (e.g: a message ID)
      * @param reaction ID of the reaction.
      */
-    async deleteReaction(channelID: string, channelType: ChannelReactionTypes, objectID: string | number, reaction: number): Promise<void> {
+    async deleteReaction(channelID: string, channelType: ChannelReactionTypes, targetID: string | number, reaction: number): Promise<void> {
         if (channelType !== "ChannelMessage" && channelType !== "ForumThread" && channelType !== "CalendarEvent" && channelType !== "Doc" && channelType !== "ChannelAnnouncement") throw new Error("Invalid channel type.");
-        let endpointType: "CHANNEL_MESSAGE_CONTENT_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
-        if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_CONTENT_EMOTE";
+        let endpointType: "CHANNEL_MESSAGE_EMOTE" | "FORUM_TOPIC_EMOTE" | "CHANNEL_EVENT_EMOTE" | "CHANNEL_DOC_EMOTE" | "CHANNEL_ANNOUNCEMENT_EMOTE" | undefined;
+        if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_EMOTE";
         if (channelType === "ForumThread") endpointType = "FORUM_TOPIC_EMOTE";
         if (channelType === "CalendarEvent") endpointType = "CHANNEL_EVENT_EMOTE";
         if (channelType === "Doc") endpointType = "CHANNEL_DOC_EMOTE";
@@ -429,15 +431,36 @@ export class Channels {
 
         return this.#manager.authRequest<void>({
             method: "DELETE",
-            path:   endpoints[endpointType as keyof typeof endpoints](channelID, objectID as never, reaction as never, 0)
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, targetID as never, reaction as never, 0)
         });
     }
 
-    /** Add a reaction to an object from a subcategory (e.g: a comment from Forum Thread)
+    /**
+     * Bulk delete every reaction from a target.
+     * @param channelID ID of a channel.
+     * @param channelType Type of channel.
+     * @param targetID Target to remove reactions from it.
+     */
+    async bulkDeleteReactions(channelID: string, channelType: ChannelReactionTypeBulkDeleteSupported, targetID: string | number, filter?: DELETEMessageReactionQuery): Promise<void> {
+        if (channelType !== "ChannelMessage") throw new Error("Invalid channel type.");
+        let endpointType: "CHANNEL_MESSAGE_EMOTES" | undefined;
+        if (channelType === "ChannelMessage") endpointType = "CHANNEL_MESSAGE_EMOTES";
+
+        const query = new URLSearchParams();
+        if (filter?.emoteId) query.set("emoteId", filter.emoteId.toString());
+
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints[endpointType as keyof typeof endpoints](channelID, targetID as never, 0 as never, 0),
+            query
+        });
+    }
+
+    /** Add a reaction to a target from a subcategory (e.g: a comment from Forum Thread)
      * @param channelID ID of a channel that supports reaction.
      * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
      * @param subcategoryID ID of the subcategory you selected.
-     * @param targetID ID of the object you'd like to add the reaction to. (e.g: a comment id)
+     * @param targetID ID of the target you'd like to add the reaction to. (e.g: a comment id)
      * @param reaction ID of the reaction to add.
      */
     async createReactionToSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {
@@ -454,11 +477,11 @@ export class Channels {
         });
     }
 
-    /** Remove a reaction from an object from a subcategory (e.g: a comment from Forum Thread)
+    /** Remove a reaction from a target from a subcategory (e.g: a comment from Forum Thread)
      * @param channelID ID of a channel that supports reaction.
      * @param subcategoryType Type of the selected subcategory. (e.g: "CalendarEvent")
      * @param subcategoryID ID of the subcategory you selected.
-     * @param targetID ID of the object you'd like to remove the reaction to. (e.g: a comment id)
+     * @param targetID ID of the target you'd like to remove the reaction from. (e.g: a comment id)
      * @param reaction ID of the reaction to add.
      */
     async deleteReactionFromSubcategory(channelID: string, subcategoryType: ChannelSubcategoryReactionTypes, subcategoryID: string | number, targetID: string | number, reaction: number): Promise<void> {

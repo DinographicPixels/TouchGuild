@@ -122,6 +122,21 @@ export type PossiblyUncachedMessage = Message<AnyTextableChannel> | {
     isPrivate: boolean | null;
 };
 
+export interface ChannelMessageReactionBulkRemove {
+    /** The ID of the server */
+    guildID: string;
+    /** The ID of the channel */
+    channelID: string;
+    /** The ID of the message */
+    messageID: string;
+    /** The ID of the user who deleted this reaction */
+    deletedBy: string;
+    /** The count of reactions that were removed */
+    count: number;
+    /** If present, only reactions of this emote were bulk removed from the message */
+    emote: APIEmote | null;
+}
+
 export type AnyTextableChannel = TextChannel;
 export type AnyChannel = GuildChannel | TextChannel | ForumChannel | DocChannel | CalendarChannel | AnnouncementChannel;
 export type AnyGuildChannel = Exclude<AnyChannel, GuildChannel>;

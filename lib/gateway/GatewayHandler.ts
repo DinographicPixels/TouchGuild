@@ -13,7 +13,7 @@ import { Client } from "../structures/Client";
 
 import type {
     GATEWAY_EVENTS,
-    GatewayEvent_ChannelMessageReactionAdded,
+    GatewayEvent_ChannelMessageReactionCreated,
     GatewayEvent_ChannelMessageReactionDeleted,
     GatewayEvent_ChatMessageCreated,
     GatewayEvent_ChatMessageDeleted,
@@ -84,7 +84,8 @@ import type {
     GatewayEvent_AnnouncementReactionCreated,
     GatewayEvent_AnnouncementReactionDeleted,
     GatewayEvent_AnnouncementCommentReactionDeleted,
-    GatewayEvent_AnnouncementCommentReactionCreated
+    GatewayEvent_AnnouncementCommentReactionCreated,
+    GatewayEvent_ChannelMessageReactionManyDeleted
 } from "../Constants";
 
 /** Gateway handler filters every ws events. */
@@ -105,8 +106,9 @@ export class GatewayHandler {
         ChatMessageCreated:                  data => this.messageHandler.messageCreate(data as GatewayEvent_ChatMessageCreated),
         ChatMessageUpdated:                  data => this.messageHandler.messageUpdate(data as GatewayEvent_ChatMessageUpdated),
         ChatMessageDeleted:                  data => this.messageHandler.messageDelete(data as GatewayEvent_ChatMessageDeleted),
-        ChannelMessageReactionCreated:       data => this.messageHandler.messageReactionAdd(data as GatewayEvent_ChannelMessageReactionAdded),
+        ChannelMessageReactionCreated:       data => this.messageHandler.messageReactionAdd(data as GatewayEvent_ChannelMessageReactionCreated),
         ChannelMessageReactionDeleted:       data => this.messageHandler.messageReactionRemove(data as GatewayEvent_ChannelMessageReactionDeleted),
+        ChannelMessageReactionManyDeleted:   data => this.messageHandler.messageReactionBulkRemove(data as GatewayEvent_ChannelMessageReactionManyDeleted),
         // Channels
         ServerChannelCreated:                data => this.channelHandler.channelCreate(data as GatewayEvent_ServerChannelCreated),
         ServerChannelUpdated:                data => this.channelHandler.channelUpdate(data as GatewayEvent_ServerChannelUpdated),

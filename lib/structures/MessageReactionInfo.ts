@@ -3,7 +3,7 @@ import { ReactionInfo } from "./ReactionInfo";
 import { TextChannel } from "./TextChannel";
 import { Client } from "../structures/Client";
 import { MessageReactionTypes } from "../types/types";
-import { GatewayEvent_ChannelMessageReactionAdded, GatewayEvent_ChannelMessageReactionDeleted } from "../Constants";
+import { GatewayEvent_ChannelMessageReactionCreated, GatewayEvent_ChannelMessageReactionDeleted } from "../Constants";
 
 /** Information about a Message's reaction. */
 export class MessageReactionInfo extends ReactionInfo {
@@ -15,7 +15,7 @@ export class MessageReactionInfo extends ReactionInfo {
      * @param data raw data.
      * @param client client.
      */
-    constructor(data: GatewayEvent_ChannelMessageReactionAdded | GatewayEvent_ChannelMessageReactionDeleted, client: Client){
+    constructor(data: GatewayEvent_ChannelMessageReactionCreated | GatewayEvent_ChannelMessageReactionDeleted, client: Client){
         super(data, client);
         this.messageID = data.reaction.messageId;
         this.type = "message";

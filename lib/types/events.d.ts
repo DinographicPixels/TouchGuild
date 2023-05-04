@@ -1,6 +1,6 @@
 /** @module Events */
 import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
-import { AnyChannel, AnyTextableChannel, PossiblyUncachedMessage } from "./channel";
+import { AnyChannel, AnyTextableChannel, ChannelMessageReactionBulkRemove, PossiblyUncachedMessage } from "./channel";
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
 import {
     JSONAnnouncement,
@@ -64,6 +64,8 @@ export interface ClientEvents {
     reactionAdd: [reactionInfo: AnyReactionInfo];
     /** @event Emitted when a reaction is removed from anything. */
     reactionRemove: [reactionInfo: AnyReactionInfo];
+    /** @event Emitted when a bulk reaction remove is performed. */
+    reactionBulkRemove: [bulkInfo: ChannelMessageReactionBulkRemove];
     /** @event Emitted when a guild channel is created. */
     channelCreate: [channel: AnyChannel];
     /** @event Emitted when a guild channel is updated. */
