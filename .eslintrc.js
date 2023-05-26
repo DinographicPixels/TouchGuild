@@ -319,7 +319,9 @@ module.exports = {
         "non-zero": "not-equal"
       }
     ],
+    "unicorn/prefer-event-target": "off",
     "unicorn/catch-error-name": "off",
+    "unicorn/prefer-at": "off",
     "unicorn/consistent-destructuring": "off",
     "unicorn/prefer-number-properties": "off",
     "unicorn/no-array-callback-reference": "off",
