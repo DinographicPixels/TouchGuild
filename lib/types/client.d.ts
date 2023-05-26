@@ -22,6 +22,12 @@ export interface ClientOptions {
      */
     RESTOptions?: RESTOptions;
 
+    /**
+     * This boolean is used to enable or disable the `> Connection established.` message when
+     * connection is successfully established.
+     */
+    connectionMessage?: boolean;
+
     collectionLimits?: {
         messages?: number;
         threads?: number;

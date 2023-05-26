@@ -96,10 +96,11 @@ export class Client extends TypedEmitter<ClientEvents> {
         if (!params?.token) throw new Error("Cannot create client without token, no token is provided.");
         super();
         this.params = {
-            token:            params.token,
-            ForceDisableREST: params.ForceDisableREST ?? false,
-            RESTOptions:      params.RESTOptions,
-            collectionLimits: {
+            token:             params.token,
+            ForceDisableREST:  params.ForceDisableREST ?? false,
+            RESTOptions:       params.RESTOptions,
+            connectionMessage: params.connectionMessage ?? true,
+            collectionLimits:  {
                 messages:             params.collectionLimits?.messages             ?? 100,
                 threads:              params.collectionLimits?.threads              ?? 100,
                 threadComments:       params.collectionLimits?.threadComments       ?? 100,
@@ -135,7 +136,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         this.ws.connect();
         this.ws.on("GATEWAY_WELCOME", data => {
             this.user = new UserClient(data, this);
-            console.log("> Connection established.");
+            if (this.params.connectionMessage) console.log("> Connection established.");
             this.startTime = Date.now();
             this.emit("ready");
         });
