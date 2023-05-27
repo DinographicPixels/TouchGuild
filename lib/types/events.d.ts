@@ -1,5 +1,11 @@
 /** @module Events */
-import type { AnyReactionInfo, GuildCreateInfo, GuildDeleteInfo } from "./types";
+import type {
+    AnyReactionInfo,
+    GuildCreateInfo,
+    GuildDeleteInfo,
+    UserStatusCreate,
+    UserStatusDelete
+} from "./types";
 import { AnyChannel, AnyTextableChannel, ChannelMessageReactionBulkRemove, PossiblyUncachedMessage } from "./channel";
 import type { AnyPacket, WelcomePacket } from "./gateway-raw";
 import {
@@ -17,6 +23,7 @@ import {
     JSONForumThread,
     JSONForumThreadComment,
     JSONGuildChannel,
+    JSONGuildGroup,
     JSONMessage,
     JSONTextChannel
 } from "./json";
@@ -42,8 +49,10 @@ import { CalendarEventComment } from "../structures/CalendarEventComment";
 import { DocComment } from "../structures/DocComment";
 import { Announcement } from "../structures/Announcement";
 import type { AnnouncementComment } from "../structures/AnnouncementComment";
+import { GuildGroup } from "../structures/GuildGroup";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
+/** Every client events. */
 export interface ClientEvents {
     // message: [message: string];
     /** @event Emitted after getting an error. */
@@ -108,6 +117,12 @@ export interface ClientEvents {
     guildCreate: [GuildCreateInfo: GuildCreateInfo];
     /** @event Emitted when the client leaves a guild. */
     guildDelete: [GuildDeleteInfo: GuildDeleteInfo];
+    /** @event Emitted when a guild group is created. */
+    guildGroupCreate: [guildGroup: GuildGroup];
+    /** @event Emitted when a guild group is updated. */
+    guildGroupUpdate: [guildGroup: GuildGroup, oldGuildGroup: JSONGuildGroup | null];
+    /** @event Emitted when a guild group is deleted. */
+    guildGroupDelete: [guildGroup: GuildGroup];
     /** @event Emitted when a doc is created. */
     docCreate: [Doc: Doc];
     /** @event Emitted when a doc is edited. */
@@ -164,10 +179,15 @@ export interface ClientEvents {
     webhooksCreate: [webhook: Webhook];
     /** @event Emitted when a webhook is deleted. */
     webhooksUpdate: [webhook: Webhook];
+    /** @event Emitted when a user updates their user status. */
+    userStatusCreate: [userStatus: UserStatusCreate];
+    /** @event Emitted when a user delete their user status. */
+    userStatusDelete: [userStatus: UserStatusDelete];
     /** @event Emitted on process exit. */
     exit: [message: string];
 }
 
+/** Internal websocket events. */
 export interface WebsocketEvents {
     /** @event Emitted after getting an error. */
     error: [error: Error];

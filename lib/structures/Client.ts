@@ -23,6 +23,7 @@ import { CalendarEventComment } from "./CalendarEventComment";
 import { DocComment } from "./DocComment";
 import { AnnouncementComment } from "./AnnouncementComment";
 import { Announcement } from "./Announcement";
+import { GuildRole } from "./GuildRole";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -47,7 +48,8 @@ import {
     PATCHChannelAnnouncementBody,
     POSTChannelAnnouncementBody,
     ChannelReactionTypeBulkDeleteSupported,
-    DELETEMessageReactionQuery
+    DELETEMessageReactionQuery,
+    PUTUserStatusBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -137,6 +139,11 @@ export class Client extends TypedEmitter<ClientEvents> {
         this.ws.on("GATEWAY_WELCOME", data => {
             this.user = new UserClient(data, this);
             if (this.params.connectionMessage) console.log("> Connection established.");
+            void this.rest.misc.getUserGuilds("@me").catch(() => [])
+                .then(guilds => {
+                    if (!guilds) guilds = [];
+                    for (const guild of guilds) this.guilds.add(guild);
+                });
             this.startTime = Date.now();
             this.emit("ready");
         });
@@ -1055,5 +1062,39 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async awardRole(guildID: string, roleID: number, amount: number): Promise<void>{
         return this.rest.guilds.awardRole(guildID, roleID, amount);
+    }
+
+    /**
+     * Get every guild roles from a guild.
+     * @param guildID ID of the guild where roles are.
+     */
+    async getGuildRoles(guildID: string): Promise<Array<GuildRole>> {
+        return this.rest.guilds.getRoles(guildID);
+    }
+
+    /**
+     * Get a guild role.
+     * @param guildID ID of the guild where the role is.
+     * @param roleID ID of the role to get.
+     */
+    async getGuildRole(guildID: string, roleID: number): Promise<GuildRole> {
+        return this.rest.guilds.getRole(guildID, roleID);
+    }
+
+    /**
+     * Change a user's status, this includes the bot's one.
+     * @param userID User ID (@me can be used).
+     * @param options Status options
+     */
+    async updateUserStatus(userID: string | "@me", options: PUTUserStatusBody): Promise<void> {
+        return this.rest.misc.updateUserStatus(userID, options);
+    }
+
+    /**
+     * Delete a user's status, this includes the bot's one.
+     * @param userID User ID (@me can be used).
+     */
+    async deleteUserStatus(userID: string | "@me"): Promise<void> {
+        return this.rest.misc.deleteUserStatus(userID);
     }
 }

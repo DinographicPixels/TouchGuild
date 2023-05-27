@@ -436,3 +436,59 @@ export interface JSONAnnouncementComment extends JSONBase<number> {
     /** ID of the guild, if received. */
     guildID: string | null;
 }
+
+export interface JSONGuildRole extends JSONBase<number> {
+    /** ID of the guild */
+    guildID: string;
+    /** Date of when the role was created. */
+    createdAt: Date;
+    /** Date of when role was last edited. */
+    editedTimestamp: Date | null;
+    /** The role's name */
+    name: string;
+    /** If set, the role will be displayed separately in the channel member */
+    isDisplayedSeparately: boolean;
+    /** If set, this roll will be self assigned*/
+    isSelfAssignable: boolean;
+    /** If set, this role can be mentioned */
+    isMentionable: boolean;
+    /** Array of permission (Permissions enum) */
+    permissions: Array<Permissions>;
+    /** An array of integer values corresponding to the decimal RGB representation for a color. The first color is solid, and a second color indicates a gradient (min items 0; max items 2) */
+    colors: Array<number> | null;
+    /** The URL of the role icon */
+    iconURL: string | null;
+    /** The position the role will be in relation to the roles in the server */
+    position: number;
+    /** The default role users are given when joining the server. Base roles are tied directly to the server and cannot be created or deleted */
+    isBase: boolean;
+}
+
+export interface JSONGuildGroup extends JSONBase<string> {
+    /** ID of the guild */
+    guildID: string;
+    /** The group's name (min length 1; max length 80)  */
+    name: string;
+    /** The group description. */
+    description: string | null;
+    /** The avatar image associated with the group */
+    avatarURL: string | null;
+    /** If true, this is the server's home group */
+    isHome: boolean;
+    /** The emote to associate with the group */
+    emoteID: number | null;
+    /** Is this group open for anyone to join? */
+    isPublic: boolean;
+    /** The ISO 8601 timestamp that the group was created at */
+    createdAt: Date;
+    /** The ID of the user who created this group */
+    createdBy: string;
+    /** The date when the group was updated, if edited. */
+    editedTimestamp: Date | null;
+    /** The ID of the user who updated this group, if edited. */
+    updatedBy: string | null;
+    /** Date of when the group was archived, if archived. */
+    archivedAt: Date | null;
+    /** The ID of the user who archived this group, if archived. */
+    archivedBy: string | null;
+}

@@ -143,5 +143,19 @@ export interface CalendarEventSeries {
     channelID: string;
 }
 
+export interface UserStatus {
+    content: string | null;
+    emoteID: number;
+}
+
+export interface UserStatusDelete {
+    userID: string;
+    userStatus: UserStatus;
+}
+
+export interface UserStatusCreate extends UserStatusDelete {
+    expiresAt: string | null;
+}
+
 export type AnyReactionInfo = MessageReactionInfo | ForumThreadReactionInfo | CalendarReactionInfo | DocReactionInfo | AnnouncementReactionInfo;
 export interface Uncached<ID = string | number> { id: ID; }

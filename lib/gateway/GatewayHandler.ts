@@ -9,6 +9,7 @@ import { DocHandler } from "./events/DocHandler";
 import { CalendarHandler } from "./events/CalendarHandler";
 import { ListItemHandler } from "./events/ListItemHandler";
 import { AnnouncementHandler } from "./events/AnnouncementHandler";
+import { UserHandler } from "./events/UserHandler";
 import { Client } from "../structures/Client";
 
 import type {
@@ -85,7 +86,12 @@ import type {
     GatewayEvent_AnnouncementReactionDeleted,
     GatewayEvent_AnnouncementCommentReactionDeleted,
     GatewayEvent_AnnouncementCommentReactionCreated,
-    GatewayEvent_ChannelMessageReactionManyDeleted
+    GatewayEvent_ChannelMessageReactionManyDeleted,
+    GatewayEvent_GroupDeleted,
+    GatewayEvent_GroupUpdated,
+    GatewayEvent_GroupCreated,
+    GatewayEvent_UserStatusCreated,
+    GatewayEvent_UserStatusDeleted
 } from "../Constants";
 
 /** Gateway handler filters every ws events. */
@@ -100,6 +106,7 @@ export class GatewayHandler {
     calendarHandler = new CalendarHandler(this.client);
     listItemHandler = new ListItemHandler(this.client);
     announcementHandler = new AnnouncementHandler(this.client);
+    userHandler = new UserHandler(this.client);
 
     readonly toHandlerMap: Record<keyof GATEWAY_EVENTS, (data: object) => void> = {
         // Messages
@@ -140,6 +147,10 @@ export class GatewayHandler {
         ServerMemberSocialLinkDeleted:       data => this.guildHandler.guildMemberSocialLinkDelete(data as GatewayEvent_ServerMemberSocialLinkDeleted),
         BotServerMembershipCreated:          data => this.guildHandler.guildCreate(data as GatewayEvent_BotServerMembershipCreated),
         BotServerMembershipDeleted:          data => this.guildHandler.guildDelete(data as GatewayEvent_BotServerMembershipDeleted),
+        // Guild groups
+        GroupCreated:                        data => this.guildHandler.guildGroupCreate(data as GatewayEvent_GroupCreated),
+        GroupUpdated:                        data => this.guildHandler.guildGroupUpdate(data as GatewayEvent_GroupUpdated),
+        GroupDeleted:                        data => this.guildHandler.guildGroupDelete(data as GatewayEvent_GroupDeleted),
         // Webhooks
         ServerWebhookCreated:                data => this.webhookHandler.webhooksCreate(data as GatewayEvent_ServerWebhookCreated),
         ServerWebhookUpdated:                data => this.webhookHandler.webhooksUpdate(data as GatewayEvent_ServerWebhookUpdated),
@@ -184,7 +195,10 @@ export class GatewayHandler {
         AnnouncementReactionCreated:         data => this.announcementHandler.announcementReactionAdd(data as GatewayEvent_AnnouncementReactionCreated),
         AnnouncementReactionDeleted:         data => this.announcementHandler.announcementReactionRemove(data as GatewayEvent_AnnouncementReactionDeleted),
         AnnouncementCommentReactionCreated:  data => this.announcementHandler.announcementCommentReactionAdd(data as GatewayEvent_AnnouncementCommentReactionCreated),
-        AnnouncementCommentReactionDeleted:  data => this.announcementHandler.announcementCommentReactionRemove(data as GatewayEvent_AnnouncementCommentReactionDeleted)
+        AnnouncementCommentReactionDeleted:  data => this.announcementHandler.announcementCommentReactionRemove(data as GatewayEvent_AnnouncementCommentReactionDeleted),
+        // Users
+        UserStatusCreated:                   data => this.userHandler.userStatusCreate(data as GatewayEvent_UserStatusCreated),
+        UserStatusDeleted:                   data => this.userHandler.userStatusDelete(data as GatewayEvent_UserStatusDeleted)
     };
 
     async handleMessage(eventType: keyof GATEWAY_EVENTS, eventData: object): Promise<void> {

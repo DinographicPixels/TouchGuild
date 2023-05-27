@@ -3,7 +3,7 @@ import { Client } from "./Client";
 
 import { User } from "./User";
 import { JSONSocialLink } from "../types/json";
-import { APISocialLink } from "guildedapi-types.ts/typings/payloads/v1/Socials";
+import { APISocialLink } from "guildedapi-types.ts/typings/payloads/v1/Users";
 
 /** User's social link. */
 export class SocialLink {

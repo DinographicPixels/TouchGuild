@@ -1,7 +1,7 @@
 /** @module Routes/Guilds */
 import type { RESTManager } from "../rest/RESTManager";
 import * as endpoints from "../rest/endpoints";
-import { GETGuildMemberSocialsResponse, GETUserResponse, GETUserServersResponse } from "../Constants";
+import { GETGuildMemberSocialsResponse, GETUserResponse, GETUserServersResponse, PUTUserStatusBody } from "../Constants";
 import { User } from "../structures/User";
 import { SocialLink } from "../structures/SocialLink";
 import { Guild } from "../structures/Guild";
@@ -51,5 +51,29 @@ export class Miscellaneous {
             method: "GET",
             path:   endpoints.USER_SERVERS(userID)
         }).then(data => data.servers.map(d => new Guild(d, this.#manager.client)));
+    }
+
+    /**
+     * Change a user's status, this includes the bot's one.
+     * @param userID User ID (@me can be used).
+     * @param options Status options
+     */
+    async updateUserStatus(userID: string | "@me", options: PUTUserStatusBody): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "PUT",
+            path:   endpoints.USER_STATUS(userID),
+            json:   options
+        });
+    }
+
+    /**
+     * Delete a user's status, this includes the bot's one.
+     * @param userID User ID (@me can be used).
+     */
+    async deleteUserStatus(userID: string | "@me"): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.USER_STATUS(userID)
+        });
     }
 }

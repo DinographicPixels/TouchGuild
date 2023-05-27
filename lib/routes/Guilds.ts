@@ -24,12 +24,15 @@ import {
     GETGuildMembersResponse,
     APIGuildMember,
     GETGuildBanResponse,
-    GETGuildBansResponse
+    GETGuildBansResponse,
+    GETGuildRoleResponse,
+    GETGuildRolesResponse
 } from "../Constants";
 import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
 import { EditMemberOptions } from "../types/guilds";
 import { BannedMember } from "../structures/BannedMember";
+import { GuildRole } from "../structures/GuildRole";
 
 export class Guilds {
     #manager: RESTManager;
@@ -356,5 +359,28 @@ export class Guilds {
             method: "DELETE",
             path:   endpoints.CHANNEL(channelID)
         });
+    }
+
+    /**
+     * Get every guild roles from a guild.
+     * @param guildID ID of the guild where roles are.
+     */
+    async getRoles(guildID: string): Promise<Array<GuildRole>> {
+        return this.#manager.authRequest<GETGuildRolesResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_ROLES(guildID)
+        }).then(data => data.roles.map(role => new GuildRole(role, this.#manager.client)));
+    }
+
+    /**
+     * Get a guild role.
+     * @param guildID ID of the guild where the role is.
+     * @param roleID ID of the role to get.
+     */
+    async getRole(guildID: string, roleID: number): Promise<GuildRole> {
+        return this.#manager.authRequest<GETGuildRoleResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_ROLE(guildID, roleID)
+        }).then(data => new GuildRole(data.role, this.#manager.client));
     }
 }

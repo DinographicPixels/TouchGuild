@@ -7,6 +7,9 @@ import { GuildCreateInfo, GuildDeleteInfo } from "../../types/types";
 import {
     GatewayEvent_BotServerMembershipCreated,
     GatewayEvent_BotServerMembershipDeleted,
+    GatewayEvent_GroupCreated,
+    GatewayEvent_GroupDeleted,
+    GatewayEvent_GroupUpdated,
     GatewayEvent_ServerMemberBanned,
     GatewayEvent_ServerMemberJoined,
     GatewayEvent_ServerMemberRemoved,
@@ -19,6 +22,7 @@ import {
 } from "../../Constants";
 import { MemberUpdateInfo } from "../../structures/MemberUpdateInfo";
 import { MemberRemoveInfo } from "../../structures/MemberRemoveInfo";
+import { GuildGroup } from "../../structures/GuildGroup";
 
 /** Internal component, emitting guild events. */
 export class GuildHandler extends GatewayEventHandler {
@@ -82,5 +86,24 @@ export class GuildHandler extends GatewayEventHandler {
 
     guildMemberSocialLinkDelete(data: GatewayEvent_ServerMemberSocialLinkDeleted): void {
         this.client.emit("guildMemberUpdate", new MemberUpdateInfo(data, data.socialLink.userId, this.client));
+    }
+
+    guildGroupCreate(data: GatewayEvent_GroupCreated): void {
+        const GuildGroupComponent = new GuildGroup(data.group, this.client);
+        this.client.guilds.get(data.serverId)?.groups.add(GuildGroupComponent);
+        this.client.emit("guildGroupCreate", GuildGroupComponent);
+    }
+
+    guildGroupUpdate(data: GatewayEvent_GroupUpdated): void {
+        const guild = this.client.guilds.get(data.serverId);
+        const CachedGroup = guild?.groups.get(data.group.id)?.toJSON() ?? null;
+        const GuildGroupComponent = guild?.groups.update(new GuildGroup(data.group, this.client)) ?? new GuildGroup(data.group, this.client);
+        this.client.emit("guildGroupUpdate", GuildGroupComponent, CachedGroup);
+    }
+
+    guildGroupDelete(data: GatewayEvent_GroupDeleted): void {
+        const guild = this.client.guilds.get(data.serverId);
+        const GuildGroupComponent = guild?.groups.update(new GuildGroup(data.group, this.client)) ?? new GuildGroup(data.group, this.client);
+        this.client.emit("guildGroupDelete", GuildGroupComponent);
     }
 }

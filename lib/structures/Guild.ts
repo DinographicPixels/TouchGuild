@@ -6,7 +6,8 @@ import { Member } from "./Member";
 import { User } from "./User";
 import { BannedMember } from "./BannedMember";
 import { GuildChannel } from "./GuildChannel";
-import { APIGuild, APIGuildChannel, APIGuildMember } from "../Constants";
+import { GuildGroup } from "./GuildGroup";
+import { APIGuild, APIGuildChannel, APIGuildGroup, APIGuildMember } from "../Constants";
 import TypedCollection from "../util/TypedCollection";
 import { JSONGuild } from "../types/json";
 import { AnyChannel } from "../types/channel";
@@ -36,6 +37,8 @@ export class Guild extends Base<string> {
     createdAt: Date;
     /** If true, the guild is verified. */
     verified: boolean;
+    /** Cached guild groups */
+    groups: TypedCollection<string, APIGuildGroup, GuildGroup>;
     /** Cached guild channels. */
     channels: TypedCollection<string, APIGuildChannel, AnyChannel>;
     /** Cached guild members. */
@@ -58,6 +61,7 @@ export class Guild extends Base<string> {
         this.defaultChannelID = data.defaultChannelId;
         this.createdAt = new Date(data.createdAt);
         this.verified = data.isVerified ?? false;
+        this.groups = new TypedCollection(GuildGroup, client);
         this.channels = new TypedCollection(GuildChannel, client);
         this.members = new TypedCollection(Member, client);
         this.update(data);
