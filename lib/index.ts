@@ -32,6 +32,8 @@ export * from "./structures/DocReactionInfo";
 export * from "./structures/MemberRemoveInfo";
 export * from "./structures/MemberUpdateInfo";
 export * from "./structures/CalendarReactionInfo";
+export * from "./structures/GuildRole";
+export * from "./structures/GuildGroup";
 
 export * from "./util/Collection";
 export * from "./util/TypedCollection";

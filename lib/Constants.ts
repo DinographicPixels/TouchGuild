@@ -16,3 +16,5 @@ export type ChannelSubcategoryReactionTypes = "CalendarEventComment" | "ForumThr
 
 /** Channel reaction types that supports bulk delete.  */
 export type ChannelReactionTypeBulkDeleteSupported = "ChannelMessage";
+
+export { Permissions } from "guildedapi-types.ts/v1";
