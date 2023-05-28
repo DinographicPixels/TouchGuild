@@ -19,70 +19,80 @@ import { DocComment } from "../../structures/DocComment";
 
 /** Internal component, emitting doc events. */
 export class DocHandler extends GatewayEventHandler {
-    docCreate(data: GatewayEvent_DocCreated): void {
-        void this.addGuildChannel(data.serverId, data.doc.channelId);
+    async docCreate(data: GatewayEvent_DocCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.doc.channelId);
+        else void this.addGuildChannel(data.serverId, data.doc.channelId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.doc.channelId);
         const DocComponent = channel?.docs.update(data.doc) ?? new Doc(data.doc, this.client);
         this.client.emit("docCreate", DocComponent);
     }
 
-    docUpdate(data: GatewayEvent_DocUpdated): void {
-        void this.addGuildChannel(data.serverId, data.doc.channelId);
+    async docUpdate(data: GatewayEvent_DocUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.doc.channelId);
+        else void this.addGuildChannel(data.serverId, data.doc.channelId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.doc.channelId);
         const CachedDoc = channel?.docs.get(data.doc.id)?.toJSON() ?? null;
         const DocComponent = channel?.docs.update(data.doc) ?? new Doc(data.doc, this.client);
         this.client.emit("docUpdate", DocComponent, CachedDoc);
     }
 
-    docDelete(data: GatewayEvent_DocDeleted): void {
-        void this.addGuildChannel(data.serverId, data.doc.channelId);
+    async docDelete(data: GatewayEvent_DocDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.doc.channelId);
+        else void this.addGuildChannel(data.serverId, data.doc.channelId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.doc.channelId);
         const DocComponent = channel?.docs.update(data.doc) ?? new Doc(data.doc, this.client);
         channel?.docs.delete(data.doc.id);
         this.client.emit("docDelete", DocComponent);
     }
 
-    docReactionAdd(data: GatewayEvent_DocReactionCreated): void {
-        void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+    async docReactionAdd(data: GatewayEvent_DocReactionCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
         const reactionInfo = new DocReactionInfo(data, this.client);
         this.client.emit("reactionAdd", reactionInfo);
     }
 
-    docReactionRemove(data: GatewayEvent_DocReactionDeleted): void {
-        void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+    async docReactionRemove(data: GatewayEvent_DocReactionDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
         const reactionInfo = new DocReactionInfo(data, this.client);
         this.client.emit("reactionRemove", reactionInfo);
     }
 
-    docCommentReactionAdd(data: GatewayEvent_DocCommentReactionCreated): void {
-        void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+    async docCommentReactionAdd(data: GatewayEvent_DocCommentReactionCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
         const reactionInfo = new DocReactionInfo(data, this.client);
         this.client.emit("reactionAdd", reactionInfo);
     }
 
-    docCommentReactionRemove(data: GatewayEvent_DocCommentReactionDeleted): void {
-        void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+    async docCommentReactionRemove(data: GatewayEvent_DocCommentReactionDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.docId);
         const reactionInfo = new DocReactionInfo(data, this.client);
         this.client.emit("reactionRemove", reactionInfo);
     }
 
-    docCommentCreate(data: GatewayEvent_DocCommentCreated): void {
-        void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+    async docCommentCreate(data: GatewayEvent_DocCommentCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+        else void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.docComment.channelId);
         const comment = channel?.docs.get(data.docComment.docId)?.comments.update(data.docComment) ?? new DocComment(data.docComment, this.client, { guildID: data.serverId });
         this.client.emit("docCommentCreate", comment);
     }
 
-    docCommentUpdate(data: GatewayEvent_DocCommentUpdated): void {
-        void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+    async docCommentUpdate(data: GatewayEvent_DocCommentUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+        else void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.docComment.channelId);
         const cachedComment = channel?.docs.get(data.docComment.docId)?.comments.get(data.docComment.id)?.toJSON() ?? null;
         const comment = channel?.docs.get(data.docComment.docId)?.comments.update(data.docComment) ?? new DocComment(data.docComment, this.client, { guildID: data.serverId });
         this.client.emit("docCommentUpdate", comment, cachedComment);
     }
 
-    docCommentDelete(data: GatewayEvent_DocCommentDeleted): void {
-        void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+    async docCommentDelete(data: GatewayEvent_DocCommentDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
+        else void this.addGuildChannel(data.serverId, data.docComment.channelId, data.docComment.docId);
         const channel = this.client.getChannel<DocChannel>(data.serverId, data.docComment.channelId);
         const comment = channel?.docs.get(data.docComment.docId)?.comments.update(data.docComment) ?? new DocComment(data.docComment, this.client, { guildID: data.serverId });
         this.client.emit("docCommentDelete", comment);

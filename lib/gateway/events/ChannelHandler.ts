@@ -5,21 +5,23 @@ import { AnyChannel } from "../../types/channel";
 
 /** Internal component, emitting channel events. */
 export class ChannelHandler extends GatewayEventHandler{
-    channelCreate(data: GatewayEvent_ServerChannelCreated): void {
-        void this.addGuildChannel(data.serverId, data.channel.id);
+    async channelCreate(data: GatewayEvent_ServerChannelCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.channel.id);
+        else void this.addGuildChannel(data.serverId, data.channel.id);
         const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelCreate", ChannelComponent);
     }
 
-    channelUpdate(data: GatewayEvent_ServerChannelUpdated): void {
-        void this.addGuildChannel(data.serverId, data.channel.id);
+    async channelUpdate(data: GatewayEvent_ServerChannelUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.channel.id);
+        else void this.addGuildChannel(data.serverId, data.channel.id);
         const channel = this.client.getChannel<AnyChannel>(data.serverId, data.channel.id);
         const CachedChannel = channel ? channel.toJSON() : null;
         const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelUpdate", ChannelComponent, CachedChannel);
     }
 
-    channelDelete(data: GatewayEvent_ServerChannelDeleted): void {
+    async channelDelete(data: GatewayEvent_ServerChannelDeleted): Promise<void> {
         const guild = this.client.guilds.get(data.serverId);
         const ChannelComponent = this.client.util.updateChannel(data.channel);
         guild?.channels.delete(data.channel.id);

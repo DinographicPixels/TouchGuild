@@ -28,6 +28,16 @@ export interface ClientOptions {
      */
     connectionMessage?: boolean;
 
+    /**
+     * If true, will wait for caching before emitting the event.
+     *
+     * This will increase the event emit latency, but ensure that you receive the cached items in time.
+     *
+     * By disabling this, you reduce latency between you & Guilded, and won't receive cached items in time.
+     * @default true
+     */
+    waitForCaching?: boolean;
+
     collectionLimits?: {
         messages?: number;
         threads?: number;

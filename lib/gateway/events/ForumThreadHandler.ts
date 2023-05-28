@@ -23,107 +23,121 @@ import { ForumChannel } from "../../structures/ForumChannel";
 
 /** Internal component, emitting forum thread events. */
 export class ForumThreadHandler extends GatewayEventHandler {
-    forumThreadCreate(data: GatewayEvent_ForumTopicCreated): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+    async forumThreadCreate(data: GatewayEvent_ForumTopicCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads?.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
         channel?.threads?.add(Thread);
-        return this.client.emit("forumThreadCreate", Thread);
+        this.client.emit("forumThreadCreate", Thread);
     }
 
-    forumThreadUpdate(data: GatewayEvent_ForumTopicUpdated): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+    async forumThreadUpdate(data: GatewayEvent_ForumTopicUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
         const CachedThread = channel?.threads.get(data.forumTopic.id)?.toJSON() ?? null;
         const Thread = channel?.threads?.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadUpdate", Thread, CachedThread);
+        this.client.emit("forumThreadUpdate", Thread, CachedThread);
     }
 
-    forumThreadDelete(data: GatewayEvent_ForumTopicDeleted): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+    async forumThreadDelete(data: GatewayEvent_ForumTopicDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads?.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
         channel?.threads?.delete(Thread.id);
-        return this.client.emit("forumThreadDelete", Thread);
+        this.client.emit("forumThreadDelete", Thread);
     }
 
-    forumThreadPin(data: GatewayEvent_ForumTopicPinned): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+    async forumThreadPin(data: GatewayEvent_ForumTopicPinned): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadPin", Thread);
+        this.client.emit("forumThreadPin", Thread);
     }
 
-    forumThreadUnpin(data: GatewayEvent_ForumTopicUnpinned): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+    async forumThreadUnpin(data: GatewayEvent_ForumTopicUnpinned): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadUnpin", Thread);
+        this.client.emit("forumThreadUnpin", Thread);
     }
 
-    forumThreadCommentCreate(data: GatewayEvent_ForumTopicCommentCreated): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+    async forumThreadCommentCreate(data: GatewayEvent_ForumTopicCommentCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+        else void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopicComment.channelId);
         const cachedTC = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.update(data.forumTopicComment);
         const ThreadComment = cachedTC ?? new ForumThreadComment(data.forumTopicComment, this.client, { guildID: data.serverId });
         channel?.threads?.get(data.forumTopicComment.forumTopicId)?.comments.add(ThreadComment);
-        return this.client.emit("forumCommentCreate", ThreadComment);
+        this.client.emit("forumCommentCreate", ThreadComment);
     }
 
-    forumThreadCommentUpdate(data: GatewayEvent_ForumTopicCommentUpdated): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+    async forumThreadCommentUpdate(data: GatewayEvent_ForumTopicCommentUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+        else void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopicComment.channelId);
         const CachedComment = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.get(data.forumTopicComment.id)?.toJSON() ?? null;
         const cachedTC = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.update(data.forumTopicComment);
         const ThreadComment = cachedTC ?? new ForumThreadComment(data.forumTopicComment, this.client, { guildID: data.serverId });
-        return this.client.emit("forumCommentUpdate", ThreadComment, CachedComment);
+        this.client.emit("forumCommentUpdate", ThreadComment, CachedComment);
     }
 
-    forumThreadCommentDelete(data: GatewayEvent_ForumTopicCommentDeleted): boolean {
-        void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+    async forumThreadCommentDelete(data: GatewayEvent_ForumTopicCommentDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
+        else void this.addGuildChannel(data.serverId, data.forumTopicComment.channelId, data.forumTopicComment.forumTopicId);
         const channel = this.client.getChannel<ForumChannel>(data.serverId, data.forumTopicComment.channelId);
         const cachedTC = channel?.threads.get(data.forumTopicComment.forumTopicId)?.comments.update(data.forumTopicComment);
         const ThreadComment = cachedTC ?? new ForumThreadComment(data.forumTopicComment, this.client, { guildID: data.serverId });
         channel?.threads?.get(data.forumTopicComment.forumTopicId)?.comments.delete(ThreadComment.id);
-        return this.client.emit("forumCommentDelete", ThreadComment);
+        this.client.emit("forumCommentDelete", ThreadComment);
     }
 
-    forumThreadLock(data: GatewayEvent_ForumTopicLocked): boolean {
-        void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
+    async forumThreadLock(data: GatewayEvent_ForumTopicLocked): Promise<void> {
+        if (this.client.params.waitForCaching) void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.forumTopic.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadLock", Thread);
+        this.client.emit("forumThreadLock", Thread);
     }
 
-    forumThreadUnlock(data: GatewayEvent_ForumTopicUnlocked): boolean {
-        void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
+    async forumThreadUnlock(data: GatewayEvent_ForumTopicUnlocked): Promise<void> {
+        if (this.client.params.waitForCaching) void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
+        else void this.addGuildChannel(data.forumTopic.serverId, data.forumTopic.channelId);
         const channel = this.client.getChannel<ForumChannel>(data.forumTopic.serverId, data.forumTopic.channelId);
         const Thread = channel?.threads.update(data.forumTopic) ?? new ForumThread(data.forumTopic, this.client);
-        return this.client.emit("forumThreadUnlock", Thread);
+        this.client.emit("forumThreadUnlock", Thread);
     }
 
-    forumThreadReactionAdd(data: GatewayEvent_ForumTopicReactionCreated): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async forumThreadReactionAdd(data: GatewayEvent_ForumTopicReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
-        return this.client.emit("reactionAdd", ReactionInfo);
+        this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    forumThreadReactionRemove(data: GatewayEvent_ForumTopicReactionDeleted): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async forumThreadReactionRemove(data: GatewayEvent_ForumTopicReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
-        return this.client.emit("reactionRemove", ReactionInfo);
+        this.client.emit("reactionRemove", ReactionInfo);
     }
 
-    forumThreadCommentReactionAdd(data: GatewayEvent_ForumTopicCommentReactionCreated): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async forumThreadCommentReactionAdd(data: GatewayEvent_ForumTopicCommentReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
-        return this.client.emit("reactionAdd", ReactionInfo);
+        this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    forumThreadCommentReactionRemove(data: GatewayEvent_ForumTopicCommentReactionDeleted): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async forumThreadCommentReactionRemove(data: GatewayEvent_ForumTopicCommentReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new ForumThreadReactionInfo(data, this.client);
-        return this.client.emit("reactionRemove", ReactionInfo);
+        this.client.emit("reactionRemove", ReactionInfo);
     }
 
     private async addGuildChannel(guildID: string, channelID: string, threadID?: number): Promise<void> {

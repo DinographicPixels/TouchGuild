@@ -102,6 +102,7 @@ export class Client extends TypedEmitter<ClientEvents> {
             ForceDisableREST:  params.ForceDisableREST ?? false,
             RESTOptions:       params.RESTOptions,
             connectionMessage: params.connectionMessage ?? true,
+            waitForCaching:    params.waitForCaching ?? true,
             collectionLimits:  {
                 messages:             params.collectionLimits?.messages             ?? 100,
                 threads:              params.collectionLimits?.threads              ?? 100,

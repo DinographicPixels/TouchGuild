@@ -19,73 +19,83 @@ import {
 
 /** Internal component, emitting announcement events. */
 export class AnnouncementHandler extends GatewayEventHandler {
-    announcementCreate(data: GatewayEvent_AnnouncementCreated): boolean {
-        void this.addGuildChannel(data.serverId, data.announcement.channelId);
+    async announcementCreate(data: GatewayEvent_AnnouncementCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcement.channelId);
+        else void this.addGuildChannel(data.serverId, data.announcement.channelId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcement.channelId);
         const AnnouncementComponent = channel?.announcements?.update(data.announcement) ?? new Announcement(data.announcement, this.client);
-        return this.client.emit("announcementCreate", AnnouncementComponent);
+        this.client.emit("announcementCreate", AnnouncementComponent);
     }
 
-    announcementUpdate(data: GatewayEvent_AnnouncementUpdated): boolean {
-        void this.addGuildChannel(data.serverId, data.announcement.channelId);
+    async announcementUpdate(data: GatewayEvent_AnnouncementUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcement.channelId);
+        else void this.addGuildChannel(data.serverId, data.announcement.channelId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcement.channelId);
         const CachedAnnouncement = channel?.announcements.get(data.announcement.id)?.toJSON() ?? null;
         const AnnouncementComponent = channel?.announcements?.update(data.announcement) ?? new Announcement(data.announcement, this.client);
-        return this.client.emit("announcementUpdate", AnnouncementComponent, CachedAnnouncement);
+        this.client.emit("announcementUpdate", AnnouncementComponent, CachedAnnouncement);
     }
 
-    announcementDelete(data: GatewayEvent_AnnouncementDeleted): boolean {
-        void this.addGuildChannel(data.serverId, data.announcement.channelId);
+    async announcementDelete(data: GatewayEvent_AnnouncementDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcement.channelId);
+        else void this.addGuildChannel(data.serverId, data.announcement.channelId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcement.channelId);
         const AnnouncementComponent = channel?.announcements?.update(data.announcement) ?? new Announcement(data.announcement, this.client);
         channel?.announcements.delete(data.announcement.id);
-        return this.client.emit("announcementDelete", AnnouncementComponent);
+        this.client.emit("announcementDelete", AnnouncementComponent);
     }
 
-    announcementCommentCreate(data: GatewayEvent_AnnouncementCommentCreated): boolean {
-        void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+    async announcementCommentCreate(data: GatewayEvent_AnnouncementCommentCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+        else void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcementComment.channelId);
         const comment = channel?.announcements.get(data.announcementComment.announcementId)?.comments.update(data.announcementComment) ?? new AnnouncementComment(data.announcementComment, this.client, { guildID: data.serverId });
-        return this.client.emit("announcementCommentCreate", comment);
+        this.client.emit("announcementCommentCreate", comment);
     }
 
-    announcementCommentUpdate(data: GatewayEvent_AnnouncementCommentUpdated): boolean {
-        void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+    async announcementCommentUpdate(data: GatewayEvent_AnnouncementCommentUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+        else void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcementComment.channelId);
         const cachedComment = channel?.announcements.get(data.announcementComment.announcementId)?.comments.get(data.announcementComment.id)?.toJSON() ?? null;
         const comment = channel?.announcements.get(data.announcementComment.announcementId)?.comments.update(data.announcementComment) ?? new AnnouncementComment(data.announcementComment, this.client, { guildID: data.serverId });
-        return this.client.emit("announcementCommentUpdate", comment, cachedComment);
+        this.client.emit("announcementCommentUpdate", comment, cachedComment);
     }
 
-    announcementCommentDelete(data: GatewayEvent_AnnouncementCommentDeleted): boolean {
-        void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+    async announcementCommentDelete(data: GatewayEvent_AnnouncementCommentDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
+        else void this.addGuildChannel(data.serverId, data.announcementComment.channelId, data.announcementComment.announcementId);
         const channel = this.client.getChannel<AnnouncementChannel>(data.serverId, data.announcementComment.channelId);
         const comment = channel?.announcements.get(data.announcementComment.announcementId)?.comments.update(data.announcementComment) ?? new AnnouncementComment(data.announcementComment, this.client, { guildID: data.serverId });
-        return this.client.emit("announcementCommentDelete", comment);
+        this.client.emit("announcementCommentDelete", comment);
     }
 
-    announcementReactionAdd(data: GatewayEvent_AnnouncementReactionCreated): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+    async announcementReactionAdd(data: GatewayEvent_AnnouncementReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
         const ReactionInfo = new AnnouncementReactionInfo(data, this.client);
-        return this.client.emit("reactionAdd", ReactionInfo);
+        this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    announcementReactionRemove(data: GatewayEvent_AnnouncementReactionDeleted): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+    async announcementReactionRemove(data: GatewayEvent_AnnouncementReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
         const ReactionInfo = new AnnouncementReactionInfo(data, this.client);
-        return this.client.emit("reactionRemove", ReactionInfo);
+        this.client.emit("reactionRemove", ReactionInfo);
     }
 
-    announcementCommentReactionAdd(data: GatewayEvent_AnnouncementCommentReactionCreated): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+    async announcementCommentReactionAdd(data: GatewayEvent_AnnouncementCommentReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
         const ReactionInfo = new AnnouncementReactionInfo(data, this.client);
-        return this.client.emit("reactionAdd", ReactionInfo);
+        this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    announcementCommentReactionRemove(data: GatewayEvent_AnnouncementCommentReactionDeleted): boolean {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+    async announcementCommentReactionRemove(data: GatewayEvent_AnnouncementCommentReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId, data.reaction.announcementId);
         const ReactionInfo = new AnnouncementReactionInfo(data, this.client);
-        return this.client.emit("reactionRemove", ReactionInfo);
+        this.client.emit("reactionRemove", ReactionInfo);
     }
 
     private async addGuildChannel(guildID: string, channelID: string, announcementID?: string): Promise<void> {

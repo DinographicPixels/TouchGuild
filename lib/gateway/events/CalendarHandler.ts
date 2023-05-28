@@ -23,51 +23,58 @@ import { CalendarEventComment } from "../../structures/CalendarEventComment";
 
 /** Internal component, emitting calendar events. */
 export class CalendarHandler extends GatewayEventHandler {
-    calendarEventCreate(data: GatewayEvent_CalendarEventCreated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+    async calendarEventCreate(data: GatewayEvent_CalendarEventCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+        else void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEvent.channelId);
         const CalendarEventComponent = channel?.scheduledEvents.update(data.calendarEvent) ?? new CalendarEvent(data.calendarEvent, this.client);
         this.client.emit("calendarEventCreate", CalendarEventComponent);
     }
 
-    calendarEventUpdate(data: GatewayEvent_CalendarEventUpdated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+    async calendarEventUpdate(data: GatewayEvent_CalendarEventUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+        else void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEvent.channelId);
         const CachedEvent = channel?.scheduledEvents.get(data.calendarEvent.id)?.toJSON() ?? null;
         const CalendarEventComponent = channel?.scheduledEvents.update(data.calendarEvent) ?? new CalendarEvent(data.calendarEvent, this.client);
         this.client.emit("calendarEventUpdate", CalendarEventComponent, CachedEvent);
     }
 
-    calendarEventDelete(data: GatewayEvent_CalendarEventDeleted): void {
-        void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+    async calendarEventDelete(data: GatewayEvent_CalendarEventDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
+        else void this.addGuildChannel(data.serverId, data.calendarEvent.channelId);
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEvent.channelId);
         const CalendarEventComponent = channel?.scheduledEvents.update(data.calendarEvent) ?? new CalendarEvent(data.calendarEvent, this.client);
         channel?.scheduledEvents.delete(data.calendarEvent.id);
         this.client.emit("calendarEventDelete", CalendarEventComponent);
     }
 
-    calendarEventReactionAdd(data: GatewayEvent_CalendarEventReactionCreated): void {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async calendarEventReactionAdd(data: GatewayEvent_CalendarEventReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new CalendarReactionInfo(data, this.client);
         this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    calendarEventReactionRemove(data: GatewayEvent_CalendarEventReactionDeleted): void {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async calendarEventReactionRemove(data: GatewayEvent_CalendarEventReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new CalendarReactionInfo(data, this.client);
         this.client.emit("reactionRemove", ReactionInfo);
     }
 
-    calendarCommentCreate(data: GatewayEvent_CalendarEventCommentCreated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+    async calendarCommentCreate(data: GatewayEvent_CalendarEventCommentCreated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+        else void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
         const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CalendarComment = CalendarEventComponent?.comments.update(data.calendarEventComment) ?? new CalendarEventComment(data.calendarEventComment, this.client, { guildID: data.serverId });
         this.client.emit("calendarCommentCreate", CalendarComment);
     }
 
-    calendarCommentUpdate(data: GatewayEvent_CalendarEventCommentUpdated): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+    async calendarCommentUpdate(data: GatewayEvent_CalendarEventCommentUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+        else void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
         const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CachedComment = CalendarEventComponent?.comments.get(data.calendarEventComment.id)?.toJSON() ?? null;
@@ -75,8 +82,9 @@ export class CalendarHandler extends GatewayEventHandler {
         this.client.emit("calendarCommentUpdate", CalendarComment, CachedComment);
     }
 
-    calendarCommentDelete(data: GatewayEvent_CalendarEventCommentDeleted): void {
-        void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+    async calendarCommentDelete(data: GatewayEvent_CalendarEventCommentDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
+        else void this.addGuildChannel(data.serverId, data.calendarEventComment.channelId, Number(data.calendarEventComment.calendarEventId));
         const channel = this.client.getChannel<CalendarChannel>(data.serverId, data.calendarEventComment.channelId);
         const CalendarEventComponent = channel?.scheduledEvents.get(Number(data.calendarEventComment.calendarEventId));
         const CalendarComment = CalendarEventComponent?.comments.update(data.calendarEventComment) ?? new CalendarEventComment(data.calendarEventComment, this.client, { guildID: data.serverId });
@@ -84,20 +92,23 @@ export class CalendarHandler extends GatewayEventHandler {
         this.client.emit("calendarCommentDelete", CalendarComment);
     }
 
-    calendarCommentReactionAdd(data: GatewayEvent_CalendarEventCommentReactionCreated): void {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async calendarCommentReactionAdd(data: GatewayEvent_CalendarEventCommentReactionCreated): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new CalendarReactionInfo(data, this.client);
         this.client.emit("reactionAdd", ReactionInfo);
     }
 
-    calendarCommentReactionRemove(data: GatewayEvent_CalendarEventCommentReactionDeleted): void {
-        if (data.serverId) void this.addGuildChannel(data.serverId, data.reaction.channelId);
+    async calendarCommentReactionRemove(data: GatewayEvent_CalendarEventCommentReactionDeleted): Promise<void> {
+        if (data.serverId) if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.reaction.channelId);
+        else void this.addGuildChannel(data.serverId, data.reaction.channelId);
         const ReactionInfo = new CalendarReactionInfo(data, this.client);
         this.client.emit("reactionRemove", ReactionInfo);
     }
 
-    calendarRsvpUpdate(data: GatewayEvent_CalendarEventRsvpUpdated): void {
-        void this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
+    async calendarRsvpUpdate(data: GatewayEvent_CalendarEventRsvpUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
+        else void this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
         const channel = this.client.getChannel<CalendarChannel>(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId);
         const CachedRSVP = channel?.scheduledEvents.get(data.calendarEventRsvp.calendarEventId)?.rsvps.get(data.calendarEventRsvp.calendarEventId)?.toJSON() ?? null;
         const updateFromCache = channel?.scheduledEvents.get(data.calendarEventRsvp.calendarEventId)?.rsvps.update(data.calendarEventRsvp);
@@ -105,8 +116,9 @@ export class CalendarHandler extends GatewayEventHandler {
         this.client.emit("calendarEventRsvpUpdate", CalendarERSVPComponent, CachedRSVP);
     }
 
-    calendarRsvpBulkUpdate(data: GatewayEvent_CalendarEventRsvpManyUpdated): void {
-        void this.addGuildChannel(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId, data.calendarEventRsvps[0].calendarEventId);
+    async calendarRsvpBulkUpdate(data: GatewayEvent_CalendarEventRsvpManyUpdated): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId, data.calendarEventRsvps[0].calendarEventId);
+        else void this.addGuildChannel(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId, data.calendarEventRsvps[0].calendarEventId);
         const channel = this.client.getChannel<CalendarChannel>(data.calendarEventRsvps[0].serverId, data.calendarEventRsvps[0].channelId);
         const CachedRSVPS = data.calendarEventRsvps.map(rsvp => channel?.scheduledEvents.get(rsvp.calendarEventId)?.rsvps.get(rsvp.calendarEventId)?.toJSON() ?? null);
         const updateFromCache = data.calendarEventRsvps.map(rsvp => channel?.scheduledEvents.get(rsvp.calendarEventId)?.rsvps.update(rsvp) ?? new CalendarEventRSVP(rsvp, this.client));
@@ -114,15 +126,16 @@ export class CalendarHandler extends GatewayEventHandler {
         this.client.emit("calendarEventRsvpBulkUpdate", CalendarRSVPMap, CachedRSVPS);
     }
 
-    calendarRsvpDelete(data: GatewayEvent_CalendarEventRsvpDeleted): void {
-        void this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
+    async calendarRsvpDelete(data: GatewayEvent_CalendarEventRsvpDeleted): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
+        else void this.addGuildChannel(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId, data.calendarEventRsvp.calendarEventId);
         const channel = this.client.getChannel<CalendarChannel>(data.calendarEventRsvp.serverId, data.calendarEventRsvp.channelId);
         const updateFromCache = channel?.scheduledEvents.get(data.calendarEventRsvp.calendarEventId)?.rsvps.update(data.calendarEventRsvp);
         const CalendarERSVPComponent = updateFromCache ?? new CalendarEventRSVP(data.calendarEventRsvp, this.client);
         this.client.emit("calendarEventRsvpDelete", CalendarERSVPComponent);
     }
 
-    calendarRsvpManyUpdated(): void {
+    async calendarRsvpManyUpdated(): Promise<void> {
         return; // TouchGuild doesn't support many updated.
     }
 
