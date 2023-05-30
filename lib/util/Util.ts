@@ -8,12 +8,14 @@ import { ForumThread } from "../structures/ForumThread";
 import { ForumChannel } from "../structures/ForumChannel";
 import { Guild } from "../structures/Guild";
 import { User } from "../structures/User";
+import { GuildRole } from "../structures/GuildRole";
 import {
     APIForumTopic,
     APIForumTopicSummary,
     APIGuild,
     APIGuildChannel,
     APIGuildMember,
+    APIGuildRole,
     APIUser
 } from "guildedapi-types.ts/v1";
 
@@ -57,6 +59,17 @@ export class Util {
             return this.#client.guilds.has(data.id) ? this.#client.guilds.update(data) : this.#client.guilds.add(new Guild(data, this.#client));
         }
         return new Guild(data, this.#client);
+    }
+
+    updateRole(data: APIGuildRole): GuildRole {
+        if (data.serverId) {
+            const guild = this.#client.guilds.get(data.serverId);
+            if (guild) {
+                const role = guild.roles.has(data.id) ? guild.roles.update(data as APIGuildRole) : guild.roles.add(new GuildRole(data, this.#client));
+                return role;
+            }
+        }
+        return new GuildRole(data, this.#client);
     }
 
     updateChannel<T extends AnyChannel>(data: APIGuildChannel): T {

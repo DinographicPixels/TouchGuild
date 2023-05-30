@@ -7,7 +7,14 @@ import { User } from "./User";
 import { BannedMember } from "./BannedMember";
 import { GuildChannel } from "./GuildChannel";
 import { GuildGroup } from "./GuildGroup";
-import { APIGuild, APIGuildChannel, APIGuildGroup, APIGuildMember } from "../Constants";
+import { GuildRole } from "./GuildRole";
+import {
+    APIGuild,
+    APIGuildChannel,
+    APIGuildGroup,
+    APIGuildMember,
+    APIGuildRole
+} from "../Constants";
 import TypedCollection from "../util/TypedCollection";
 import { JSONGuild } from "../types/json";
 import { AnyChannel } from "../types/channel";
@@ -43,6 +50,8 @@ export class Guild extends Base<string> {
     channels: TypedCollection<string, APIGuildChannel, AnyChannel>;
     /** Cached guild members. */
     members: TypedCollection<string, APIGuildMember, Member, [guildID: string]>;
+    /** Cached guild roles. */
+    roles: TypedCollection<number, APIGuildRole, GuildRole>;
 
     /**
      * @param data raw data.
@@ -64,6 +73,7 @@ export class Guild extends Base<string> {
         this.groups = new TypedCollection(GuildGroup, client);
         this.channels = new TypedCollection(GuildChannel, client);
         this.members = new TypedCollection(Member, client);
+        this.roles = new TypedCollection(GuildRole, client);
         this.update(data);
     }
 

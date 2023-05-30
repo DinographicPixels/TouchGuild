@@ -204,7 +204,7 @@ export class GatewayHandler {
     async handleMessage(eventType: keyof GATEWAY_EVENTS, eventData: object): Promise<void> {
         if (eventType as keyof GATEWAY_EVENTS){
             const serverId = "serverId" as keyof object;
-            if (eventData[serverId] && this.client.guilds.get(eventData[serverId]) === undefined) {
+            if (eventData[serverId] && this.client.guilds.has(eventData[serverId]) === false) {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 this.client.guilds.add(await this.client.rest.guilds.getGuild(eventData[serverId]));
             }

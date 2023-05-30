@@ -369,7 +369,7 @@ export class Guilds {
         return this.#manager.authRequest<GETGuildRolesResponse>({
             method: "GET",
             path:   endpoints.GUILD_ROLES(guildID)
-        }).then(data => data.roles.map(role => new GuildRole(role, this.#manager.client)));
+        }).then(data => data.roles.map(role => this.#manager.client.util.updateRole(role)));
     }
 
     /**
@@ -381,6 +381,6 @@ export class Guilds {
         return this.#manager.authRequest<GETGuildRoleResponse>({
             method: "GET",
             path:   endpoints.GUILD_ROLE(guildID, roleID)
-        }).then(data => new GuildRole(data.role, this.#manager.client));
+        }).then(data => this.#manager.client.util.updateRole(data.role));
     }
 }
