@@ -9,11 +9,13 @@ import { ForumChannel } from "../structures/ForumChannel";
 import { Guild } from "../structures/Guild";
 import { User } from "../structures/User";
 import { GuildRole } from "../structures/GuildRole";
+import { GuildGroup } from "../structures/GuildGroup";
 import {
     APIForumTopic,
     APIForumTopicSummary,
     APIGuild,
     APIGuildChannel,
+    APIGuildGroup,
     APIGuildMember,
     APIGuildRole,
     APIUser
@@ -70,6 +72,17 @@ export class Util {
             }
         }
         return new GuildRole(data, this.#client);
+    }
+
+    updateGuildGroup(data: APIGuildGroup): GuildGroup {
+        if (data.serverId) {
+            const guild = this.#client.guilds.get(data.serverId);
+            if (guild) {
+                const group = guild.groups.has(data.id) ? guild.groups.update(data as APIGuildGroup) : guild.groups.add(new GuildGroup(data, this.#client));
+                return group;
+            }
+        }
+        return new GuildGroup(data, this.#client);
     }
 
     updateChannel<T extends AnyChannel>(data: APIGuildChannel): T {

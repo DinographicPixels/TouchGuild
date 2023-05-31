@@ -26,13 +26,20 @@ import {
     GETGuildBanResponse,
     GETGuildBansResponse,
     GETGuildRoleResponse,
-    GETGuildRolesResponse
+    GETGuildRolesResponse,
+    GETGuildGroupsResponse,
+    GETGuildGroupResponse,
+    POSTGuildGroupBody,
+    POSTGuildGroupResponse,
+    PATCHGuildGroupBody,
+    PATCHGuildGroupResponse
 } from "../Constants";
 import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
 import { EditMemberOptions } from "../types/guilds";
 import { BannedMember } from "../structures/BannedMember";
 import { GuildRole } from "../structures/GuildRole";
+import { GuildGroup } from "../structures/GuildGroup";
 
 export class Guilds {
     #manager: RESTManager;
@@ -383,4 +390,58 @@ export class Guilds {
             path:   endpoints.GUILD_ROLE(guildID, roleID)
         }).then(data => this.#manager.client.util.updateRole(data.role));
     }
+
+    async getGroups(guildID: string): Promise<Array<GuildGroup>> {
+        return this.#manager.authRequest<GETGuildGroupsResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_GROUPS(guildID)
+        }).then(data => data.groups.map(group => this.#manager.client.util.updateGuildGroup(group)));
+    }
+
+    async getGroup(guildID: string, groupID: string): Promise<GuildGroup> {
+        return this.#manager.authRequest<GETGuildGroupResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_GROUP(guildID, groupID)
+        }).then(data => this.#manager.client.util.updateGuildGroup(data.group));
+    }
+
+    /**
+     * Create a guild group.
+     * @param guildID The ID of the guild to create a group in.
+     * @param options Create options
+     */
+    async createGroup(guildID: string, options: POSTGuildGroupBody): Promise<GuildGroup> {
+        return this.#manager.authRequest<POSTGuildGroupResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_GROUPS(guildID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateGuildGroup(data.group));
+    }
+
+    /**
+     * Edit a guild group.
+     * @param guildID The ID of the guild where the group to edit is in
+     * @param groupID The ID of the group to edit.
+     * @param options Edit options
+     */
+    async editGroup(guildID: string, groupID: string, options: PATCHGuildGroupBody): Promise<GuildGroup> {
+        return this.#manager.authRequest<PATCHGuildGroupResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_GROUP(guildID, groupID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateGuildGroup(data.group));
+    }
+
+    /**
+     * Delete a guild group
+     * @param guildID ID of the guild where the group is in.
+     * @param groupID ID of the group to delete.
+     */
+    async deleteGroup(guildID: string, groupID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.GUILD_GROUP(guildID, groupID)
+        });
+    }
+
 }

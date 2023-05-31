@@ -24,6 +24,7 @@ import { DocComment } from "./DocComment";
 import { AnnouncementComment } from "./AnnouncementComment";
 import { Announcement } from "./Announcement";
 import { GuildRole } from "./GuildRole";
+import { GuildGroup } from "./GuildGroup";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -49,7 +50,9 @@ import {
     POSTChannelAnnouncementBody,
     ChannelReactionTypeBulkDeleteSupported,
     DELETEMessageReactionQuery,
-    PUTUserStatusBody
+    PUTUserStatusBody,
+    POSTGuildGroupBody,
+    PATCHGuildGroupBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -1097,5 +1100,33 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteUserStatus(userID: string | "@me"): Promise<void> {
         return this.rest.misc.deleteUserStatus(userID);
+    }
+
+    /**
+     * Create a guild group.
+     * @param guildID The ID of the guild to create a group in.
+     * @param options Create options
+     */
+    async createGuildGroup(guildID: string, options: POSTGuildGroupBody): Promise<GuildGroup> {
+        return this.rest.guilds.createGroup(guildID, options);
+    }
+
+    /**
+     * Edit a guild group.
+     * @param guildID The ID of the guild where the group to edit is in
+     * @param groupID The ID of the group to edit.
+     * @param options Edit options
+     */
+    async editGuildGroup(guildID: string, groupID: string, options: PATCHGuildGroupBody): Promise<GuildGroup> {
+        return this.rest.guilds.editGroup(guildID, groupID, options);
+    }
+
+    /**
+     * Delete a guild group
+     * @param guildID ID of the guild where the group is in.
+     * @param groupID ID of the group to delete.
+     */
+    async deleteGuildGroup(guildID: string, groupID: string): Promise<void> {
+        return this.rest.guilds.deleteGroup(guildID, groupID);
     }
 }
