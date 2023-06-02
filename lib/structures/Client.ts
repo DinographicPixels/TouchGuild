@@ -52,7 +52,9 @@ import {
     DELETEMessageReactionQuery,
     PUTUserStatusBody,
     POSTGuildGroupBody,
-    PATCHGuildGroupBody
+    PATCHGuildGroupBody,
+    POSTGuildRoleBody,
+    PATCHGuildRoleBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -1086,6 +1088,34 @@ export class Client extends TypedEmitter<ClientEvents> {
     }
 
     /**
+     * Create a guild role.
+     * @param guildID ID of the server you want to create the role in.
+     * @param options Create options
+     */
+    async createGuildRole(guildID: string, options: POSTGuildRoleBody): Promise<GuildRole> {
+        return this.rest.guilds.createRole(guildID, options);
+    }
+
+    /**
+     * Edit a guild role.
+     * @param guildID ID of the server
+     * @param roleID ID of the role to edit
+     * @param options Edit options
+     */
+    async editGuildRole(guildID: string, roleID: number, options: PATCHGuildRoleBody): Promise<GuildRole> {
+        return this.rest.guilds.editRole(guildID, roleID, options);
+    }
+
+    /**
+     * Delete a guild role.
+     * @param guildID ID of the guild where the role to delete is in
+     * @param roleID ID of the role to delete
+     */
+    async deleteGuildRole(guildID: string, roleID: number): Promise<void> {
+        return this.rest.guilds.deleteRole(guildID, roleID);
+    }
+
+    /**
      * Change a user's status, this includes the bot's one.
      * @param userID User ID (@me can be used).
      * @param options Status options
@@ -1100,6 +1130,23 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteUserStatus(userID: string | "@me"): Promise<void> {
         return this.rest.misc.deleteUserStatus(userID);
+    }
+
+    /**
+     * Get guild groups.
+     * @param guildID ID of the guild.
+     */
+    async getGuildGroups(guildID: string): Promise<Array<GuildGroup>> {
+        return this.rest.guilds.getGroups(guildID);
+    }
+
+    /**
+     * Get a guild group.
+     * @param guildID ID of the guild.
+     * @param groupID ID of the group to get.
+     */
+    async getGuildGroup(guildID: string, groupID: string): Promise<GuildGroup> {
+        return this.rest.guilds.getGroup(guildID, groupID);
     }
 
     /**

@@ -91,7 +91,10 @@ import type {
     GatewayEvent_GroupUpdated,
     GatewayEvent_GroupCreated,
     GatewayEvent_UserStatusCreated,
-    GatewayEvent_UserStatusDeleted
+    GatewayEvent_UserStatusDeleted,
+    GatewayEvent_RoleCreated,
+    GatewayEvent_RoleUpdated,
+    GatewayEvent_RoleDeleted
 } from "../Constants";
 
 /** Gateway handler filters every ws events. */
@@ -151,6 +154,10 @@ export class GatewayHandler {
         GroupCreated:                        data => this.guildHandler.guildGroupCreate(data as GatewayEvent_GroupCreated),
         GroupUpdated:                        data => this.guildHandler.guildGroupUpdate(data as GatewayEvent_GroupUpdated),
         GroupDeleted:                        data => this.guildHandler.guildGroupDelete(data as GatewayEvent_GroupDeleted),
+        // Guild roles
+        RoleCreated:                         data => this.guildHandler.guildRoleCreate(data as GatewayEvent_RoleCreated),
+        RoleUpdated:                         data => this.guildHandler.guildRoleUpdate(data as GatewayEvent_RoleUpdated),
+        RoleDeleted:                         data => this.guildHandler.guildRoleDelete(data as GatewayEvent_RoleDeleted),
         // Webhooks
         ServerWebhookCreated:                data => this.webhookHandler.webhooksCreate(data as GatewayEvent_ServerWebhookCreated),
         ServerWebhookUpdated:                data => this.webhookHandler.webhooksUpdate(data as GatewayEvent_ServerWebhookUpdated),

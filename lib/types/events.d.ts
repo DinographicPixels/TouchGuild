@@ -24,6 +24,7 @@ import {
     JSONForumThreadComment,
     JSONGuildChannel,
     JSONGuildGroup,
+    JSONGuildRole,
     JSONMessage,
     JSONTextChannel
 } from "./json";
@@ -50,6 +51,7 @@ import { DocComment } from "../structures/DocComment";
 import { Announcement } from "../structures/Announcement";
 import type { AnnouncementComment } from "../structures/AnnouncementComment";
 import { GuildGroup } from "../structures/GuildGroup";
+import { GuildRole } from "../structures/GuildRole";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 /** Every client events. */
@@ -123,6 +125,12 @@ export interface ClientEvents {
     guildGroupUpdate: [guildGroup: GuildGroup, oldGuildGroup: JSONGuildGroup | null];
     /** @event Emitted when a guild group is deleted. */
     guildGroupDelete: [guildGroup: GuildGroup];
+    /** @event Emitted when a guild role is created. */
+    guildRoleCreate: [role: GuildRole];
+    /** @event Emitted when a guild role is updated. */
+    guildRoleUpdate: [role: GuildRole, oldRole: JSONGuildRole | null];
+    /** @event Emitted when a guild role is deleted. */
+    guildRoleDelete: [role: GuildRole];
     /** @event Emitted when a doc is created. */
     docCreate: [Doc: Doc];
     /** @event Emitted when a doc is edited. */

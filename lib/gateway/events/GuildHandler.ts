@@ -1,7 +1,7 @@
 /** @module GuildHandler */
 import { GatewayEventHandler } from "./GatewayEventHandler";
 
-import { BannedMember, Guild, Member } from "../../index";
+import { BannedMember, Guild, GuildRole, Member } from "../../index";
 
 import { GuildCreateInfo, GuildDeleteInfo } from "../../types/types";
 import {
@@ -10,6 +10,9 @@ import {
     GatewayEvent_GroupCreated,
     GatewayEvent_GroupDeleted,
     GatewayEvent_GroupUpdated,
+    GatewayEvent_RoleCreated,
+    GatewayEvent_RoleDeleted,
+    GatewayEvent_RoleUpdated,
     GatewayEvent_ServerMemberBanned,
     GatewayEvent_ServerMemberJoined,
     GatewayEvent_ServerMemberRemoved,
@@ -105,5 +108,25 @@ export class GuildHandler extends GatewayEventHandler {
         const guild = this.client.guilds.get(data.serverId);
         const GuildGroupComponent = guild?.groups.update(new GuildGroup(data.group, this.client)) ?? new GuildGroup(data.group, this.client);
         this.client.emit("guildGroupDelete", GuildGroupComponent);
+    }
+
+    guildRoleCreate(data: GatewayEvent_RoleCreated): void {
+        const guild = this.client.guilds.get(data.serverId);
+        const role = guild?.roles.add(new GuildRole(data.role, this.client)) ?? new GuildRole(data.role, this.client);
+        this.client.emit("guildRoleCreate", role);
+    }
+
+    guildRoleUpdate(data: GatewayEvent_RoleUpdated): void {
+        const guild = this.client.guilds.get(data.serverId);
+        const cachedRole = guild?.roles.get(data.role.id)?.toJSON() ?? null;
+        const role = guild?.roles.update(new GuildRole(data.role, this.client)) ?? new GuildRole(data.role, this.client);
+        this.client.emit("guildRoleUpdate", role, cachedRole);
+    }
+
+    guildRoleDelete(data: GatewayEvent_RoleDeleted): void {
+        const guild = this.client.guilds.get(data.serverId);
+        const role = guild?.roles.update(new GuildRole(data.role, this.client)) ?? new GuildRole(data.role, this.client);
+        guild?.roles.delete(data.role.id);
+        this.client.emit("guildRoleCreate", role);
     }
 }

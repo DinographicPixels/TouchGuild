@@ -32,7 +32,10 @@ import {
     POSTGuildGroupBody,
     POSTGuildGroupResponse,
     PATCHGuildGroupBody,
-    PATCHGuildGroupResponse
+    PATCHGuildGroupResponse,
+    POSTGuildRoleBody,
+    POSTGuildRoleResponse,
+    PATCHGuildRoleBody
 } from "../Constants";
 import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
@@ -391,6 +394,49 @@ export class Guilds {
         }).then(data => this.#manager.client.util.updateRole(data.role));
     }
 
+    /**
+     * Create a guild role.
+     * @param guildID ID of the server you want to create the role in.
+     * @param options Create options
+     */
+    async createRole(guildID: string, options: POSTGuildRoleBody): Promise<GuildRole> {
+        return this.#manager.authRequest<POSTGuildRoleResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_ROLES(guildID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateRole(data.role));
+    }
+
+    /**
+     * Edit a guild role.
+     * @param guildID ID of the server
+     * @param roleID ID of the role to edit
+     * @param options Edit options
+     */
+    async editRole(guildID: string, roleID: number, options: PATCHGuildRoleBody): Promise<GuildRole> {
+        return this.#manager.authRequest<POSTGuildRoleResponse>({
+            method: "PATCH",
+            path:   endpoints.GUILD_ROLE(guildID, roleID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateRole(data.role));
+    }
+
+    /**
+     * Delete a guild role.
+     * @param guildID ID of the guild where the role to delete is in
+     * @param roleID ID of the role to delete
+     */
+    async deleteRole(guildID: string, roleID: number): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.GUILD_ROLE(guildID, roleID)
+        });
+    }
+
+    /**
+     * Get guild groups.
+     * @param guildID ID of the guild.
+     */
     async getGroups(guildID: string): Promise<Array<GuildGroup>> {
         return this.#manager.authRequest<GETGuildGroupsResponse>({
             method: "GET",
@@ -398,6 +444,11 @@ export class Guilds {
         }).then(data => data.groups.map(group => this.#manager.client.util.updateGuildGroup(group)));
     }
 
+    /**
+     * Get a guild group.
+     * @param guildID ID of the guild.
+     * @param groupID ID of the group to get.
+     */
     async getGroup(guildID: string, groupID: string): Promise<GuildGroup> {
         return this.#manager.authRequest<GETGuildGroupResponse>({
             method: "GET",
