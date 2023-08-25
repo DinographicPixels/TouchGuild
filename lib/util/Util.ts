@@ -18,8 +18,10 @@ import {
     APIGuildGroup,
     APIGuildMember,
     APIGuildRole,
+    APIGuildSubscription,
     APIUser
 } from "guildedapi-types.ts/v1";
+import { GuildSubscription } from "../structures/GuildSubscription";
 
 export class Util {
     #client: Client;
@@ -94,6 +96,10 @@ export class Util {
             }
         }
         return Channel.from<T>(data, this.#client);
+    }
+
+    updateGuildSubscription(data: APIGuildSubscription): GuildSubscription {
+        return new GuildSubscription(data, this.#client);
     }
 }
 

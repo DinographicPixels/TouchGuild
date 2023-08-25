@@ -1066,4 +1066,52 @@ export class Channels {
             path:   endpoints.CHANNEL_ANNOUNCEMENT_COMMENT(channelID, announcementID, commentID)
         }).then(data => new AnnouncementComment(data.announcementComment, this.#manager.client));
     }
+
+    /**
+     * Archive a channel.
+     * @param guildID ID of the guild where the channel to archive is in
+     * @param channelID ID of the channel to archive
+     */
+    async archiveChannel(channelID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "PUT",
+            path:   endpoints.CHANNEL_ARCHIVE(channelID)
+        });
+    }
+
+    /**
+     * Restore a channel.
+     * @param guildID ID of the guild where the channel to restore is in
+     * @param channelID ID of the channel to restore
+     */
+    async restoreChannel(channelID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_ARCHIVE(channelID)
+        });
+    }
+
+    /**
+     * Pin a message.
+     * @param channelID ID of the channel where the message to pin is in
+     * @param messageID ID of the message to pin
+     */
+    async pinMessage(channelID: string, messageID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "POST",
+            path:   endpoints.CHANNEL_MESSAGE_PIN(channelID, messageID)
+        });
+    }
+
+    /**
+     * Unpin a message.
+     * @param channelID ID of the channel where the message to unpin is in
+     * @param messageID ID of the message to unpin
+     */
+    async unpinMessage(channelID: string, messageID: string): Promise<void> {
+        return this.#manager.authRequest<void>({
+            method: "DELETE",
+            path:   endpoints.CHANNEL_MESSAGE_PIN(channelID, messageID)
+        });
+    }
 }

@@ -35,7 +35,12 @@ import {
     PATCHGuildGroupResponse,
     POSTGuildRoleBody,
     POSTGuildRoleResponse,
-    PATCHGuildRoleBody
+    PATCHGuildRoleBody,
+    GETGuildSubscriptionsResponse,
+    GETGuildSubscriptionResponse,
+    GETGuildMemberPermissionResponse,
+    Permissions,
+    PATCHGuildRoleUpdateResponse
 } from "../Constants";
 import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
@@ -43,6 +48,7 @@ import { EditMemberOptions } from "../types/guilds";
 import { BannedMember } from "../structures/BannedMember";
 import { GuildRole } from "../structures/GuildRole";
 import { GuildGroup } from "../structures/GuildGroup";
+import { GuildSubscription } from "../structures/GuildSubscription";
 
 export class Guilds {
     #manager: RESTManager;
@@ -495,4 +501,53 @@ export class Guilds {
         });
     }
 
+
+    /**
+     * Get guild subscriptions.
+     * @param guildID ID of the guild.
+     */
+    async getSubscriptions(guildID: string): Promise<Array<GuildSubscription>> {
+        return this.#manager.authRequest<GETGuildSubscriptionsResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_SUBSCRIPTIONS(guildID)
+        }).then(data => data.serverSubscriptionTiers.map(tiers => this.#manager.client.util.updateGuildSubscription(tiers)));
+    }
+
+    /**
+     * Get guild subscriptions.
+     * @param guildID ID of the guild.
+     * @param subscriptionID ID of the subscription to get.
+     */
+    async getSubscription(guildID: string, subscriptionID: string): Promise<GuildSubscription> {
+        return this.#manager.authRequest<GETGuildSubscriptionResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_SUBSCRIPTION(guildID, subscriptionID)
+        }).then(data => this.#manager.client.util.updateGuildSubscription(data.serverSubscriptionTier));
+    }
+
+    /**
+     * Get guild member permissions.
+     * @param guildID ID of the guild.
+     * @param memberID ID of the member.
+     */
+    async getMemberPermission(guildID: string, memberID: string): Promise<Array<Permissions>> {
+        return this.#manager.authRequest<GETGuildMemberPermissionResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_MEMBER_PERMISSION(guildID, memberID)
+        }).then(data => data.permissions);
+    }
+
+    /**
+     * Edit Role Permission.
+     * @param guildID ID of the guild.
+     * @param roleID ID of the role.
+     * @param options Permissions to edit.
+     */
+    async updateRolePermission(guildID: string, roleID: number, options: PATCHGuildRoleBody): Promise<GuildRole> {
+        return this.#manager.authRequest<PATCHGuildRoleUpdateResponse>({
+            method: "PATCH",
+            path:   endpoints.GUILD_ROLE_UPDATE_PERMISSION(guildID, roleID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateRole(data.role));
+    }
 }

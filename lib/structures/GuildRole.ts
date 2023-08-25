@@ -31,6 +31,8 @@ export class GuildRole extends Base<number> {
     position: number;
     /** The default role users are given when joining the server. Base roles are tied directly to the server and cannot be created or deleted */
     isBase: boolean;
+    /** The bot user ID this role has been defined for. Roles with this populated can only be deleted by kicking the bot */
+    botUserID: string | null;
     constructor(data: APIGuildRole, client: Client) {
         super(data.id, client);
         this.guildID = data.serverId;
@@ -45,6 +47,7 @@ export class GuildRole extends Base<number> {
         this.iconURL = data.icon ?? null;
         this.position = data.position;
         this.isBase = data.isBase ?? false;
+        this.botUserID = data.botUserId ?? null;
         this.update(data);
     }
 
@@ -62,7 +65,8 @@ export class GuildRole extends Base<number> {
             colors:                this.colors,
             iconURL:               this.iconURL,
             position:              this.position,
-            isBase:                this.isBase
+            isBase:                this.isBase,
+            botUserID:             this.botUserID,
         };
     }
 

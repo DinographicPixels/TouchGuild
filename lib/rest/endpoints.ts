@@ -5,6 +5,7 @@
 
 export const CHANNELS = () => `/channels`;
 export const CHANNEL = (channelID: string) => `/channels/${channelID}`;
+export const CHANNEL_ARCHIVE = (channelID: string) => `/channels/${channelID}/archive`;
 
 export const GUILD = (guildID: string) => `/servers/${guildID}`;
 export const USER = (userID: string) => `/users/${userID}`;
@@ -13,6 +14,7 @@ export const USER_STATUS = (userID: string) => `/users/${userID}/status`;
 
 export const CHANNEL_MESSAGES = (channelID: string) => `/channels/${channelID}/messages`;
 export const CHANNEL_MESSAGE = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}`;
+export const CHANNEL_MESSAGE_PIN = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}/pin`;
 export const CHANNEL_MESSAGE_EMOTES = (channelID: string, messageID: string) => `/channels/${channelID}/messages/${messageID}/emotes`;
 export const CHANNEL_MESSAGE_EMOTE = (channelID: string, messageID: string, emoteID: number) => `/channels/${channelID}/messages/${messageID}/emotes/${emoteID}`;
 export const CHANNEL_ANNOUNCEMENTS = (channelID: string) => `/channels/${channelID}/announcements`;
@@ -27,6 +29,7 @@ export const CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE = (channelID: string, announceme
 export const MEMBER_NICKNAME = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/nickname`;
 
 export const GUILD_MEMBER = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}`;
+export const GUILD_MEMBER_PERMISSION = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/permissions`;
 export const GUILD_MEMBER_XP = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/xp`;
 export const GUILD_MEMBERS = (guildID: string) => `/servers/${guildID}/members`;
 export const GUILD_MEMBER_SOCIALS = (guildID: string, memberID: string, type: string) => `/servers/${guildID}/members/${memberID}/social-links/${type}`;
@@ -37,11 +40,15 @@ export const GUILD_GROUP_MEMBER = (groupID: string, memberID: string) => `/group
 export const GUILD_GROUP_MEMBERS = (groupID: string) => `/groups/${groupID}/members/`;
 export const GUILD_GROUP_ALTERNATIVE = (groupID: string) => `/groups/${groupID}`;
 
+export const GUILD_SUBSCRIPTIONS = (guildID: string) => `/servers/${guildID}/subscriptions/tiers`;
+export const GUILD_SUBSCRIPTION = (guildID: string, subscriptionID: string) => `/servers/${guildID}/subscriptions/tiers/${subscriptionID}`;
+
 export const GUILD_BAN = (guildID: string, memberID: string) => `/servers/${guildID}/bans/${memberID}`;
 export const GUILD_BANS = (guildID: string) => `/servers/${guildID}/bans`;
 
 export const GUILD_ROLES = (guildID: string) => `/servers/${guildID}/roles`;
 export const GUILD_ROLE = (guildID: string, roleID: number) => `/servers/${guildID}/roles/${roleID}`;
+export const GUILD_ROLE_UPDATE_PERMISSION = (guildID: string, roleID: number) => `/servers/${guildID}/roles/${roleID}/permissions`;
 export const GUILD_MEMBER_ROLE = (guildID: string, memberID: string, roleID: number) => `/servers/${guildID}/members/${memberID}/roles/${roleID}`;
 export const GUILD_MEMBER_ROLE_XP = (guildID: string, roleID: number) => `/servers/${guildID}/roles/${roleID}/xp`;
 export const GUILD_MEMBER_ROLES = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/roles`;
