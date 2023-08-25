@@ -5,6 +5,7 @@ import { Channel } from "./Channel";
 import { Member } from "./Member";
 import { User } from "./User";
 import { BannedMember } from "./BannedMember";
+import { GuildSubscription } from "./GuildSubscription";
 import { GuildChannel } from "./GuildChannel";
 import { GuildGroup } from "./GuildGroup";
 import { GuildRole } from "./GuildRole";
@@ -169,5 +170,17 @@ export class Guild extends Base<string> {
      */
     async removeBan(memberID: string): Promise<void> {
         return this.client.rest.guilds.removeBan(this.id as string, memberID);
+    }
+
+    /** Get Subscription
+     * @param subscriptionID ID of the subscription to get.
+     */
+    async getSubscription(subscriptionID: string): Promise<GuildSubscription> {
+        return this.client.rest.guilds.getSubscription(this.id as string, subscriptionID);
+    }
+
+    /** Get Subscriptions */
+    async getSubscriptions(): Promise<Array<GuildSubscription>> {
+        return this.client.rest.guilds.getSubscriptions(this.id as string);
     }
 }

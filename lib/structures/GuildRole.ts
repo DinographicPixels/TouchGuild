@@ -3,7 +3,7 @@
 import { Base } from "./Base";
 import { Client } from "./Client";
 import { JSONGuildRole } from "../types/json";
-import { APIGuildRole, Permissions } from "guildedapi-types.ts/v1";
+import { APIGuildRole, PATCHGuildRoleBody, Permissions } from "guildedapi-types.ts/v1";
 
 /** Class representing a guild role. */
 export class GuildRole extends Base<number> {
@@ -107,5 +107,10 @@ export class GuildRole extends Base<number> {
         if (data.isBase !== undefined) {
             this.isBase = data.isBase;
         }
+    }
+
+    /** Edit the role permission */
+    async editPermission(options: PATCHGuildRoleBody): Promise<GuildRole>{
+        return this.client.rest.guilds.updateRolePermission(this.guildID as string, this.id as number, options);
     }
 }

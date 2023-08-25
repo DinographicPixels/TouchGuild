@@ -263,4 +263,14 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
     async deleteReaction(reaction: number): Promise<void>{
         return this.client.rest.channels.deleteReaction(this.channelID, "ChannelMessage", this.id as string, reaction);
     }
+
+    /** Pin this message */
+    async pin(): Promise<void>{
+        return this.client.rest.channels.pinMessage(this.channelID, this.id as string);
+    }
+
+    /** Unpin this message */
+    async unpin(): Promise<void>{
+        return this.client.rest.channels.unpinMessage(this.channelID, this.id as string);
+    }
 }
