@@ -34,6 +34,8 @@ export class GuildChannel extends Base<string> {
     archivedBy: string | null;
     /** When the channel was last archived. */
     archivedAt: Date | null;
+    /** Channel visibility */
+    visibility: string;
     // /** Cached messages. */
     // messages: TypedCollection<string, APIChatMessage, Message<AnyTextableChannel>>;
     // /** Cached threads. */
@@ -58,9 +60,10 @@ export class GuildChannel extends Base<string> {
         this.parentID = data.parentId ?? null;
         this.categoryID = data.categoryId ?? null;
         this.groupID = data.groupId;
-        this.isPublic = data.isPublic ?? false;
         this.archivedBy = data.archivedBy ?? null;
         this.archivedAt = data.archivedAt ? new Date(data.archivedAt) : null;
+        this.visibility = data.visibility ?? "public";
+        this.isPublic = this.visibility === "public" ? true : false;
         // this.messages = new TypedCollection(Message, client, client.params.collectionLimits?.messages);
         // this.threads = new TypedCollection(ForumThread, client, client.params.collectionLimits?.threads);
         // this.docs = new TypedCollection(Doc, client, client.params.collectionLimits?.docs);
@@ -83,7 +86,8 @@ export class GuildChannel extends Base<string> {
             groupID:         this.groupID,
             isPublic:        this.isPublic,
             archivedBy:      this.archivedBy,
-            archivedAt:      this.archivedAt
+            archivedAt:      this.archivedAt,
+            visibility:      this.visibility
         };
     }
 
@@ -129,6 +133,9 @@ export class GuildChannel extends Base<string> {
         }
         if (data.updatedAt !== undefined) {
             this.editedTimestamp = new Date(data.updatedAt);
+        }
+        if (data.visibility !== undefined) {
+            this.visibility = data.visibility;
         }
     }
 

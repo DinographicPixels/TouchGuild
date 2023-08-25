@@ -10,6 +10,7 @@ import { Guild } from "../structures/Guild";
 import { User } from "../structures/User";
 import { GuildRole } from "../structures/GuildRole";
 import { GuildGroup } from "../structures/GuildGroup";
+import { GuildSubscription } from "../structures/GuildSubscription";
 import {
     APIForumTopic,
     APIForumTopicSummary,
@@ -18,6 +19,7 @@ import {
     APIGuildGroup,
     APIGuildMember,
     APIGuildRole,
+    APIGuildSubscription,
     APIUser
 } from "guildedapi-types.ts/v1";
 
@@ -94,6 +96,10 @@ export class Util {
             }
         }
         return Channel.from<T>(data, this.#client);
+    }
+
+    updateGuildSubscription(data: APIGuildSubscription): GuildSubscription {
+        return new GuildSubscription(data, this.#client);
     }
 }
 

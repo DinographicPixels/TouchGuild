@@ -25,6 +25,7 @@ import { AnnouncementComment } from "./AnnouncementComment";
 import { Announcement } from "./Announcement";
 import { GuildRole } from "./GuildRole";
 import { GuildGroup } from "./GuildGroup";
+import { GuildSubscription } from "./GuildSubscription";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -54,7 +55,8 @@ import {
     POSTGuildGroupBody,
     PATCHGuildGroupBody,
     POSTGuildRoleBody,
-    PATCHGuildRoleBody
+    PATCHGuildRoleBody,
+    Permissions
 } from "../Constants";
 import {
     AnyChannel,
@@ -1175,5 +1177,76 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async deleteGuildGroup(guildID: string, groupID: string): Promise<void> {
         return this.rest.guilds.deleteGroup(guildID, groupID);
+    }
+
+    /**
+     * Get guild subscriptions.
+     * @param guildID ID of the guild.
+     */
+    async getGuildSubscriptions(guildID: string): Promise<Array<GuildSubscription>> {
+        return this.rest.guilds.getSubscriptions(guildID);
+    }
+
+    /**
+     * Get guild subscriptions.
+     * @param guildID ID of the guild.
+     * @param subscriptionID ID of the subscription to get.
+     */
+    async getGuildSubscription(guildID: string, subscriptionID: string): Promise<GuildSubscription> {
+        return this.rest.guilds.getSubscription(guildID, subscriptionID);
+    }
+
+    /**
+     * Get guild member permissions.
+     * @param guildID ID of the guild.
+     * @param memberID ID of the member.
+     */
+    async getMemberPermissions(guildID: string, memberID: string): Promise<Array<Permissions>> {
+        return this.rest.guilds.getMemberPermission(guildID, memberID);
+    }
+
+    /**
+     * Edit Role Permission.
+     * @param guildID ID of the guild.
+     * @param roleID ID of the role.
+     * @param options Permissions to edit.
+     */
+    async updateRolePermission(guildID: string, roleID: number, options: PATCHGuildRoleBody): Promise<GuildRole> {
+        return this.rest.guilds.updateRolePermission(guildID, roleID, options);
+    }
+
+    /**
+     * Archive a channel.
+     * @param channelID ID of the channel to archive.
+     */
+    async archiveChannel(channelID: string): Promise<void> {
+        return this.rest.channels.archiveChannel(channelID);
+    }
+
+    /**
+     * Unarchive a channel.
+     * @param channelID ID of the channel to unarchive.
+     */
+
+    async restoreChannel(channelID: string): Promise<void> {
+        return this.rest.channels.restoreChannel(channelID);
+    }
+
+    /**
+     * Pin a message.
+     * @param channelID ID of the channel where the message is.
+     * @param messageID ID of the message to pin.
+     */
+    async pinMessage(channelID: string, messageID: string): Promise<void> {
+        return this.rest.channels.pinMessage(channelID, messageID);
+    }
+
+    /**
+     * Unpin a message.
+     * @param channelID ID of the channel where the message is.
+     * @param messageID ID of the message to unpin.
+     */
+    async unpinMessage(channelID: string, messageID: string): Promise<void> {
+        return this.rest.channels.unpinMessage(channelID, messageID);
     }
 }

@@ -113,6 +113,8 @@ export interface JSONGuildChannel extends JSONBase<string> {
     archivedBy: string | null;
     /** When the channel was last archived. */
     archivedAt: Date | null;
+    /** Channel visibility */
+    visibility: string;
 }
 
 export interface JSONTextChannel extends JSONGuildChannel {
@@ -462,6 +464,8 @@ export interface JSONGuildRole extends JSONBase<number> {
     position: number;
     /** The default role users are given when joining the server. Base roles are tied directly to the server and cannot be created or deleted */
     isBase: boolean;
+    /** The bot user ID this role has been defined for. Roles with this populated can only be deleted by kicking the bot */
+    botUserID: string | null;
 }
 
 export interface JSONGuildGroup extends JSONBase<string> {
@@ -492,3 +496,19 @@ export interface JSONGuildGroup extends JSONBase<string> {
     /** The ID of the user who archived this group, if archived. */
     archivedBy: string | null;
 }
+
+export interface JSONGuildSubscription extends JSONBase<string> {
+    /** Type of the subscription */
+    type: string;
+    /** ID of the guild */
+    guildID: string;
+    /** Description associated with the subscription */
+    description: string | null;
+    /** ID of the role associated to the subscription */
+    roleID: number | null;
+    /** Cost of the subscription */
+    cost: number;
+    /** The ISO 8601 timestamp that the group was created at */
+    createdAt: Date;
+}
+
