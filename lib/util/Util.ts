@@ -10,6 +10,7 @@ import { Guild } from "../structures/Guild";
 import { User } from "../structures/User";
 import { GuildRole } from "../structures/GuildRole";
 import { GuildGroup } from "../structures/GuildGroup";
+import { GuildSubscription } from "../structures/GuildSubscription";
 import {
     APIForumTopic,
     APIForumTopicSummary,
@@ -21,7 +22,6 @@ import {
     APIGuildSubscription,
     APIUser
 } from "guildedapi-types.ts/v1";
-import { GuildSubscription } from "../structures/GuildSubscription";
 
 export class Util {
     #client: Client;

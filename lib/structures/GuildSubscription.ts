@@ -6,7 +6,7 @@ import { JSONGuildSubscription } from "../types/json";
 import { APIGuildSubscription } from "guildedapi-types.ts/v1";
 
 /** Class representing a guild group. */
-export class GuildSubscription extends Base<string> {    
+export class GuildSubscription extends Base<string> {
     /** Type of the subscription */
     type: string;
     /** ID of the guild */
@@ -24,7 +24,7 @@ export class GuildSubscription extends Base<string> {
         super(data.serverId, client);
         this.type = data.type;
         this.guildID = data.serverId;
-        this.description = data.description !== '' ? data.description : null;
+        this.description = data.description !== "" ? data.description : null;
         this.roleID = data.roleId ?? null;
         this.cost = data.cost;
         this.createdAt = new Date(data.createdAt);
@@ -32,15 +32,14 @@ export class GuildSubscription extends Base<string> {
     }
 
     override toJSON(): JSONGuildSubscription {
-        
         return {
             ...super.toJSON(),
-            type:            this.type,
-            guildID:         this.guildID,
-            description:     this.description,
-            roleID:          this.roleID,
-            cost:            this.cost,
-            createdAt:       this.createdAt,
+            type:        this.type,
+            guildID:     this.guildID,
+            description: this.description,
+            roleID:      this.roleID,
+            cost:        this.cost,
+            createdAt:   this.createdAt
         };
     }
 
@@ -52,7 +51,7 @@ export class GuildSubscription extends Base<string> {
             this.type = data.type;
         }
         if (data.description !== undefined) {
-            this.description = data.description !== '' ? data.description : null;
+            this.description = data.description !== "" ? data.description : null;
         }
         if (data.roleId !== undefined) {
             this.roleID = data.roleId;

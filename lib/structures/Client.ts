@@ -25,6 +25,7 @@ import { AnnouncementComment } from "./AnnouncementComment";
 import { Announcement } from "./Announcement";
 import { GuildRole } from "./GuildRole";
 import { GuildGroup } from "./GuildGroup";
+import { GuildSubscription } from "./GuildSubscription";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -78,7 +79,6 @@ import {
 import { EditMemberOptions } from "../types/guilds";
 import { Util } from "../util/Util";
 import { CreateDocCommentOptions, EditDocCommentOptions } from "../types/docComment";
-import { GuildSubscription } from "./GuildSubscription";
 
 /** Represents the bot's client. */
 export class Client extends TypedEmitter<ClientEvents> {

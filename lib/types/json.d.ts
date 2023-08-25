@@ -3,7 +3,6 @@ import { User } from "../structures/User";
 import { Guild } from "../structures/Guild";
 import { UserTypes } from "../Constants";
 import { APICalendarEvent, APICalendarEventComment } from "guildedapi-types.ts/v1";
-import { type } from "os";
 
 export interface JSONBase<ID= string | number> {
     // createdAt: number;

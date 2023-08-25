@@ -66,7 +66,7 @@ export class GuildRole extends Base<number> {
             iconURL:               this.iconURL,
             position:              this.position,
             isBase:                this.isBase,
-            botUserID:             this.botUserID,
+            botUserID:             this.botUserID
         };
     }
 
