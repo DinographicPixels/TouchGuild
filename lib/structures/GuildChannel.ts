@@ -148,4 +148,14 @@ export class GuildChannel extends Base<string> {
     async delete(): Promise<void>{
         return this.client.rest.guilds.deleteChannel(this.id as string);
     }
+
+    /** Archive the channel */
+    async archive(): Promise<void>{
+        return this.client.rest.channels.archiveChannel(this.id as string);
+    }
+
+    /** Unarchive the channel */
+    async unarchive(): Promise<void>{
+        return this.client.rest.channels.restoreChannel(this.id as string);
+    }
 }

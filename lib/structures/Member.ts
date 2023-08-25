@@ -4,7 +4,7 @@ import { User } from "./User";
 import { Guild } from "./Guild";
 import { BannedMember } from "./BannedMember";
 import { SocialLink } from "./SocialLink";
-import { APIGuildMember } from "../Constants";
+import { APIGuildMember, Permissions } from "../Constants";
 import { EditMemberOptions } from "../types/guilds";
 import { JSONMember } from "../types/json";
 
@@ -155,6 +155,11 @@ export class Member extends User {
      */
     async setXP(amount: number): Promise<number>{
         return this.client.rest.guilds.setMemberXP(this.guildID, this.id as string, amount);
+    }
+
+    /** Get member permission */
+    async getPermission(): Promise<Array<Permissions>>{
+        return this.client.rest.guilds.getMemberPermission(this.guildID, this.id as string);
     }
 }
 
