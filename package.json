@@ -1,6 +1,6 @@
 {
   "name": "touchguild",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "TouchGuild is a NodeJS library for interfacing with Guilded.",
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
@@ -33,7 +33,8 @@
   ],
   "author": "DinographicPixels",
   "contributors": [
-    "Wade (PakkoGraphic)<https://github.com/PakkoGraphic>"
+    "Wade (PakkoGraphic)<https://github.com/PakkoGraphic>",
+    "Raphaël (raphckrman)<https://github.com/raphckrman>"
   ],
   "license": "Apache-2.0",
   "bugs": {
@@ -62,7 +63,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "guildedapi-types.ts": "0.3.33",
+    "guildedapi-types.ts": "0.3.34",
     "undici": "^5.14.0",
     "ws": "^8.11.0"
   },

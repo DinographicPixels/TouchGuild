@@ -155,7 +155,7 @@ export class GuildChannel extends Base<string> {
     }
 
     /** Unarchive the channel */
-    async unarchive(): Promise<void>{
+    async restore(): Promise<void>{
         return this.client.rest.channels.restoreChannel(this.id as string);
     }
 }
