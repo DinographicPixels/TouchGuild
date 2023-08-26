@@ -10,11 +10,11 @@ jobs:
       run: npm i
     - name: Installing TS-Node
       run: npm install -g ts-node
-    - name: Simple bot
-      run: ts-node ./scripts/tests/simpleBot.ts
+    - name: Channel Features
+      run: ts-node ./scripts/tests/channel.ts
       env: 
         TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
-    - name: Message test
+    - name: Message Features
       run: ts-node ./scripts/tests/message.ts
       env:
         TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
