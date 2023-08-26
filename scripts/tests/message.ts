@@ -1,5 +1,5 @@
 import { Client } from "../../lib";
-const client = new Client({ token: process.env.TOKEN as string ?? "gapi_ESzOr6wIapXs9VUhMAlfJGLYaW5H74L+e5nG++JG7EfxAZZuhc7ljtGS4HplTZn2OGP0zT2IIXW7Waj5l0651w==" });
+const client = new Client({ token: process.env.TOKEN as string});
 
 client.on("ready", async () => {
     console.log(`Logged as ${client.user?.username}`);
