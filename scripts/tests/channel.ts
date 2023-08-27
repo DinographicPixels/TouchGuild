@@ -36,17 +36,17 @@ client.on("ready", async () => {
     await scheduling.archive();
     await stream.archive();
     console.log("📦 The Channels were archived")
-    await chat.unarchive();
-    await announcement.unarchive();
-    await calendar.unarchive();
-    await forums.unarchive();
-    await media.unarchive();
-    await voice.unarchive();
-    await docs.unarchive();
-    await list.unarchive();
-    await scheduling.unarchive();
-    await stream.unarchive();
-    console.log("📦 The Channels were unarchived")
+    await chat.restore();
+    await announcement.restore();
+    await calendar.restore();
+    await forums.restore();
+    await media.restore();
+    await voice.restore();
+    await docs.restore();
+    await list.restore();
+    await scheduling.restore();
+    await stream.restore();
+    console.log("📦 The Channels were restored")
     await chat.delete();
     await announcement.delete();
     await calendar.delete();
