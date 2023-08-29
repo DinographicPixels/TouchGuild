@@ -605,7 +605,7 @@ export class Guilds {
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
      */
-    async readCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
+    async getCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
         return this.#manager.authRequest<GETReadCategoryResponse>({
             method: "GET",
             path:   endpoints.GUILD_CATEGORY(guildID, categoryID)

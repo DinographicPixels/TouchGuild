@@ -217,7 +217,7 @@ export class Guild extends Base<string> {
      * @param categoryID ID of the category you want to read.
      */
     async getCategory(categoryID: number): Promise<GuildCategory> {
-        return this.client.rest.guilds.readCategory(this.id as string, categoryID);
+        return this.client.rest.guilds.getCategory(this.id as string, categoryID);
     }
     /**
      * Update a guild category.

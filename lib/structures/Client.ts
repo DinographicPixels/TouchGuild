@@ -1289,7 +1289,7 @@ export class Client extends TypedEmitter<ClientEvents> {
      * @param categoryID ID of the category you want to read.
      */
     async getGuildCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
-        return this.rest.guilds.readCategory(guildID, categoryID);
+        return this.rest.guilds.getCategory(guildID, categoryID);
     }
     /**
      * Update a guild category.
