@@ -26,6 +26,7 @@ import { Announcement } from "./Announcement";
 import { GuildRole } from "./GuildRole";
 import { GuildGroup } from "./GuildGroup";
 import { GuildSubscription } from "./GuildSubscription";
+import { GuildCategory } from "./GuildCategory";
 import { WSManager } from "../gateway/WSManager";
 import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
@@ -56,7 +57,13 @@ import {
     PATCHGuildGroupBody,
     POSTGuildRoleBody,
     PATCHGuildRoleBody,
-    Permissions
+    Permissions,
+    POSTBulkAwardXPBody,
+    POSTBulkAwardXPResponse,
+    PUTBulkSetXPBody,
+    PUTBulkSetXPResponse,
+    POSTCreateCategoryBody,
+    PATCHUpdateCategoryBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -1248,5 +1255,58 @@ export class Client extends TypedEmitter<ClientEvents> {
      */
     async unpinMessage(channelID: string, messageID: string): Promise<void> {
         return this.rest.channels.unpinMessage(channelID, messageID);
+    }
+
+    /**
+     * Bulk XP Awards Members.
+     * @param guildID ID of the guild.
+     * @param options Bulk XP options.
+     */
+    async bulkAwardXPMembers(guildID: string, options: POSTBulkAwardXPBody): Promise<POSTBulkAwardXPResponse> {
+        return this.rest.guilds.bulkAwardXP(guildID, options);
+    }
+
+    /**
+     * Bulk XP Set Members.
+     * @param guildID ID of the guild.
+     * @param options Bulk XP options.
+     */
+    async bulkSetMembersXP(guildID: string, options: PUTBulkSetXPBody): Promise<PUTBulkSetXPResponse> {
+        return this.rest.guilds.bulkSetXP(guildID, options);
+    }
+
+    /**
+     * Create a guild category
+     * @param guildID ID of the guild.
+     * @param options Create options.
+     */
+    async createGuildCategory(guildID: string, options: POSTCreateCategoryBody): Promise<GuildCategory> {
+        return this.rest.guilds.createCategory(guildID, options);
+    }
+    /**
+     * Read a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     */
+    async getGuildCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
+        return this.rest.guilds.readCategory(guildID, categoryID);
+    }
+    /**
+     * Update a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     * @param options Options to update a category.
+     */
+    async updateGuildCategory(guildID: string, categoryID: number, options: PATCHUpdateCategoryBody): Promise<GuildCategory> {
+        return this.rest.guilds.updateCategory(guildID, categoryID, options);
+    }
+
+    /**
+     * Delete a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     */
+    async deleteGuildCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
+        return this.rest.guilds.deleteCategory(guildID, categoryID);
     }
 }

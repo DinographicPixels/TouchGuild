@@ -11,6 +11,7 @@ import { User } from "../structures/User";
 import { GuildRole } from "../structures/GuildRole";
 import { GuildGroup } from "../structures/GuildGroup";
 import { GuildSubscription } from "../structures/GuildSubscription";
+import { GuildCategory } from "../structures/GuildCategory";
 import {
     APIForumTopic,
     APIForumTopicSummary,
@@ -20,7 +21,8 @@ import {
     APIGuildMember,
     APIGuildRole,
     APIGuildSubscription,
-    APIUser
+    APIUser,
+    APIGuildCategory
 } from "guildedapi-types.ts/v1";
 
 export class Util {
@@ -100,6 +102,10 @@ export class Util {
 
     updateGuildSubscription(data: APIGuildSubscription): GuildSubscription {
         return new GuildSubscription(data, this.#client);
+    }
+
+    updateGuildCategory(data: APIGuildCategory): GuildCategory {
+        return new GuildCategory(data, this.#client);
     }
 }
 
