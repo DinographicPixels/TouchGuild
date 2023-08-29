@@ -512,3 +512,18 @@ export interface JSONGuildSubscription extends JSONBase<string> {
     createdAt: Date;
 }
 
+export interface JSONGuildCategory extends JSONBase<string> {
+    /** Type of the subscription */
+    id: number;
+    /** ID of the guild */
+    serverId: string;
+    /** ID of the group */
+    groupId: string;
+    /** The ISO 8601 timestamp that the group was created at */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that the category was updated at, if relevant */
+    updatedAt: Date | null;
+    /** Name of the category (min length 1; max length 100) */
+    name: string;
+}
+

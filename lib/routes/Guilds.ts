@@ -40,7 +40,17 @@ import {
     GETGuildSubscriptionResponse,
     GETGuildMemberPermissionResponse,
     Permissions,
-    PATCHGuildRoleUpdateResponse
+    PATCHGuildRoleUpdateResponse,
+    POSTBulkAwardXPBody,
+    POSTBulkAwardXPResponse,
+    PUTBulkSetXPBody,
+    PUTBulkSetXPResponse,
+    POSTCreateCategoryBody,
+    POSTCreateCategoryResponse,
+    GETReadCategoryResponse,
+    PATCHUpdateCategoryBody,
+    PATCHUpdateCategoryResponse,
+    DELETEDeleteCategoryResponse
 } from "../Constants";
 import { AnyChannel, CreateChannelOptions, EditChannelOptions } from "../types/channel";
 import { EditWebhookOptions } from "../types/webhooks";
@@ -49,6 +59,7 @@ import { BannedMember } from "../structures/BannedMember";
 import { GuildRole } from "../structures/GuildRole";
 import { GuildGroup } from "../structures/GuildGroup";
 import { GuildSubscription } from "../structures/GuildSubscription";
+import { GuildCategory } from "../structures/GuildCategory";
 
 export class Guilds {
     #manager: RESTManager;
@@ -549,5 +560,81 @@ export class Guilds {
             path:   endpoints.GUILD_ROLE_UPDATE_PERMISSION(guildID, roleID),
             json:   options
         }).then(data => this.#manager.client.util.updateRole(data.role));
+    }
+
+    /**
+     * Bulk Award XP Members
+     * @param guildID ID of the guild
+     * @param options Members to award XP
+     */
+    async bulkAwardXP(guildID: string, options: POSTBulkAwardXPBody): Promise<POSTBulkAwardXPResponse> {
+        return this.#manager.authRequest<POSTBulkAwardXPResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_MEMBER_BULK_XP(guildID),
+            json:   options
+        }).then(data => data);
+    }
+
+    /**
+     * Bulk Set XP Members
+     * @param guildID ID of the guild
+     * @param options Members to set XP
+     */
+    async bulkSetXP(guildID: string, options: PUTBulkSetXPBody): Promise<PUTBulkSetXPResponse> {
+        return this.#manager.authRequest<PUTBulkSetXPResponse>({
+            method: "PUT",
+            path:   endpoints.GUILD_MEMBER_BULK_XP(guildID),
+            json:   options
+        }).then(data => data);
+    }
+
+    /** 
+     * Create a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param options Options to create a category.
+     */
+    async createCategory(guildID: string, options: POSTCreateCategoryBody): Promise<GuildCategory> {
+        return this.#manager.authRequest<POSTCreateCategoryResponse>({
+            method: "POST",
+            path:   endpoints.GUILD_CATEGORY_CREATE(guildID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
+    }
+    /** 
+     * Read a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     */
+    async readCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
+        return this.#manager.authRequest<GETReadCategoryResponse>({
+            method: "GET",
+            path:   endpoints.GUILD_CATEGORY(guildID, categoryID)
+        }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
+    }
+
+    /** 
+     * Update a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     * @param options Options to update a category.
+     */
+    async updateCategory(guildID: string, categoryID: number, options: PATCHUpdateCategoryBody): Promise<GuildCategory> {
+        return this.#manager.authRequest<PATCHUpdateCategoryResponse>({
+            method: "PATCH",
+            path:   endpoints.GUILD_CATEGORY(guildID, categoryID),
+            json:   options
+        }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
+    }
+
+    /** 
+     * Delete a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     */
+    async deleteCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
+        return this.#manager.authRequest<DELETEDeleteCategoryResponse>({
+            method: "DELETE",
+            path:   endpoints.GUILD_CATEGORY(guildID, categoryID)
+        }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
     }
 }
