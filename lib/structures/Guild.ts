@@ -18,14 +18,8 @@ import {
     APIGuildRole,
     POSTBulkAwardXPBody,
     POSTBulkAwardXPResponse,
-    PUTBulkSetXPBody,
-    PUTBulkSetXPResponse,
-    GETReadCategoryResponse,
     POSTCreateCategoryBody,
-    POSTCreateCategoryResponse,
-    PATCHUpdateCategoryBody,
-    PATCHUpdateCategoryResponse,
-    DELETEDeleteCategoryResponse
+    PATCHUpdateCategoryBody
 } from "../Constants";
 import TypedCollection from "../util/TypedCollection";
 import { JSONGuild } from "../types/json";
@@ -208,7 +202,7 @@ export class Guild extends Base<string> {
     async bulkSetXPMembers(options: POSTBulkAwardXPBody): Promise<POSTBulkAwardXPResponse> {
         return this.client.rest.guilds.bulkSetXP(this.id as string, options);
     }
-    
+
     /**
      * Create a guild category
      * @param guildID ID of the guild.
@@ -217,7 +211,7 @@ export class Guild extends Base<string> {
     async createCategory(options: POSTCreateCategoryBody): Promise<GuildCategory> {
         return this.client.rest.guilds.createCategory(this.id as string, options);
     }
-    /** 
+    /**
      * Read a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -225,7 +219,7 @@ export class Guild extends Base<string> {
     async getCategory(categoryID: number): Promise<GuildCategory> {
         return this.client.rest.guilds.readCategory(this.id as string, categoryID);
     }
-    /** 
+    /**
      * Update a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -235,7 +229,7 @@ export class Guild extends Base<string> {
         return this.client.rest.guilds.updateCategory(this.id as string, categoryID, options);
     }
 
-    /** 
+    /**
      * Delete a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.

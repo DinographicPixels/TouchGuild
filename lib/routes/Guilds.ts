@@ -588,7 +588,7 @@ export class Guilds {
         }).then(data => data);
     }
 
-    /** 
+    /**
      * Create a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param options Options to create a category.
@@ -600,7 +600,7 @@ export class Guilds {
             json:   options
         }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
     }
-    /** 
+    /**
      * Read a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -612,7 +612,7 @@ export class Guilds {
         }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
     }
 
-    /** 
+    /**
      * Update a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -626,7 +626,7 @@ export class Guilds {
         }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
     }
 
-    /** 
+    /**
      * Delete a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.

@@ -3,15 +3,8 @@
 import { Client } from "./Client";
 import { Base } from "./Base";
 import { JSONGuildCategory } from "../types/json";
+import { PATCHUpdateCategoryBody } from "../Constants";
 import { APIGuildCategory } from "guildedapi-types.ts/v1";
-import {
-    GETReadCategoryResponse,
-    POSTCreateCategoryBody,
-    POSTCreateCategoryResponse,
-    PATCHUpdateCategoryBody,
-    PATCHUpdateCategoryResponse,
-    DELETEDeleteCategoryResponse
-} from "../Constants";
 
 /** Class representing a guild group. */
 export class GuildCategory extends Base<number> {
@@ -72,22 +65,22 @@ export class GuildCategory extends Base<number> {
         }
     }
 
-        /** 
+    /**
      * Update a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
      * @param options Options to update a category.
      */
-        async updateCategory(options: PATCHUpdateCategoryBody): Promise<GuildCategory> {
-            return this.client.rest.guilds.updateCategory(this.serverId as string, this.id as number, options);
-        }
-    
-        /** 
-         * Delete a guild category.
-         * @param guildID ID of the guild to create a category in.
-         * @param categoryID ID of the category you want to read.
-         */
-        async deleteCategory(): Promise<GuildCategory> {
-            return this.client.rest.guilds.deleteCategory(this.serverId as string, this.id as number);
-        }
+    async updateCategory(options: PATCHUpdateCategoryBody): Promise<GuildCategory> {
+        return this.client.rest.guilds.updateCategory(this.serverId as string, this.id as number, options);
+    }
+
+    /**
+     * Delete a guild category.
+     * @param guildID ID of the guild to create a category in.
+     * @param categoryID ID of the category you want to read.
+     */
+    async deleteCategory(): Promise<GuildCategory> {
+        return this.client.rest.guilds.deleteCategory(this.serverId as string, this.id as number);
+    }
 }

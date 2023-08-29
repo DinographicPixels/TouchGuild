@@ -63,11 +63,7 @@ import {
     PUTBulkSetXPBody,
     PUTBulkSetXPResponse,
     POSTCreateCategoryBody,
-    POSTCreateCategoryResponse,
-    GETReadCategoryResponse,
-    PATCHUpdateCategoryBody,
-    PATCHUpdateCategoryResponse,
-    DELETEDeleteCategoryResponse
+    PATCHUpdateCategoryBody
 } from "../Constants";
 import {
     AnyChannel,
@@ -1287,7 +1283,7 @@ export class Client extends TypedEmitter<ClientEvents> {
     async createGuildCategory(guildID: string, options: POSTCreateCategoryBody): Promise<GuildCategory> {
         return this.rest.guilds.createCategory(guildID, options);
     }
-    /** 
+    /**
      * Read a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -1295,7 +1291,7 @@ export class Client extends TypedEmitter<ClientEvents> {
     async getGuildCategory(guildID: string, categoryID: number): Promise<GuildCategory> {
         return this.rest.guilds.readCategory(guildID, categoryID);
     }
-    /** 
+    /**
      * Update a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
@@ -1305,7 +1301,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         return this.rest.guilds.updateCategory(guildID, categoryID, options);
     }
 
-    /** 
+    /**
      * Delete a guild category.
      * @param guildID ID of the guild to create a category in.
      * @param categoryID ID of the category you want to read.
