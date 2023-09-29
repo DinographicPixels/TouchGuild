@@ -25,6 +25,14 @@ export const CHANNEL_ANNOUNCEMENT_COMMENTS = (channelID: string, announcementID:
 export const CHANNEL_ANNOUNCEMENT_COMMENT = (channelID: string, announcementID: string, commentID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}`;
 export const CHANNEL_ANNOUNCEMENT_COMMENT_EMOTES = (channelID: string, announcementID: string, commentID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}/emotes`;
 export const CHANNEL_ANNOUNCEMENT_COMMENT_EMOTE = (channelID: string, announcementID: string, commentID: number, emoteID: number) => `/channels/${channelID}/announcements/${announcementID}/comments/${commentID}/emotes/${emoteID}`;
+export const CHANNEL_ROLE_PERMISSION = (serverID: string, channelID: string, roleID: number) => `/servers/${serverID}/channels/${channelID}/permissions/roles/${roleID}`;
+export const CHANNEL_ROLE_MANY_PERMISSION = (serverID: string, channelID: string) => `/servers/${serverID}/channels/${channelID}/permissions/roles`;
+export const CHANNEL_USER_PERMISSION = (serverID: string, channelID: string, userID: string) => `/servers/${serverID}/channels/${channelID}/permissions/users/${userID}`;
+export const CHANNEL_USER_MANY_PERMISSION = (serverID: string, channelID: string) => `/servers/${serverID}/channels/${channelID}/permissions/users`;
+export const CHANNEL_CATEGORY_USER_PERMISSION = (serverID: string, categoryID: number, userID: string) => `/servers/${serverID}/categories/${categoryID}/permissions/users/${userID}`;
+export const CHANNEL_CATEGORY_USER_MANY_PERMISSION = (serverID: string, categoryID: number) => `/servers/${serverID}/categories/${categoryID}/permissions/users`;
+export const CHANNEL_CATEGORY_ROLE_PERMISSION = (serverID: string, categoryID: number, roleID: number) => `/servers/${serverID}/categories/${categoryID}/permissions/roles/${roleID}`;
+export const CHANNEL_CATEGORY_ROLE_MANY_PERMISSION = (serverID: string, categoryID: number) => `/servers/${serverID}/categories/${categoryID}/permissions/roles`;
 
 export const MEMBER_NICKNAME = (guildID: string, memberID: string) => `/servers/${guildID}/members/${memberID}/nickname`;
 

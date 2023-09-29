@@ -3,9 +3,11 @@ import { GatewayEventHandler } from "./GatewayEventHandler";
 import { Message } from "../../structures/Message";
 import { MessageReactionInfo } from "../../structures/MessageReactionInfo";
 import {
+    GatewayEvent_ChannelMessagePinned,
     GatewayEvent_ChannelMessageReactionCreated,
     GatewayEvent_ChannelMessageReactionDeleted,
     GatewayEvent_ChannelMessageReactionManyDeleted,
+    GatewayEvent_ChannelMessageUnpinned,
     GatewayEvent_ChatMessageCreated,
     GatewayEvent_ChatMessageDeleted,
     GatewayEvent_ChatMessageUpdated
@@ -75,6 +77,21 @@ export class MessageHandler extends GatewayEventHandler {
         this.client.emit("reactionBulkRemove", BulkRemoveInfo);
     }
 
+    async messagePin(data: GatewayEvent_ChannelMessagePinned): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.message.channelId);
+        else void this.addGuildChannel(data.serverId, data.message.channelId);
+        const channel = this.client.getChannel<TextChannel>(data.serverId, data.message.channelId);
+        const MessageComponent = channel?.messages?.update(data.message) ?? new Message(data.message, this.client);
+        this.client.emit("messagePin", MessageComponent);
+    }
+
+    async messageUnpin(data: GatewayEvent_ChannelMessageUnpinned): Promise<void> {
+        if (this.client.params.waitForCaching) await this.addGuildChannel(data.serverId, data.message.channelId);
+        else void this.addGuildChannel(data.serverId, data.message.channelId);
+        const channel = this.client.getChannel<TextChannel>(data.serverId, data.message.channelId);
+        const MessageComponent = channel?.messages?.update(data.message) ?? new Message(data.message, this.client);
+        this.client.emit("messageUnpin", MessageComponent);
+    }
 
     private async addGuildChannel(guildID: string, channelID: string): Promise<void> {
         if (this.client.getChannel(guildID, channelID) !== undefined) return;

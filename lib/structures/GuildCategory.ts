@@ -2,9 +2,11 @@
 
 import { Client } from "./Client";
 import { Base } from "./Base";
+import { ChannelCategoryRolePermission } from "./ChannelCategoryRolePermission";
+import { ChannelCategoryUserPermission } from "./ChannelCategoryUserPermission";
 import { JSONGuildCategory } from "../types/json";
 import { PATCHUpdateCategoryBody } from "../Constants";
-import { APIGuildCategory } from "guildedapi-types.ts/v1";
+import { APIGuildCategory, POSTChannelCategoryRolePermissionBody, POSTChannelCategoryUserPermissionBody } from "guildedapi-types.ts/v1";
 
 /** Class representing a guild group. */
 export class GuildCategory extends Base<number> {
@@ -82,5 +84,87 @@ export class GuildCategory extends Base<number> {
      */
     async deleteCategory(): Promise<GuildCategory> {
         return this.client.rest.guilds.deleteCategory(this.serverId as string, this.id as number);
+    }
+
+    /**
+     * Create guild category role permission.
+     * @param roleID ID of the role
+     * @param options permissions to set
+     */
+    async createRolePermission(roleID: number, options: POSTChannelCategoryRolePermissionBody): Promise<ChannelCategoryRolePermission> {
+        return this.client.rest.channels.createChannelCategoryRolePermission(this.serverId as string, this.id as number, roleID, options);
+    }
+
+    /**
+     * Create guild category role permissions.
+     * @param roleID ID of the role
+     */
+    async getRolePermissions(roleID: number): Promise<ChannelCategoryRolePermission> {
+        return this.client.rest.channels.getChannelCategoryRolePermission(this.serverId as string, this.id as number, roleID);
+    }
+
+    /**
+     * Get guild category roles permissions.
+     */
+    async getRolesPermissions(): Promise<Array<ChannelCategoryRolePermission>> {
+        return this.client.rest.channels.getChannelCategoryRolesPermission(this.serverId as string, this.id as number);
+    }
+
+    /**
+     * Edit guild category role permission.
+     * @param roleID ID of the role
+     * @param options permissions to set
+     */
+    async editRolePermissions(roleID: number, options: POSTChannelCategoryRolePermissionBody): Promise<ChannelCategoryRolePermission> {
+        return this.client.rest.channels.editChannelCategoryRolePermission(this.serverId as string, this.id as number, roleID, options);
+    }
+
+    /**
+     * Delete guild category role permissions.
+     * @param roleID ID of the role
+     */
+    async deleteRolePermissions(roleID: number): Promise<void> {
+        return this.client.rest.channels.deleteChannelCategoryRolePermission(this.serverId as string, this.id as number, roleID);
+    }
+
+    /**
+     * Create guild category role permission.
+     * @param userID ID of the user
+     * @param options permissions to set
+     */
+    async createUserPermissions(userID: string, options: POSTChannelCategoryUserPermissionBody): Promise<ChannelCategoryUserPermission> {
+        return this.client.rest.channels.createChannelCategoryUserPermission(this.serverId as string, this.id as number, userID, options);
+    }
+
+    /**
+     * Create guild category role permissions.
+     * @param userID ID of the user
+     */
+    async getUserPermissions(userID: string): Promise<ChannelCategoryUserPermission> {
+        return this.client.rest.channels.getChannelCategoryUserPermission(this.serverId as string, this.id as number, userID);
+    }
+
+    /**
+     * Get guild category roles permissions.
+     */
+    async getUsersPermissions(): Promise<Array<ChannelCategoryUserPermission>> {
+        return this.client.rest.channels.getChannelCategoryUsersPermission(this.serverId as string, this.id as number);
+    }
+
+    /**
+     * Edit guild category role permission.
+     * @param userID ID of the user
+     * @param options permissions to set
+     */
+    async editUserPermissions(userID: string, options: POSTChannelCategoryRolePermissionBody): Promise<ChannelCategoryUserPermission> {
+        return this.client.rest.channels.editChannelCategoryUserPermission(this.serverId as string, this.id as number, userID, options);
+    }
+
+    /**
+     * Delete guild category role permissions.
+     * @param userID ID of the user
+     */
+    async deleteUserPermissions(userID: string): Promise<void> {
+        return this.client.rest.channels.deleteChannelCategoryUserPermission(this.serverId as string, this.id as number, userID);
     }
 }

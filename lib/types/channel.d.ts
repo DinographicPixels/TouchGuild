@@ -10,6 +10,8 @@ import type { APIEmbedField } from "guildedapi-types.ts/v1";
 export interface CreateMessageOptions {
     /** The content of the message (min length 1; max length 4000) */
     content?: string;
+    /** Links in content to prevent unfurling as a link preview when displaying in Guilded (min items 1; must have unique items true) */
+    hiddenLinkPreviewUrls?: Array<string>;
     /** Embeds */
     embeds?: Array<MessageEmbedOptions>;
     /** Message IDs to reply to (min items 1; max items 5) */
@@ -23,6 +25,8 @@ export interface CreateMessageOptions {
 export interface EditMessageOptions {
     /** The content of the message (min length 1; max length 4000) */
     content?: string;
+    /** Links in content to prevent unfurling as a link preview when displaying in Guilded (min items 1; must have unique items true) */
+    hiddenLinkPreviewUrls?: Array<string>;
     /** Embeds */
     embeds?: Array<MessageEmbedOptions>;
     /** Message IDs to reply to (min items 1; max items 5) */
@@ -135,6 +139,54 @@ export interface ChannelMessageReactionBulkRemove {
     count: number;
     /** If present, only reactions of this emote were bulk removed from the message */
     emote: APIEmote | null;
+}
+
+export interface ChannelRolePermission {
+    permission: Array<Permissions>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: string;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt?: string;
+    /** The ID of the role */
+    roleId: number;
+    /** The ID of the channel */
+    channelId: string;
+}
+
+export interface ChannelUserPermission {
+    permission: Array<Permissions>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: string;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt?: string;
+    /** The ID of the role */
+    userId: number;
+    /** The ID of the channel */
+    channelId: string;
+}
+
+export interface ChannelCategoryUserPermission {
+    permission: Array<Permissions>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: string;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt?: string;
+    /** The ID of the role */
+    userId: number;
+    /** The ID of the channel */
+    categoryId: string;
+}
+
+export interface ChannelCategoryRolePermission {
+    permission: Array<Permissions>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: string;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt?: string;
+    /** The ID of the role */
+    roleId: number;
+    /** The ID of the channel */
+    categoryId: string;
 }
 
 export type AnyTextableChannel = TextChannel;
