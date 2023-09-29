@@ -52,6 +52,7 @@ import { Announcement } from "../structures/Announcement";
 import type { AnnouncementComment } from "../structures/AnnouncementComment";
 import { GuildGroup } from "../structures/GuildGroup";
 import { GuildRole } from "../structures/GuildRole";
+import { GuildCategory } from "../structures/GuildCategory";
 import type { APIBotUser } from "guildedapi-types.ts/v1";
 
 /** Every client events. */
@@ -71,6 +72,10 @@ export interface ClientEvents {
     messageUpdate: [message: Message<AnyTextableChannel>, oldMessage: JSONMessage | null];
     /** @event Emitted when a message coming from a "chat" channel is deleted. */
     messageDelete: [message: PossiblyUncachedMessage];
+    /** @event Emitted when a message coming from a "chat" channel is pinned. */
+    messagePin: [message: Message<AnyTextableChannel>];
+    /** @event Emitted when a message coming from a "chat" channel is unpinned. */
+    messageUnpin: [message: Message<AnyTextableChannel>];
     /** @event Emitted when a reaction is added to anything. */
     reactionAdd: [reactionInfo: AnyReactionInfo];
     /** @event Emitted when a reaction is removed from anything. */
@@ -83,6 +88,34 @@ export interface ClientEvents {
     channelUpdate: [channel: TextChannel, oldChannel: JSONTextChannel | null] | [channel: ForumChannel, oldChannel: JSONForumChannel | null] | [channel: CalendarChannel, oldChannel: JSONCalendarChannel | null] | [channel: DocChannel, oldChannel: JSONDocChannel | null] | [channel: GuildChannel, oldChannel: JSONGuildChannel | null] | [channel: Channel, oldChannel: JSONChannel | null];
     /** @event Emitted when a guild channel is deleted. */
     channelDelete: [channel: AnyChannel];
+    /** @event Emitted when a channel role permission is created. */
+    channelRolePermissionCreated: [channelRolePermission: ChannelRolePermission];
+    /** @event Emitted when a channel role permission is updated. */
+    channelRolePermissionUpdated: [channelRolePermission: ChannelRolePermission];
+    /** @event Emitted when a channel role permission is deleted. */
+    channelRolePermissionDeleted: [channelRolePermission: ChannelRolePermission];
+    /** @event Emitted when a channel user permission is created. */
+    channelUserPermissionCreated: [channelUserPermission: ChannelUserPermission];
+    /** @event Emitted when a channel user permission is updated. */
+    channelUserPermissionUpdated: [channelUserPermission: ChannelUserPermission];
+    /** @event Emitted when a channel user permission is deleted. */
+    channelUserPermissionDeleted: [channelUserPermission: ChannelUserPermission];
+    /** @event Emitted when a channel category role permission is created. */
+    channelCategoryRolePermissionCreated: [channelCategoryUserPermission: ChannelCategoryRolePermission];
+    /** @event Emitted when a channel category roke permission is updated. */
+    channelCategoryRolePermissionUpdated: [channelCategoryUserPermission: ChannelCategoryRolePermission];
+    /** @event Emitted when a channel category role permission is deleted. */
+    channelCategoryRolePermissionDeleted: [channelCategoryUserPermission: ChannelCategoryRolePermission];
+    /** @event Emitted when a channel category user permission is created. */
+    channelCategoryUserPermissionCreated: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    /** @event Emitted when a channel category user permission is updated. */
+    channelCategoryUserPermissionUpdated: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    /** @event Emitted when a channel category user permission is deleted. */
+    channelCategoryUserPermissionDeleted: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    /** @event Emitted when a guild channel is archived. */
+    channelArchive: [channel: AnyChannel];
+    /** @event Emitted when a guild channel is restored. */
+    channelRestore: [channel: AnyChannel];
     /** @event Emitted when a forum thread is created. */
     forumThreadCreate: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is edited. */
@@ -191,6 +224,12 @@ export interface ClientEvents {
     userStatusCreate: [userStatus: UserStatusCreate];
     /** @event Emitted when a user delete their user status. */
     userStatusDelete: [userStatus: UserStatusDelete];
+    /** @event Emitted when a category is created. */
+    guildCategoryCreate: [category: GuildCategory];
+    /** @event Emitted when a category is updated. */
+    guildCategoryUpdate: [category: GuildCategory];
+    /** @event Emitted when a category is deleted. */
+    guildCategoryDelete: [category: GuildCategory];
     /** @event Emitted on process exit. */
     exit: [message: string];
 }

@@ -2,7 +2,7 @@ import { Member } from "../structures/Member";
 import { User } from "../structures/User";
 import { Guild } from "../structures/Guild";
 import { UserTypes } from "../Constants";
-import { APICalendarEvent, APICalendarEventComment } from "guildedapi-types.ts/v1";
+import { APICalendarEvent, APICalendarEventComment, APIChannelUserPermission } from "guildedapi-types.ts/v1";
 
 export interface JSONBase<ID= string | number> {
     // createdAt: number;
@@ -18,6 +18,8 @@ export interface JSONMessage extends JSONBase<string> {
     channelID: string;
     /** Content of the message. */
     content: string | null;
+    /** Links in content to prevent unfurling as a link preview when displaying in Guilded (min items 1; must have unique items true) */
+    hiddenLinkPreviewUrls?: Array<string>;
     /** Array of message embed. */
     embeds?: Array<APIEmbedOptions> | [];
     /** The IDs of the message replied by the message. */
@@ -527,3 +529,54 @@ export interface JSONGuildCategory extends JSONBase<string> {
     name: string;
 }
 
+export interface JSONChannelUserPermission extends JSONBase<string> {
+    data: APIChannelUserPermission;
+    permissions: Record<string, boolean>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt: Date | null;
+    /** The ID of the user */
+    userId: string;
+    /** The ID of the channel */
+    channelId: string;
+}
+
+export interface JSONChannelRolePermission extends JSONBase<number> {
+    data: APIChannelRolePermission;
+    permissions: Record<string, boolean>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt: Date | null;
+    /** The ID of the user */
+    roleId: number;
+    /** The ID of the channel */
+    channelId: string;
+}
+
+export interface JSONChannelCategoryRolePermission extends JSONBase<number> {
+    data: APIChannelCategoryRolePermission;
+    permissions: Record<string, boolean>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt: Date | null;
+    /** The ID of the role */
+    roleId: number;
+    /** The ID of the channel */
+    categoryId: number;
+}
+
+export interface JSONChannelCategoryUserPermission extends JSONBase<string> {
+    data: APIChannelCategoryRolePermission;
+    permissions: Record<string, boolean>;
+    /** The ISO 8601 timestamp that the permission override was created at */
+    createdAt: Date;
+    /** The ISO 8601 timestamp that the permission override was updated at, if relevant */
+    updatedAt: Date | null;
+    /** The ID of the user */
+    userId: string;
+    /** The ID of the channel */
+    categoryId: number;
+}

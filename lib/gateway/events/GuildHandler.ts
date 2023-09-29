@@ -21,11 +21,13 @@ import {
     GatewayEvent_ServerMemberSocialLinkUpdated,
     GatewayEvent_ServerMemberUnbanned,
     GatewayEvent_ServerMemberUpdated,
-    GatewayEvent_ServerRolesUpdated
+    GatewayEvent_ServerRolesUpdated,
+    GatewayEvent_CategoryCreated
 } from "../../Constants";
 import { MemberUpdateInfo } from "../../structures/MemberUpdateInfo";
 import { MemberRemoveInfo } from "../../structures/MemberRemoveInfo";
 import { GuildGroup } from "../../structures/GuildGroup";
+import { GuildCategory } from "../../structures/GuildCategory";
 
 /** Internal component, emitting guild events. */
 export class GuildHandler extends GatewayEventHandler {
@@ -127,6 +129,21 @@ export class GuildHandler extends GatewayEventHandler {
         const guild = this.client.guilds.get(data.serverId);
         const role = guild?.roles.update(new GuildRole(data.role, this.client)) ?? new GuildRole(data.role, this.client);
         guild?.roles.delete(data.role.id);
-        this.client.emit("guildRoleCreate", role);
+        this.client.emit("guildRoleDelete", role);
+    }
+
+    guildCategoryCreate(data: GatewayEvent_CategoryCreated): void {
+        const category = new GuildCategory(data.category, this.client);
+        this.client.emit("guildCategoryCreate", category);
+    }
+
+    guildCategoryUpdate(data: GatewayEvent_CategoryCreated): void {
+        const category = new GuildCategory(data.category, this.client);
+        this.client.emit("guildCategoryUpdate", category);
+    }
+
+    guildCategoryDelete(data: GatewayEvent_CategoryCreated): void {
+        const category = new GuildCategory(data.category, this.client);
+        this.client.emit("guildCategoryDelete", category);
     }
 }

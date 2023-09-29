@@ -24,6 +24,8 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
     channelID: string;
     /** Content of the message. */
     content: string | null;
+    /** Links in content to prevent unfurling as a link preview when displaying in Guilded (min items 1; must have unique items true) */
+    hiddenLinkPreviewUrls?: Array<string>;
     /** Array of message embed. */
     embeds?: Array<APIEmbedOptions> | [];
     /** The IDs of the message replied by the message. */
@@ -58,6 +60,7 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
         this.guildID = data.serverId ?? null;
         this.channelID = data.channelId;
         this.content = data.content ?? "";
+        this.hiddenLinkPreviewUrls = data.hiddenLinkPreviewUrls ?? [];
         this.embeds = data.embeds ?? [];
         this.replyMessageIds = data.replyMessageIds ?? [];
         this.isPrivate = data.isPrivate ?? false;
@@ -77,20 +80,21 @@ export class Message<T extends AnyTextableChannel> extends Base<string> {
     override toJSON(): JSONMessage {
         return {
             ...super.toJSON(),
-            type:            this.type,
-            guildID:         this.guildID,
-            channelID:       this.channelID,
-            content:         this.content,
-            embeds:          this.embeds,
-            replyMessageIds: this.replyMessageIds,
-            isPrivate:       this.isPrivate,
-            isSilent:        this.isSilent,
-            mentions:        this.mentions,
-            createdAt:       this.createdAt,
-            editedTimestamp: this.editedTimestamp,
-            memberID:        this.memberID,
-            webhookID:       this.webhookID,
-            deletedAt:       this.deletedAt
+            type:                  this.type,
+            guildID:               this.guildID,
+            channelID:             this.channelID,
+            content:               this.content,
+            hiddenLinkPreviewUrls: this.hiddenLinkPreviewUrls,
+            embeds:                this.embeds,
+            replyMessageIds:       this.replyMessageIds,
+            isPrivate:             this.isPrivate,
+            isSilent:              this.isSilent,
+            mentions:              this.mentions,
+            createdAt:             this.createdAt,
+            editedTimestamp:       this.editedTimestamp,
+            memberID:              this.memberID,
+            webhookID:             this.webhookID,
+            deletedAt:             this.deletedAt
         };
     }
 
