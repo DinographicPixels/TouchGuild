@@ -600,6 +600,7 @@ export class Guilds {
             json:   options
         }).then(data => this.#manager.client.util.updateGuildCategory(data.category));
     }
+
     /**
      * Read a guild category.
      * @param guildID ID of the guild to create a category in.
