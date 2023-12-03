@@ -108,6 +108,10 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.#connectTimeout = null;
 
         this.compression = params.compression ?? false; // not enabled, guilded doesn't support compression for now.
+
+        setInterval(() => {
+            console.log(this.latency);
+        }, 1000);
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -290,7 +294,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
 
     private onSocketPong(): void {
         this.client.emit("debug", "Heartbeat acknowledged.");
-        this.latency = this.lastHeartbeatSent - Date.now();
+        if (!Number.isNaN(this.lastHeartbeatSent)) this.latency = Date.now() - this.lastHeartbeatSent;
         this.lastHeartbeatAck = true;
     }
 
@@ -378,7 +382,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.currReconnectAttempt = 0;
 
         this.alive = false;
-        this.latency = Infinity;
+        this.latency = NaN;
         this.lastHeartbeatSent = NaN;
         this.lastHeartbeatReceived = NaN;
         this.lastHeartbeatAck = false;
@@ -403,7 +407,7 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.currReconnectAttempt = 0;
 
         this.alive = false;
-        this.latency = Infinity;
+        this.latency = NaN;
         this.lastHeartbeatSent = NaN;
         this.lastHeartbeatReceived = NaN;
         this.lastHeartbeatAck = false;
