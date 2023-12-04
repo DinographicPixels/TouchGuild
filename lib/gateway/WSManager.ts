@@ -108,10 +108,6 @@ export class WSManager extends TypedEmitter<WebsocketEvents> {
         this.#connectTimeout = null;
 
         this.compression = params.compression ?? false; // not enabled, guilded doesn't support compression for now.
-
-        setInterval(() => {
-            console.log(this.latency);
-        }, 1000);
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
