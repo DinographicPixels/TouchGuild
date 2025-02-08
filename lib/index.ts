@@ -69,8 +69,8 @@ export * from "./structures/Category";
 export * from "./structures/Subscription";
 export * from "./structures/Permission";
 
-export * from "./util/Collection";
-export * from "./util/TypedCollection";
+export { default as Collection } from "./util/Collection";
+export { default as TypedCollection } from "./util/TypedCollection";
 
 export * as APITypes from "guildedapi-types.ts/v1";
 export * from "./Constants";
