@@ -47,7 +47,7 @@ The documentation under `dev` is always for the latest commit. If something isn'
 Data collection is enabled by default for improving and making statistics.
 This includes collecting application IDs, guild count, build info, method execution counts, latency data, and application command usage.
 
-[Learn more.](https://guide.touchguild.com/data-and-analytics)
+[Learn more](https://guide.touchguild.com/data-and-analytics) –– [Privacy Policy](https://guide.touchguild.com/privacy-policy)
 
 For transparency, you can review the source code.
 
@@ -58,9 +58,13 @@ If some of your data have already been collected and want to the removal of them
 <hr>
 
 ## Links:
+#### Ressources
 - [Website](https://touchguild.com/)
 - [Guide](https://guide.touchguild.com/)
 - [Release documentation](https://docs.touchguild.com/)
 - [Development documentation](https://docs.touchguild.com/dev/)
+#### Policies
+- [Privacy Policy](https://guide.touchguild.com/privacy-policy)
+#### Community
 - [Discord server](https://discord.gg/UgPRaGRkrQ)
 - [Guilded server](https://www.guilded.gg/i/ExPXPrwE)
