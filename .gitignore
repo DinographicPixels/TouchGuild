@@ -4,7 +4,6 @@ tests/*
 deprecated/
 archives/
 
-README.md
 .DS_Store
 *.env
 .env
