@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DinographicPixels/TouchGuild.git"
+    "url": "git+https://github.com/Dinographic/TouchGuild.git"
   },
   "keywords": [
     "touchguild",
@@ -43,14 +43,14 @@
     "content",
     "interaction"
   ],
-  "author": "DinographicPixels",
+  "author": "Dinographic",
   "contributors": [
-    "Wade (PakkoGraphic)<https://github.com/PakkoGraphic>",
+    "Wade (pakkographic)<https://github.com/PakkoGraphic>",
     "Raphaël (raphckrman)<https://github.com/raphckrman>"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DinographicPixels/TouchGuild/issues"
+    "url": "https://github.com/Dinographic/TouchGuild/issues"
   },
   "homepage": "https://touchguild.com",
   "devDependencies": {

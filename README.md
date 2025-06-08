@@ -1,8 +1,8 @@
 <p align="center">
-<a href="https://touchguild.com/"><img width=100% src="https://github.com/DinographicPixels/TouchGuild/raw/dev/images/touchguild-banner-2025.png"></a>
+<a href="https://touchguild.com/"><img width=100% src="https://github.com/Dinographic/TouchGuild/raw/dev/images/touchguild-banner-2025.png"></a>
   <br>
   <a href="https://npmjs.com/package/touchguild"><img src="https://img.shields.io/npm/v/touchguild.svg?style=rounded&color=informational"></a>
-   <a href="https://github.com/DinographicPixels/TouchGuild/stargazers"><img src="https://img.shields.io/github/stars/DinographicPixels/TouchGuild?color=yellow&style=rounded"></a>
+   <a href="https://github.com/Dinographic/TouchGuild/stargazers"><img src="https://img.shields.io/github/stars/Dinographic/TouchGuild?color=yellow&style=rounded"></a>
   <a href="https://npmjs.com/package/touchguild"><img href="https://npmjs.com/package/touchguild" src="https://img.shields.io/npm/dt/touchguild?color=red&style=rounded"></a>
   <a href="https://npmjs.com/package/touchguild"><img href="https://npmjs.com/package/touchguild" src="https://img.shields.io/npm/dw/touchguild?color=red&style=rounded"></a>
 </p>
@@ -23,7 +23,7 @@ client.on('error', (err) => {
 client.connect();
 ```
 
-For more examples, check out the [examples](https://github.com/DinographicPixels/TouchGuild/tree/dev/examples) folder on GitHub.
+For more examples, check out the [examples](https://github.com/Dinographic/TouchGuild/tree/dev/examples) folder on GitHub.
 <hr>
 
 ## Installation

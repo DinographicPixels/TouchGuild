@@ -6,7 +6,7 @@
   "description": "TouchGuild, a NodeJS library for interfacing with Guilded.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DinographicPixels/TouchGuild"
+    "url": "https://github.com/Dinographic/TouchGuild"
   },
   "keywords": ["touchguild", "guilded", "api", "node", "npm-only"],
   "compatibility": {
