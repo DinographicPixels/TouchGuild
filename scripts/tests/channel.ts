@@ -1,18 +1,20 @@
 import { Client } from "../../lib";
 const client = new Client({ token: process.env.TOKEN as string });
 
+const guildID = "Rpm1GWol";
+
 client.on("ready", async () => {
     console.log(`Logged as ${client.user?.username}`);
-    let chat = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "chat", { description: "We love Pizza 🍕" });
-    let announcement = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "announcements", { description: "We love Pizza 🍕" });
-    let calendar = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "calendar", { description: "We love Pizza 🍕" });
-    let forums = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "forums", { description: "We love Pizza 🍕" });
-    let media = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "media", { description: "We love Pizza 🍕" });
-    let voice = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "voice", { description: "We love Pizza 🍕" });
-    let docs = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "docs", { description: "We love Pizza 🍕" });
-    let list = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "list", { description: "We love Pizza 🍕" });
-    let scheduling = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "scheduling", { description: "We love Pizza 🍕" });
-    let stream = await client.rest.guilds.createChannel("l6Wgk5QE", "PIZZANANAS", "stream", { description: "We love Pizza 🍕" });
+    let chat = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "chat", { description: "We love Pizza 🍕" });
+    let announcement = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "announcements", { description: "We love Pizza 🍕" });
+    let calendar = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "calendar", { description: "We love Pizza 🍕" });
+    let forums = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "forums", { description: "We love Pizza 🍕" });
+    let media = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "media", { description: "We love Pizza 🍕" });
+    let voice = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "voice", { description: "We love Pizza 🍕" });
+    let docs = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "docs", { description: "We love Pizza 🍕" });
+    let list = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "list", { description: "We love Pizza 🍕" });
+    let scheduling = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "scheduling", { description: "We love Pizza 🍕" });
+    let stream = await client.rest.guilds.createChannel(guildID, "PIZZANANAS", "stream", { description: "We love Pizza 🍕" });
     console.log("📧 The Channels were created")
     await chat.edit({ description: "We love Pizza 🍕\nWith Nutella", isPublic: true, name:"P-I-Z-Z-A" });
     await announcement.edit({ description: "We love Pizza 🍕\nWith Nutella", isPublic: true, name:"P-I-Z-Z-A" });

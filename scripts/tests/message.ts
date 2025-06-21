@@ -1,10 +1,18 @@
 import { Client } from "../../lib";
 const client = new Client({ token: process.env.TOKEN as string});
 
+const guildID = "Rpm1GWol";
+const textChannelID = "72db369a-5506-4169-8c9a-44492028628e";
+const announcementChannelID = "91595989-6f5c-4bf4-8787-a48acddf41cd";
+const calendarChannelID = "28e022d0-e206-4e78-abb2-47b4e2bea207";
+const docChannelID = "5896f92a-edc3-42bc-9806-3df79ef5e7ae";
+const forumChannelID = "746d881e-67c5-44a8-b9cf-ebf846c1c1bf";
+const listChannelID = "91fc5ce3-c62d-4c19-ae9d-823323b35b56";
+
 client.on("ready", async () => {
     console.log(`Logged as ${client.user?.username}`);
     console.log("📧 Sending Message")
-    let message = await client.rest.channels.createMessage("b531fbd7-6aec-47f0-a58d-4021aaa45ec6", { content: "We love Pizza 🍕" });
+    let message = await client.rest.channels.createMessage(textChannelID, { content: "We love Pizza 🍕" });
     console.log("📧 The Message was sent")
     await message.pin();
     console.log("📌 The Message was pinned")
@@ -35,12 +43,12 @@ client.on("ready", async () => {
     console.log("👍 The Reactions were deleted")
     await message.delete();
     console.log("🗑️ The Message was deleted")
-    let cache = await client.getMessage("NEa5J8GE", message.channelID, message.id)
+    let cache = await client.getMessage(guildID, message.channelID, message.id)
     if (!cache) console.log("❌ The Message was not cached")
     if (cache) console.log("✅ The Message was cached")
     console.log("--------------------")
     console.log("📧 Sending Announcement")
-    let announcement = await client.rest.channels.createAnnouncement("05bd1082-8722-408e-8682-f6c8c56cd3d5", {title: "Pizza",content: "We love Pizza 🍕",});
+    let announcement = await client.rest.channels.createAnnouncement(announcementChannelID, {title: "Pizza",content: "We love Pizza 🍕",});
     console.log("📧 The Announcement was sent")
     let comment = await client.rest.channels.createAnnouncementComment(announcement.channelID, announcement.id, {content: "With Pineapple"});
     console.log("📧 The Announcement Comment was sent")
@@ -57,7 +65,7 @@ client.on("ready", async () => {
     console.log("🗑️ The Announcement was deleted")
     console.log("--------------------")
     console.log("📧 Sending Calendar Event")
-    let event = await client.rest.channels.createCalendarEvent("0a5f7608-e7cd-48ac-ad71-9f4d45ea7bb6", {
+    let event = await client.rest.channels.createCalendarEvent(calendarChannelID, {
         name: "Pizza Party",
         description: "We love Pizza 🍕",
         color: 0xFFE933,
@@ -96,7 +104,7 @@ client.on("ready", async () => {
     console.log("🗑️ The Calendar Event was deleted")
     console.log("--------------------")
     console.log("📧 Sending Docs")
-    let doc = await client.rest.channels.createDoc("1a023be2-c1a3-4609-ac69-c00a487d5786", {"title":"The 5 Reasons Why You Should Eat Pizza (The 6th Will Shock You)","content":"So, this is the 5 reasons why you should eat pizza:\n1 » It's good\n2» It's good\n3» It's good\n4» It's good\n5» It's good"});
+    let doc = await client.rest.channels.createDoc(docChannelID, {"title":"The 5 Reasons Why You Should Eat Pizza (The 6th Will Shock You)","content":"So, this is the 5 reasons why you should eat pizza:\n1 » It's good\n2» It's good\n3» It's good\n4» It's good\n5» It's good"});
     console.log("📧 The Doc was sent")
     let CommentDoc = await client.rest.channels.createDocComment(doc.channelID, doc.id, {content: "With Pineapple it's better"});
     console.log("📧 The Doc Comment was sent")
@@ -113,7 +121,7 @@ client.on("ready", async () => {
     console.log("🗑️ The Doc was deleted")
     console.log("--------------------")
     console.log("📧 Sending Forum Topic")
-    let Thread = await client.rest.channels.createForumThread("3fa9c321-213b-42b8-a9f0-9658d4c9efa4", {title: "Pizza",content: "We love Pizza 🍕",});
+    let Thread = await client.rest.channels.createForumThread(forumChannelID, {title: "Pizza",content: "We love Pizza 🍕",});
     console.log("📧 The Forum Thread was sent")
     let CommentThread = await client.rest.channels.createForumComment(Thread.channelID, Thread.id, {content: "With Pineapple it's better"});
     console.log("📧 The Forum Comment was sent")
@@ -130,7 +138,7 @@ client.on("ready", async () => {
     console.log("🗑️ The Forum Thread was deleted")
     console.log("--------------------")
     console.log("📧 Sending List Item")
-    let Item = await client.rest.channels.createListItem("0f0a5197-ef5e-4a07-9b21-2c258af63702", "Eat some Pizza", {content:"With Pineapple it's better",});
+    let Item = await client.rest.channels.createListItem(listChannelID, "Eat some Pizza", {content:"With Pineapple it's better",});
     console.log("📧 The List Item was sent")
     await client.rest.channels.completeListItem(Item.channelID, Item.id);
     console.log("📧 The List Item was completed")
