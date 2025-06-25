@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "guildedapi-types.ts": "0.3.64",
-    "undici": "^6.19.8",
+    "undici": "^6.21.3",
     "ws": "^8.18.0"
   },
   "engines": {
