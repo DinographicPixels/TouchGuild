@@ -4,10 +4,11 @@
 // Copyright (c) 2024 DinographicPixels. All rights reserved.
 //
 
-import type { ApplicationCommandType, ApplicationCommandOptionType } from "../Constants";
+import type { ApplicationCommandType, ApplicationCommandOptionType, Locales } from "../Constants";
 
 export interface ApplicationCommand {
     name: string;
+    nameLocalizations?: Partial<Record<Locales, string>>;
     options?: Array<ApplicationCommandOption>;
     type: ApplicationCommandType;
 }

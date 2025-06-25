@@ -67,24 +67,24 @@ export class MessageHandler extends GatewayEventHandler {
                   return message?.memberID === this.client.user?.id;
               }) ?? false;
 
-            const commandNames =
-          this.client.application.commands.map(command => command.name);
+            const commandNames = this.client.application.commands.map(command =>
+                [command.name, ...Object.values(command.nameLocalizations ?? {})]
+            );
 
             let currentCommandName: string | null = null;
             const executionType: "full" | "simple" | false =
-              commandNames?.some((name): boolean => {
-                  const usingAppCommandRegExp = new RegExp(`^/${this.client.application.appShortname} ${name}(\\s|$)`);
-                  const usingSimpleCommandRegExp = new RegExp(`^/${name}(\\s|$)`);
-                  const usingAppCommand = usingAppCommandRegExp.test(data.message.content ?? "");
-                  const usingSimpleCommand = usingSimpleCommandRegExp.test(data.message.content ?? "");
+              commandNames?.some((names): boolean => {
+                  const isUsingCommand = names.some((name): boolean => {
+                      const usingAppCommandRegExp = new RegExp(`^/${this.client.application.appShortname} ${name}(\\s|$)`);
+                      const usingSimpleCommandRegExp = new RegExp(`^/${name}(\\s|$)`);
+                      const usingAppCommand = usingAppCommandRegExp.test(data.message.content ?? "");
+                      const usingSimpleCommand = usingSimpleCommandRegExp.test(data.message.content ?? "");
 
-                  if (usingAppCommand) {
-                      currentCommandName = name;
-                      return true;
-                  }
+                      return usingAppCommand || usingSimpleCommand;
+                  });
 
-                  if (usingSimpleCommand) {
-                      currentCommandName = name;
+                  if (isUsingCommand) {
+                      currentCommandName = names[0];
                       return true;
                   }
 
