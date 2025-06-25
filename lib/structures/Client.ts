@@ -181,12 +181,25 @@ export class Client extends TypedEmitter<ClientEvents> {
     ): void {
         if (!this.application.enabled)
             throw new Error("Couldn't register application command if Client Option \"applicationShortname\" has not been set.");
+
         const regExpCheck = /^[\d_a-z-]{1,32}$/;
         if (!regExpCheck.test(command.name))
             throw new Error(
                 "Application command name is invalid (name property), " +
               "requirements: \"1-32 characters containing no capital letters, spaces, or symbols other than - and _\"."
             );
+
+        if (command.nameLocalizations) {
+            const localizedNameValues = Object.values(command.nameLocalizations);
+            for (const [i, localizedNameValue] of localizedNameValues.entries()) {
+                if (!regExpCheck.test(localizedNameValue))
+                    throw new Error(
+                        `Application command localized name is invalid: nameLocalizations[${i}], ` +
+                      "requirements: \"1-32 characters containing no capital letters, spaces, or symbols other than - and _\"."
+                    );
+            }
+        }
+
         if (!Object.values(ApplicationCommandType).includes(command.type))
             throw new Error("Application command type is invalid (type property).");
 
