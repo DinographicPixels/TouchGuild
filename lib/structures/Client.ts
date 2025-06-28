@@ -251,9 +251,9 @@ export class Client extends TypedEmitter<ClientEvents> {
                 ) {
                     if (!numericTypes.has(option.type))
                         throw new Error(`Application command option is invalid: minValue and maxValue are only allowed on numeric option types, not on type ${option.type}`);
-                    if (typeof option.minValue !== "number")
+                    if (typeof option.minValue !== "number" && option.minValue !== undefined)
                         throw new Error("Application command option is invalid: minValue has to be a number.");
-                    if (typeof option.maxValue !== "number")
+                    if (typeof option.maxValue !== "number" && option.maxValue !== undefined)
                         throw new Error("Application command option is invalid: maxValue has to be a number.");
                     if (
                         option.minValue !== undefined &&
