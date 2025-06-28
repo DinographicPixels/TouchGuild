@@ -1,15 +1,14 @@
 /** @module SocialLink */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import type { Client } from "./Client";
 
 import type { User } from "./User";
 import type { JSONSocialLink, RawSocialLink } from "../types";
-import { type SocialLinkType } from "../Constants";
+import type { SocialLinkType } from "../Constants";
 
 /** User's social link. */
 export class SocialLink {

@@ -1,8 +1,7 @@
 /** @module ListItemHandler */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import { GatewayEventHandler } from "./GatewayEventHandler";
@@ -16,7 +15,7 @@ import type {
 } from "../../Constants";
 
 /** Internal component, emitting list events. */
-export class ListItemHandler extends GatewayEventHandler{
+export class ListItemHandler extends GatewayEventHandler {
     listItemComplete(data: GatewayEvent_ListItemCompleted): void {
         const ListItemComponent = new ListItem(data.listItem, this.client);
         this.client.emit("listItemComplete", ListItemComponent);

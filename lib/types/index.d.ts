@@ -11,3 +11,4 @@ export * from "./webhooks";
 export * from "./users";
 export * from "./applications";
 export * from "./interactions";
+export * from "./shared";

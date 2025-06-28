@@ -13,8 +13,7 @@ import type {
 } from "../types";
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 /** Represents a "docs" channel. */

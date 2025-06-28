@@ -1,11 +1,10 @@
 /** @module CommandInteraction */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2024–present Dinographic. All rights reserved.
 //
 
-import { type Client } from "./Client";
+import type { Client } from "./Client";
 import { Guild } from "./Guild";
 
 import { Base } from "./Base";

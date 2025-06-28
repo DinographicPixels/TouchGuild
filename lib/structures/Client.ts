@@ -7,7 +7,7 @@
 // Main access component
 //
 // Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import type { Message } from "./Message";
@@ -23,17 +23,17 @@ import { GatewayHandler } from "../gateway/GatewayHandler";
 import { RESTManager } from "../rest/RESTManager";
 import TypedCollection from "../util/TypedCollection";
 import TypedEmitter from "../util/TypedEmitter";
-import { type GATEWAY_EVENTS, ApplicationCommandOptionType, ApplicationCommandType } from "../Constants";
+import { ApplicationCommandOptionTypes, ApplicationCommandType, type GATEWAY_EVENTS } from "../Constants";
 import type {
-    ClientEvents,
-    ClientOptions,
     AnyChannel,
     AnyTextableChannel,
-    RawGuild,
-    RawUser,
     ApplicationCommand,
     ClientApplication,
-    PrivateApplicationCommand
+    ClientEvents,
+    ClientOptions,
+    PrivateApplicationCommand,
+    RawGuild,
+    RawUser
 } from "../types";
 import { Util } from "../util/Util";
 import { config } from "../../pkgconfig";
@@ -84,6 +84,7 @@ export class Client extends TypedEmitter<ClientEvents> {
             waitForCaching:            params.waitForCaching ?? true,
             isOfficialMarkdownEnabled: params.isOfficialMarkdownEnabled ?? true,
             wsReconnect:               params.wsReconnect,
+            wsOptions:                 params.wsOptions,
             collectionLimits:          {
                 interactions:         params.collectionLimits?.interactions ?? 100,
                 messages:             params.collectionLimits?.messages ?? 100,
@@ -98,11 +99,19 @@ export class Client extends TypedEmitter<ClientEvents> {
                 announcementComments: params.collectionLimits?.announcementComments ?? 100
             },
             applicationShortname: params.applicationShortname,
-            restMode:             false,
+            restMode:             params.restMode,
             intents:              params.intents ?? [],
             dataCollection:       params.dataCollection
         };
-        this.ws = new WSManager(this, { token: this.token, client: this, reconnect: params.wsReconnect });
+        this.ws = new WSManager(
+            this,
+            {
+                ...params.wsOptions,
+                token:     this.token,
+                client:    this,
+                reconnect: params.wsOptions?.reconnect ?? params.wsReconnect
+            }
+        );
         this.guilds = new TypedCollection(Guild, this);
         this.users = new TypedCollection(User, this);
         this.rest = (
@@ -206,7 +215,7 @@ export class Client extends TypedEmitter<ClientEvents> {
         if (command.options) {
             const wrongOptionTypeIndex =
               command.options.map(opt =>
-                  Object.values(ApplicationCommandOptionType).includes(opt.type)).indexOf(false);
+                  Object.values(ApplicationCommandOptionTypes).includes(opt.type)).indexOf(false);
             if (wrongOptionTypeIndex !== -1)
                 throw new Error(`Application command option type is invalid: options[${wrongOptionTypeIndex}].`);
 
@@ -215,11 +224,102 @@ export class Client extends TypedEmitter<ClientEvents> {
             if (wrongOptionNameIndex !== -1)
                 throw new Error(`Application command option name is invalid options[${wrongOptionNameIndex}], requirements: "1-32 characters containing no capital letters, spaces, or symbols other than - and _".`);
 
+            const optNames = command.options.map(opt => opt.name);
+            if (optNames.length > new Set(optNames).size)
+                throw new Error("Application command option name is invalid, cannot have two or more options with the same name.");
+
             let firstOptionalFound = false;
             for (let i = 0; i < command.options.length; i++) {
                 if (!command.options[i].required && !firstOptionalFound) firstOptionalFound = true;
                 if (firstOptionalFound && command.options[i].required)
                     throw new Error(`Application command option cannot be required after setting an optional one: options[${i}].`);
+            }
+
+            for (let i = 0; i < command.options.length; i++) {
+                const option = command.options[i];
+
+                const numericTypes = new Set([
+                    ApplicationCommandOptionTypes.NUMBER,
+                    ApplicationCommandOptionTypes.INTEGER,
+                    ApplicationCommandOptionTypes.FLOAT,
+                    ApplicationCommandOptionTypes.SIGNED_32_INTEGER
+                ]);
+
+                if (
+                    ("minValue" in option && option.minValue !== undefined) ||
+                  ("maxValue" in option && option.maxValue !== undefined)
+                ) {
+                    if (!numericTypes.has(option.type))
+                        throw new Error(`Application command option is invalid: minValue and maxValue are only allowed on numeric option types, not on type ${option.type}`);
+                    if (typeof option.minValue !== "number")
+                        throw new Error("Application command option is invalid: minValue has to be a number.");
+                    if (typeof option.maxValue !== "number")
+                        throw new Error("Application command option is invalid: maxValue has to be a number.");
+                    if (
+                        option.minValue !== undefined &&
+                      option.maxValue !== undefined &&
+                      option.maxValue <= option.minValue
+                    ) {
+                        throw new Error("Application command option is invalid: maxValue must be greater than minValue");
+                    }
+                }
+
+                if (
+                    ("minLength" in option && option.minLength !== undefined) ||
+                  ("maxLength" in option && option.maxLength !== undefined)
+                ) {
+                    if (option.type !== ApplicationCommandOptionTypes.STRING)
+                        throw new Error("Application command option is invalid: minLength and maxLength are only allowed on STRING option type.");
+                    if (typeof option.minLength !== "number")
+                        throw new Error("Application command option is invalid: minLength has to be a number.");
+                    if (typeof option.maxLength !== "number")
+                        throw new Error("Application command option is invalid: maxLength has to be a number.");
+                    if (
+                        option.minLength !== undefined &&
+                      option.maxLength !== undefined &&
+                      option.maxLength <= option.minLength
+                    ) {
+                        throw new Error("Application command option is invalid: maxLength must be greater than minLength");
+                    }
+                }
+                if ("choices" in option && option.choices) {
+                    const choices = option.choices;
+
+                    const allowedTypes = [
+                        ApplicationCommandOptionTypes.STRING,
+                        ApplicationCommandOptionTypes.NUMBER,
+                        ApplicationCommandOptionTypes.INTEGER,
+                        ApplicationCommandOptionTypes.FLOAT,
+                        ApplicationCommandOptionTypes.SIGNED_32_INTEGER
+                    ];
+
+                    if (!allowedTypes.includes(option.type))
+                        throw new Error(`Application command option is invalid: options[${i}].choices is not supported by set option type`);
+
+                    for (const [choiceIndex, choice] of choices.entries()) {
+                        if (choice.value === undefined || choice.value === null)
+                            throw new Error(`Application command option choice value is invalid: options[${i}].choices[${choiceIndex}].value has to be set."`);
+                        if (typeof choice.name !== "string" || choice.name.length === 0 || choice.name.length > 50)
+                            throw new Error(`Application command option choice name is invalid: options[${i}].choices[${choiceIndex}].name, requirement: "1-50 characters."`);
+                        if (option.type === ApplicationCommandOptionTypes.STRING && typeof choice.value !== "string") {
+                            throw new Error(`Application command option choice value is invalid: options[${i}].choices[${choiceIndex}].value has to be a string.`);
+                        }
+                        if (
+                            (
+                                option.type === ApplicationCommandOptionTypes.NUMBER
+                              || option.type === ApplicationCommandOptionTypes.INTEGER
+                              || option.type === ApplicationCommandOptionTypes.FLOAT
+                              || option.type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER
+                            )
+                          && typeof choice.value !== "number"
+                        ) throw new Error(`Application command option choice value is invalid: options[${i}].choices[${choiceIndex}].value has to be a number.`);
+                        if (typeof choice.value === "string" && !regExpCheck.test(choice.value))
+                            throw new Error(`Application command option choice value is invalid: options[${i}].choices[${choiceIndex}].value, requirements: "1-32 characters containing no capital letters, spaces, or symbols other than - and _".`);
+                    }
+                    const choiceValues = choices.map(choice => choice.value);
+                    if (choiceValues.length > new Set(choiceValues).size)
+                        throw new Error(`Application command option choice value is invalid: options[${i}].choices, two choices cannot have the same value.`);
+                }
             }
         }
 

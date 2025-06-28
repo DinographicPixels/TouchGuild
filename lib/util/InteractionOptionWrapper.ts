@@ -1,12 +1,24 @@
-import type { AnyChannel, ApplicationCommandOption, InteractionOptionWrapperData, MessageAttachment } from "../types";
+
+//
+// © 2024–present Dinographic. All rights reserved.
+//
+
+import type {
+    AnyChannel,
+    ApplicationCommandOption,
+    InteractionOptionWrapperData,
+    MessageAttachment,
+    VerifyOptionsData
+} from "../types";
 import type { Client } from "../structures/Client";
-import { ApplicationCommandOptionType } from "../Constants";
+import { ApplicationCommandOptionTypes } from "../Constants";
 import { fetch } from "undici";
 import type { APIURLSignature } from "guildedapi-types.ts/v1";
 
 export class InteractionOptionWrapper {
     #client: Client;
     #data: InteractionOptionWrapperData;
+    optionalOptions: Array<ApplicationCommandOption>;
     requiredOptions: Array<ApplicationCommandOption>;
     values: Array<string | number | boolean>;
     constructor(data: InteractionOptionWrapperData, client: Client) {
@@ -18,6 +30,11 @@ export class InteractionOptionWrapper {
                 data.applicationCommand.options
                     .filter(opt => opt.required)
                 : [];
+        this.optionalOptions =
+          data.applicationCommand.options ?
+              data.applicationCommand.options
+                  .filter(opt => !opt.required)
+              : [];
     }
 
     private extractValues(text: string): Array<string | number> {
@@ -67,87 +84,112 @@ export class InteractionOptionWrapper {
 
         return result;
     }
-    private getMentionOptions<T = string | number | boolean>(name: string, type: ApplicationCommandOptionType): { name: string; value: T; } | undefined {
+    private getMentionOptions<T = string | number | boolean>(name: string, type: ApplicationCommandOptionTypes): { name: string; value: T; } | undefined {
         if (!this.#data.applicationCommand) return;
+        const appCmdOptions = this.#data.applicationCommand.options;
         const optionIndex =
-            this.#data.applicationCommand.options?.findIndex(opt =>
-                opt.name === name
-                && opt.type === type
-            );
+          appCmdOptions?.findIndex(opt =>
+              opt.name === name
+            && opt.type === type
+          );
 
         if (!optionIndex && optionIndex !== 0 || this.values?.[optionIndex] === undefined) return;
 
-        if (type === ApplicationCommandOptionType.CHANNEL
-            && !this.#data.mentions?.channels?.map(channel => channel.id).includes(this.values[optionIndex].toString())
-            || type === ApplicationCommandOptionType.ROLE
-            && !this.#data.mentions?.roles?.map(channel => channel.id).includes(Number(this.values[optionIndex]))
-            || type === ApplicationCommandOptionType.USER
-            && !this.#data.mentions?.users?.map(channel => channel.id).includes(this.values[optionIndex].toString())
-            || type === ApplicationCommandOptionType.STRING
-            && typeof this.values[optionIndex] !== "string"
-            || type === ApplicationCommandOptionType.INTEGER
-            && (
-                typeof this.values[optionIndex] !== "number"
-                || !Number.isFinite(this.values[optionIndex])
-                || !Number.isInteger(this.values[optionIndex])
-            )
-            || type === ApplicationCommandOptionType.NUMBER
-            && (
-                typeof this.values[optionIndex] !== "number"
-                || !Number.isFinite(this.values[optionIndex])
-            )
-            || type === ApplicationCommandOptionType.FLOAT
-            && (
-                typeof this.values[optionIndex] !== "number"
-                || !Number.isFinite(this.values[optionIndex])
-                || Number.isInteger(this.values[optionIndex])
-            )
-            || type === ApplicationCommandOptionType.SIGNED_32_INTEGER
-            && (
-                typeof this.values[optionIndex] !== "number"
-                || !Number.isFinite(this.values[optionIndex])
-                || !Number.isInteger(this.values[optionIndex])
-                || Number(this.values[optionIndex]) < -2147483648
-                || Number(this.values[optionIndex]) > 2147483647
-            )
-            || type === ApplicationCommandOptionType.EMBEDDED_ATTACHMENT
-            && (
-                typeof this.values[optionIndex] !== "string"
-                || !this.values[optionIndex].toString().includes("![](https://cdn.gilcdn.com/")
-            )
-            || type === ApplicationCommandOptionType.BOOLEAN
-            && (
-                typeof this.values[optionIndex] === "string"
-                && ((this.values[optionIndex] as string)?.toLowerCase() !== "true"
-                    && (this.values[optionIndex] as string)?.toLowerCase() !== "false")
-                || typeof this.values[optionIndex] === "number"
-                && (this.values[optionIndex] !== 1
-                    && this.values[optionIndex] !== 0)
-            )
-            || type === ApplicationCommandOptionType.EMOTE
-            && typeof this.values[optionIndex] !== "string"
-            && (
-                typeof this.values[optionIndex] !== "number"
-                || this.values[optionIndex] > 9999999
-                || this.values[optionIndex] < 1000000
-            )
+        if (type === ApplicationCommandOptionTypes.CHANNEL
+          && !this.#data.mentions?.channels?.map(channel => channel.id).includes(this.values[optionIndex].toString())
+          || type === ApplicationCommandOptionTypes.ROLE
+          && !this.#data.mentions?.roles?.map(channel => channel.id).includes(Number(this.values[optionIndex]))
+          || type === ApplicationCommandOptionTypes.USER
+          && !this.#data.mentions?.users?.map(channel => channel.id).includes(this.values[optionIndex].toString())
+          || type === ApplicationCommandOptionTypes.STRING
+          && typeof this.values[optionIndex] !== "string"
+          || type === ApplicationCommandOptionTypes.INTEGER
+          && (
+              typeof this.values[optionIndex] !== "number"
+            || !Number.isFinite(this.values[optionIndex])
+            || !Number.isInteger(this.values[optionIndex])
+          )
+          || type === ApplicationCommandOptionTypes.NUMBER
+          && (
+              typeof this.values[optionIndex] !== "number"
+            || !Number.isFinite(this.values[optionIndex])
+          )
+          || type === ApplicationCommandOptionTypes.FLOAT
+          && (
+              typeof this.values[optionIndex] !== "number"
+            || !Number.isFinite(this.values[optionIndex])
+            || Number.isInteger(this.values[optionIndex])
+          )
+          || type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER
+          && (
+              typeof this.values[optionIndex] !== "number"
+            || !Number.isFinite(this.values[optionIndex])
+            || !Number.isInteger(this.values[optionIndex])
+            || Number(this.values[optionIndex]) < -2147483648
+            || Number(this.values[optionIndex]) > 2147483647
+          )
+          || type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT
+          && (
+              typeof this.values[optionIndex] !== "string"
+            || !this.values[optionIndex].toString().includes("![](https://cdn.gilcdn.com/")
+          )
+          || type === ApplicationCommandOptionTypes.BOOLEAN
+          && (
+              typeof this.values[optionIndex] === "string"
+            && ((this.values[optionIndex] as string)?.toLowerCase() !== "true"
+              && (this.values[optionIndex] as string)?.toLowerCase() !== "false")
+            || typeof this.values[optionIndex] === "number"
+            && (this.values[optionIndex] !== 1
+              && this.values[optionIndex] !== 0)
+          )
+          || type === ApplicationCommandOptionTypes.EMOTE
+          && typeof this.values[optionIndex] !== "string"
+          && (
+              typeof this.values[optionIndex] !== "number"
+            || Number(this.values[optionIndex]) > 9999999
+            || Number(this.values[optionIndex]) < 1000000
+          )
         ) return;
-        if (type === ApplicationCommandOptionType.INTEGER)
+        if (type === ApplicationCommandOptionTypes.INTEGER)
             this.values[optionIndex] = Math.trunc(Number(this.values[optionIndex]));
-        if (type === ApplicationCommandOptionType.EMBEDDED_ATTACHMENT) {
+        if (type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT) {
             const regExp = /!\[]\((https:\/\/[^)]+)\)/g;
             const regExpArray: Array<string> = regExp.exec(this.values[optionIndex].toString()) ?? [];
             this.values[optionIndex] = regExpArray[0];
         }
-        if (type === ApplicationCommandOptionType.BOOLEAN) {
-            if (typeof this.values[optionIndex] === "string")
-                this.values[optionIndex] = this.values[optionIndex] === "true" ? 1 : 0;
-            this.values[optionIndex] = Boolean(this.values[optionIndex]);
+        if (type === ApplicationCommandOptionTypes.BOOLEAN) {
+            const val = this.values[optionIndex];
+            this.values[optionIndex] =
+              typeof val === "string"
+                  ? val.toLowerCase() === "true"
+                  : (typeof val === "number" ? val === 1 : Boolean(val));
         }
-        if (type === ApplicationCommandOptionType.EMOTE && typeof this.values[optionIndex] !== "number") {
+        if (type === ApplicationCommandOptionTypes.EMOTE && typeof this.values[optionIndex] !== "number") {
             const emoteID = Number((this.values[optionIndex] as string)?.match(/<:\w+:(\d+)>/)?.[1]);
             if (isNaN(emoteID)) return;
             this.values[optionIndex] = emoteID;
+        }
+
+        const appCmdCurrentOpt = appCmdOptions?.[optionIndex];
+        if (appCmdCurrentOpt) {
+            if ("choices" in appCmdCurrentOpt && appCmdCurrentOpt.choices) {
+                const choices = appCmdCurrentOpt.choices;
+                if (
+                    !choices.map(choice => choice.value)
+                        .includes(this.values[optionIndex] as string | number) // choices cannot be applied to boolean
+                ) return;
+            }
+
+            const optValue = this.values[optionIndex];
+            if (typeof optValue === "string" && ("minLength" in appCmdCurrentOpt || "maxLength" in appCmdCurrentOpt) && (
+                (appCmdCurrentOpt.maxLength && optValue.length > appCmdCurrentOpt.maxLength)
+                  || (appCmdCurrentOpt.minLength && optValue.length < appCmdCurrentOpt.minLength)
+            )) return;
+
+            if (typeof optValue === "number" && ("minValue" in appCmdCurrentOpt || "maxValue" in appCmdCurrentOpt) && (
+                (appCmdCurrentOpt.maxValue && appCmdCurrentOpt.maxValue !== 0 && optValue > appCmdCurrentOpt.maxValue)
+                || (appCmdCurrentOpt.minValue && optValue < appCmdCurrentOpt.minValue)
+            )) return;
         }
 
         return {
@@ -213,7 +255,7 @@ export class InteractionOptionWrapper {
     getAttachmentOption(name: string, required?: boolean): { name: string; value: string; } | undefined {
         const option = this.getMentionOptions<string>(
             name,
-            ApplicationCommandOptionType.EMBEDDED_ATTACHMENT
+            ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT
         );
         if (option === undefined && required) throw new Error("Couldn't get embedded attachment option.");
         return option;
@@ -224,7 +266,7 @@ export class InteractionOptionWrapper {
     getBooleanOption(name: string, required?: boolean): { name: string; value: boolean; } | undefined {
         const option = this.getMentionOptions<boolean>(
             name,
-            ApplicationCommandOptionType.BOOLEAN
+            ApplicationCommandOptionTypes.BOOLEAN
         );
         if (option === undefined && required) throw new Error("Couldn't get boolean option.");
         return option;
@@ -243,7 +285,7 @@ export class InteractionOptionWrapper {
     getChannelOption(name: string, required?: boolean): { name: string; value: string; } | undefined {
         const option = this.getMentionOptions<string>(
             name,
-            ApplicationCommandOptionType.CHANNEL
+            ApplicationCommandOptionTypes.CHANNEL
         );
         if (option === undefined && required) throw new Error("Couldn't get channel option.");
         return option;
@@ -254,43 +296,43 @@ export class InteractionOptionWrapper {
     getEmoteOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.EMOTE
+            ApplicationCommandOptionTypes.EMOTE
         );
         if (option === undefined && required) throw new Error("Couldn't get emote option.");
         return option;
     }
 
-    getFloatOption(name: string, required?: false): { name: string; value: number; } | undefined;
-    getFloatOption(name: string, required: true): { name: string; value: number; };
-    getFloatOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
+    getFloatOption<T extends number = number>(name: string, required?: false): { name: string; value: T; } | undefined;
+    getFloatOption<T extends number = number>(name: string, required: true): { name: string; value: T; };
+    getFloatOption<T extends number = number>(name: string, required?: boolean): { name: string; value: T; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.FLOAT
+            ApplicationCommandOptionTypes.FLOAT
         );
         if (option === undefined && required) throw new Error("Couldn't get float option.");
-        return option;
+        return option as { name: string; value: T; } | undefined;
     }
 
-    getIntegerOption(name: string, required?: false): { name: string; value: number; } | undefined;
-    getIntegerOption(name: string, required: true): { name: string; value: number; };
-    getIntegerOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
+    getIntegerOption<T extends number = number>(name: string, required?: false): { name: string; value: T; } | undefined;
+    getIntegerOption<T extends number = number>(name: string, required: true): { name: string; value: T; };
+    getIntegerOption<T extends number = number>(name: string, required?: boolean): { name: string; value: T; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.INTEGER
+            ApplicationCommandOptionTypes.INTEGER
         );
         if (option === undefined && required) throw new Error("Couldn't get integer option.");
-        return option;
+        return option as { name: string; value: T; } | undefined;
     }
 
-    getNumberOption(name: string, required?: false): { name: string; value: number; } | undefined;
-    getNumberOption(name: string, required: true): { name: string; value: number; };
-    getNumberOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
+    getNumberOption<T extends number = number>(name: string, required?: false): { name: string; value: T; } | undefined;
+    getNumberOption<T extends number = number>(name: string, required: true): { name: string; value: T; };
+    getNumberOption<T extends number = number>(name: string, required?: boolean): { name: string; value: T; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.NUMBER
+            ApplicationCommandOptionTypes.NUMBER
         );
         if (option === undefined && required) throw new Error("Couldn't get number option.");
-        return option;
+        return option as { name: string; value: T; } | undefined;
     }
 
     getRoleOption(name: string, required?: false): { name: string; value: number; } | undefined;
@@ -298,32 +340,32 @@ export class InteractionOptionWrapper {
     getRoleOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.ROLE
+            ApplicationCommandOptionTypes.ROLE
         );
         if (option === undefined && required) throw new Error("Couldn't get role option.");
         return option;
     }
 
-    getSigned32IntOption(name: string, required?: false): { name: string; value: number; } | undefined;
-    getSigned32IntOption(name: string, required: true): { name: string; value: number; };
-    getSigned32IntOption(name: string, required?: boolean): { name: string; value: number; } | undefined {
+    getSigned32IntOption<T extends number = number>(name: string, required?: false): { name: string; value: T; } | undefined;
+    getSigned32IntOption<T extends number = number>(name: string, required: true): { name: string; value: T; };
+    getSigned32IntOption<T extends number = number>(name: string, required?: boolean): { name: string; value: T; } | undefined {
         const option = this.getMentionOptions<number>(
             name,
-            ApplicationCommandOptionType.SIGNED_32_INTEGER
+            ApplicationCommandOptionTypes.SIGNED_32_INTEGER
         );
         if (option === undefined && required) throw new Error("Couldn't get signed 32-bit integer option.");
-        return option;
+        return option as { name: string; value: T; } | undefined;
     }
 
-    getStringOption(name: string, required?: false): { name: string; value: string; } | undefined;
-    getStringOption(name: string, required: true): { name: string; value: string; };
-    getStringOption(name: string, required?: boolean): { name: string; value: string; } | undefined {
+    getStringOption<T extends string = string>(name: string, required?: false): { name: string; value: T; } | undefined;
+    getStringOption<T extends string = string>(name: string, required: true): { name: string; value: T; };
+    getStringOption<T extends string = string>(name: string, required?: boolean): { name: string; value: T; } | undefined {
         const option = this.getMentionOptions<string>(
             name,
-            ApplicationCommandOptionType.STRING
+            ApplicationCommandOptionTypes.STRING
         );
         if (option === undefined && required) throw new Error("Couldn't get string option.");
-        return option;
+        return option as { name: string; value: T; } | undefined;
     }
 
 
@@ -332,7 +374,7 @@ export class InteractionOptionWrapper {
     getUserOption(name: string, required?: boolean): { name: string; value: string; } | undefined {
         const option = this.getMentionOptions<string>(
             name,
-            ApplicationCommandOptionType.USER
+            ApplicationCommandOptionTypes.USER
         );
         if (option === undefined && required) throw new Error("Couldn't get user option.");
         return option;
@@ -346,91 +388,108 @@ export class InteractionOptionWrapper {
         return this.#data.mentions?.here ?? false;
     }
 
-    verifyOptions(): { incorrect: Array<string>; missing: Array<string>; total: Array<string>; } {
+    isOptionRequired(name: string): boolean {
+        return this.requiredOptions.some(opt => opt.name === name);
+    }
+
+    mergeVerifyOptionsData(required: VerifyOptionsData, optionals: VerifyOptionsData): VerifyOptionsData {
+        return {
+            missing:   required.missing,
+            incorrect: required.incorrect.concat(optionals.incorrect),
+            total:     required.total.concat(optionals.total)
+        };
+    }
+
+    verifyOptions(target: "required" | "optionals" | "full" = "required"): VerifyOptionsData {
         const missing = [];
         const incorrect = [];
         const total = [];
-        for (const option of this.requiredOptions) {
+        const fullOptionArr = this.requiredOptions.concat(this.optionalOptions);
+        const targetOptions =
+          target === "full"
+              ? fullOptionArr
+              : (target === "required" ? this.requiredOptions : this.optionalOptions);
+        for (const option of targetOptions) {
             const optionIndex =
-                this.requiredOptions.findIndex(opt =>
+                fullOptionArr.findIndex(opt =>
                     opt.name === option.name
                     && opt.type === option.type
                 );
             switch (option.type) {
-                case ApplicationCommandOptionType.STRING: {
+                case ApplicationCommandOptionTypes.STRING: {
                     const value = this.getStringOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex]) missing.push(option.name);
+                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (!value && this.values[optionIndex]) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.INTEGER: {
+                case ApplicationCommandOptionTypes.INTEGER: {
                     const value = this.getIntegerOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
+                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.FLOAT: {
+                case ApplicationCommandOptionTypes.FLOAT: {
                     const value = this.getFloatOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
+                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.SIGNED_32_INTEGER: {
+                case ApplicationCommandOptionTypes.SIGNED_32_INTEGER: {
                     const value = this.getSigned32IntOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
+                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.NUMBER: {
+                case ApplicationCommandOptionTypes.NUMBER: {
                     const value = this.getNumberOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
+                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.ROLE: {
+                case ApplicationCommandOptionTypes.ROLE: {
                     const value = this.getRoleOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex]) missing.push(option.name);
+                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (!value && this.values[optionIndex]) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.USER: {
+                case ApplicationCommandOptionTypes.USER: {
                     const value = this.getUserOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex]) missing.push(option.name);
+                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (!value && this.values[optionIndex]) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.CHANNEL: {
+                case ApplicationCommandOptionTypes.CHANNEL: {
                     const value = this.getChannelOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex]) missing.push(option.name);
+                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (!value && this.values[optionIndex]) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.EMBEDDED_ATTACHMENT: {
+                case ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT: {
                     const value = this.getAttachmentOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex]) missing.push(option.name);
+                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (!value && this.values[optionIndex]) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.BOOLEAN: {
+                case ApplicationCommandOptionTypes.BOOLEAN: {
                     const value = this.getBooleanOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
                     if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
-                case ApplicationCommandOptionType.EMOTE: {
+                case ApplicationCommandOptionTypes.EMOTE: {
                     const value = this.getEmoteOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex]) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
+                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }

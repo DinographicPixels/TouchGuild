@@ -1,8 +1,7 @@
 /** @module Category */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2023–present Dinographic. All rights reserved.
 //
 
 import type { Client } from "./Client";

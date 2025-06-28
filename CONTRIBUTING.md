@@ -1,4 +1,4 @@
-Join our [Guilded](https://guilded.gg/dinographicpixels) when adding features that aren't directly related to Guilded's API, make sure to look at existing pull requests before opening a new one.
+Join our [Guilded](https://guilded.gg/dinographic) when adding features that aren't directly related to Guilded's API, make sure to look at existing pull requests before opening a new one.
 
 ### Guidelines:
 - Ensure you are following the eslint rules. You can use `npm run lint` to test locally.

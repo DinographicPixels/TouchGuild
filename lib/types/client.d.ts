@@ -1,11 +1,11 @@
 /** @module Types/Client */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import type { GatewayLayerIntent } from "../Constants";
+import type { WSManagerParams } from "../gateway/WSManager";
 import type { Agent } from "undici";
 
 export interface ClientOptions {
@@ -106,11 +106,15 @@ export interface ClientOptions {
      * @default true
      */
     waitForCaching?: boolean;
+    /**
+     * Websocket configuration options
+     */
+    wsOptions?: Omit<WSManagerParams, "client" | "isOfficialMarkdownEnabled" | "proxyURL" | "token" | "compression" | "apiVersion">;
     /** Websocket auto reconnect on connection loss.
      * @default true
+     * @deprecated Use wsOptions#reconnect
      */
     wsReconnect?: boolean;
-
 }
 
 export interface RESTOptions {

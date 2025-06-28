@@ -1,10 +1,8 @@
 /** @module GatewayHandler */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
-
 import { ChannelHandler } from "./events/ChannelHandler";
 import { ForumThreadHandler } from "./events/ForumThreadHandler";
 import { MessageHandler } from "./events/MessageHandler";

@@ -1,7 +1,6 @@
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2024–present Dinographic. All rights reserved.
 //
 
 import type { RawMentions, RawMessage } from "./channels";
@@ -16,7 +15,6 @@ export interface InteractionData {
     applicationCommand: ApplicationCommand | PrivateApplicationCommand;
     name: string;
     options: InteractionOptionWrapper;
-    // resolved?: InteractionResolved;
 }
 
 export interface ComponentInteractionData {
@@ -25,10 +23,6 @@ export interface ComponentInteractionData {
     reactionInfo: MessageReactionInfo;
     userTriggerMessageID: string;
 }
-
-// export interface InteractionResolved {
-//     users: TypedCollection<number, RawUser, User>;
-// }
 
 export interface InteractionOptionWrapperData {
     applicationCommand: ApplicationCommand | PrivateApplicationCommand;
@@ -62,6 +56,12 @@ export interface InteractionButtonComponent extends InteractionComponent {
     customID: string;
     emoteID: number;
     type: InteractionComponentType.BUTTON;
+}
+
+export interface VerifyOptionsData {
+    incorrect: Array<string>;
+    missing: Array<string>;
+    total: Array<string>;
 }
 
 export type AnyInteractionComponent = InteractionButtonComponent;

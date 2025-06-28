@@ -1,10 +1,9 @@
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
-import { type PathsServersServerIdMembersUserIdSocialLinksSocialLinkTypeGetParametersPathSocialLinkType as APISocialLinkType } from "guildedapi-types.ts/typings/schemas/v1";
+import type { PathsServersServerIdMembersUserIdSocialLinksSocialLinkTypeGetParametersPathSocialLinkType as APISocialLinkType } from "guildedapi-types.ts/typings/schemas/v1";
 
 export const RESTMethods = [
     "GET",
@@ -26,7 +25,7 @@ export type ChannelSubcategoryReactionTypes = "CalendarEventComment" | "ForumThr
 /** Channel reaction types that supports bulk delete.  */
 export type ChannelReactionTypeBulkDeleteSupported = "ChannelMessage";
 
-export enum ApplicationCommandOptionType {
+export enum ApplicationCommandOptionTypes {
     STRING,
     INTEGER,
     FLOAT,

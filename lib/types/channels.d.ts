@@ -1,8 +1,7 @@
 /** @module Types/Channels */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2024–present Dinographic. All rights reserved.
 //
 
 import type { AnyInteractionComponent } from "./interactions";

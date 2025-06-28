@@ -1,10 +1,8 @@
 /** @module Events */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
-
 
 import type {
     AnyReactionInfo,
@@ -93,17 +91,17 @@ export interface ClientEvents {
     /** @event Emitted when a calendar event comment is edited. */
     calendarCommentUpdate: [comment: CalendarComment, oldComment: JSONCalendarComment | null];
     /** @event Emitted when an event was added to a calendar. */
-    calendarEventCreate: [CalendarEvent: CalendarEvent];
+    calendarEventCreate: [calendarEvent: CalendarEvent];
     /** @event Emitted when a calendar event is deleted. */
-    calendarEventDelete: [CalendarEvent: CalendarEvent];
+    calendarEventDelete: [calendarEvent: CalendarEvent];
     /** @event Emitted when multiple event RSVPs are updated. */
-    calendarEventRsvpBulkUpdate: [CalendarRSVPs: Array<CalendarEventRSVP>, oldRSVPs: Array<JSONCalendarRSVP | null>];
+    calendarEventRsvpBulkUpdate: [calendarRSVPs: Array<CalendarEventRSVP>, oldRSVPs: Array<JSONCalendarRSVP | null>];
     /** @event Emitted when an event RSVP is deleted. */
-    calendarEventRsvpDelete: [CalendarRSVP: CalendarEventRSVP];
+    calendarEventRsvpDelete: [calendarRSVP: CalendarEventRSVP];
     /** @event Emitted when an event RSVP is updated. */
-    calendarEventRsvpUpdate: [CalendarRSVP: CalendarEventRSVP, oldRSVP: JSONCalendarRSVP | null];
+    calendarEventRsvpUpdate: [calendarRSVP: CalendarEventRSVP, oldRSVP: JSONCalendarRSVP | null];
     /** @event Emitted when a calendar event got updated. */
-    calendarEventUpdate: [CalendarEvent: CalendarEvent, oldEvent: JSONCalendarEvent | null];
+    calendarEventUpdate: [calendarEvent: CalendarEvent, oldEvent: JSONCalendarEvent | null];
     /** @event Emitted when a guild channel is archived. */
     channelArchive: [channel: AnyChannel];
     /** @event Emitted when a channel category role permission is created. */
@@ -152,11 +150,11 @@ export interface ClientEvents {
     /** @event Emitted when a doc comment is edited. */
     docCommentUpdate: [comment: DocComment, oldComment: JSONDocComment | null];
     /** @event Emitted when a doc is created. */
-    docCreate: [Doc: Doc];
+    docCreate: [doc: Doc];
     /** @event Emitted when a doc is deleted. */
-    docDelete: [DeletedDoc: Doc];
+    docDelete: [deletedDoc: Doc];
     /** @event Emitted when a doc is edited. */
-    docUpdate: [Doc: Doc , oldDoc: JSONDoc | null];
+    docUpdate: [doc: Doc , oldDoc: JSONDoc | null];
     /** @event Emitted after getting an error. */
     error: [error: Error];
     /** @event Emitted on process exit. */
@@ -165,26 +163,26 @@ export interface ClientEvents {
     forumCommentCreate: [comment: ForumThreadComment];
     /** @event Emitted when forum thread is deleted. */
     forumCommentDelete: [comment: ForumThreadComment];
-    /** @event Emitted when a forum thread is deleted. */
+    /** @event Emitted when a forum thread is edited. */
     forumCommentUpdate: [comment: ForumThreadComment, oldComment: JSONForumThreadComment | null];
     /** @event Emitted when a forum thread is created. */
     forumThreadCreate: [thread: ForumThread<ForumChannel>];
-    /** @event Emitted when a forum thread is edited. */
+    /** @event Emitted when a forum thread is deleted. */
     forumThreadDelete: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when forum thread got locked. */
-    forumThreadLock: [ForumThread: ForumThread<ForumChannel>];
+    forumThreadLock: [forumThread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is pinned. */
     forumThreadPin: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when forum thread got unlocked. */
-    forumThreadUnlock: [ForumThread: ForumThread<ForumChannel>];
+    forumThreadUnlock: [forumThread: ForumThread<ForumChannel>];
     /** @event Emitted when a forum thread is unpinned. */
     forumThreadUnpin: [thread: ForumThread<ForumChannel>];
     /** @event Emitted when a thread comment is created. */
     forumThreadUpdate: [thread: ForumThread<ForumChannel>, oldThread: JSONForumThread<ForumChannel> | null];
     /** @event Emitted when a guild member got banned. */
-    guildBanAdd: [BannedMember: BannedMember];
+    guildBanAdd: [bannedMember: BannedMember];
     /** @event Emitted when guild member got unbanned. */
-    guildBanRemove: [BannedMember: BannedMember];
+    guildBanRemove: [bannedMember: BannedMember];
     /** @event Emitted when a category is created. */
     guildCategoryCreate: [category: Category];
     /** @event Emitted when a category is deleted. */
@@ -193,23 +191,23 @@ export interface ClientEvents {
     guildCategoryUpdate: [category: Category];
 
     /** @event Emitted when the client joins a guild. */
-    guildCreate: [GuildCreateInfo: GuildCreateInfo];
+    guildCreate: [guildCreateInfo: GuildCreateInfo];
     /** @event Emitted when the client leaves a guild. */
-    guildDelete: [GuildDeleteInfo: GuildDeleteInfo];
+    guildDelete: [guildDeleteInfo: GuildDeleteInfo];
     /** @event Emitted when a guild group is created. */
     guildGroupCreate: [guildGroup: Group];
-    /** @event Emitted when a guild group is updated. */
-    guildGroupDelete: [guildGroup: Group];
-    /** @event Emitted when a member joined the server. */
-    guildGroupUpdate: [guildGroup: Group, oldGuildGroup: JSONGroup | null];
     /** @event Emitted when a guild group is deleted. */
-    guildMemberAdd: [Member: Member, guildMemberCount: number];
+    guildGroupDelete: [guildGroup: Group];
+    /** @event Emitted when a guild group is updated. */
+    guildGroupUpdate: [guildGroup: Group, oldGuildGroup: JSONGroup | null];
+    /** @event Emitted when a member joined the server. */
+    guildMemberAdd: [member: Member, guildMemberCount: number];
     /** @event Emitted when a member left the server. */
-    guildMemberRemove: [MemberRemoveInfo: MemberRemoveInfo];
+    guildMemberRemove: [memberRemoveInfo: MemberRemoveInfo];
     /** @event Emitted when a member updated their guild profile.
      * It does include role changes, nickname & more.
      */
-    guildMemberUpdate: [MemberUpdateInfo: MemberUpdateInfo];
+    guildMemberUpdate: [memberUpdateInfo: MemberUpdateInfo];
     /** @event Emitted when a guild role is created. */
     guildRoleCreate: [role: Role];
     /** @event Emitted when a guild role is deleted. */

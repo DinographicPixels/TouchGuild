@@ -1,8 +1,7 @@
 /** @module Types */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import type { AnyTextableChannel, RawEmote, RawMentions } from "./channels";

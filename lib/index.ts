@@ -7,7 +7,7 @@
 // First release: 2022
 //
 // Contributors:
-// https://github.com/DinographicPixels/TouchGuild/graphs/contributors
+// https://github.com/Dinographic/TouchGuild/graphs/contributors
 //
 // Website: https://touchguild.com/
 // Documentation: https://docs.touchguild.com/
@@ -16,7 +16,7 @@
 // Support by donating: https://github.com/sponsors/pakkographic
 //
 //
-// Copyright (c) – DinographicPixels. All rights reserved.
+// © Dinographic. All rights reserved.
 //
 
 // EXPORT LIST:

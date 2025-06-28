@@ -1,8 +1,7 @@
 /** @module MessageHandler */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// © 2022–present Dinographic. All rights reserved.
 //
 
 import { GatewayEventHandler } from "./GatewayEventHandler";
@@ -20,8 +19,8 @@ import {
     GatewayLayerIntent,
     InteractionComponentType
 } from "../../Constants";
-import { type TextChannel } from "../../structures/TextChannel";
-import type { AnyTextableChannel, ChannelMessageReactionBulkRemove, PrivateApplicationCommand } from "../../types/";
+import type { TextChannel } from "../../structures/TextChannel";
+import type { AnyTextableChannel, ApplicationCommandOptionsString, ChannelMessageReactionBulkRemove, PrivateApplicationCommand } from "../../types/";
 import { CommandInteraction } from "../../structures/CommandInteraction";
 import { ComponentInteraction } from "../../structures/ComponentInteraction";
 
@@ -127,32 +126,100 @@ export class MessageHandler extends GatewayEventHandler {
                     if (appCmd?.userID && appCmd?.userID !== interaction.memberID) return;
                 }
 
-                const verifyOptionsData = interaction.data ? interaction.data.options.verifyOptions() : { missing: [], incorrect: [], total: [] };
+                const verifyOptionsRequiredData =
+                  interaction.data ? interaction.data.options.verifyOptions() : { missing: [], incorrect: [], total: [] };
+                const verifyOptionsOptionalsData =
+                  interaction.data ? interaction.data.options.verifyOptions("optionals") : { missing: [], incorrect: [], total: [] };
+                const verifyOptionsData =
+                  interaction.data
+                      ? interaction.data.options.mergeVerifyOptionsData(
+                          verifyOptionsRequiredData,
+                          verifyOptionsOptionalsData
+                      )
+                      : { missing: [], incorrect: [], total: [] };
+
                 if (
-                    interaction.data?.options.requiredOptions.length
+                    (
+                        interaction.data?.options.requiredOptions.length
+                      || interaction.data?.options.optionalOptions.length
+                    )
                   && interaction.data.options.values
                   && (verifyOptionsData.missing.length !== 0 || verifyOptionsData.incorrect.length !== 0)
                 ) {
+                    const missingCount = verifyOptionsData.missing.length;
+                    const incorrectCount = verifyOptionsData.incorrect.length;
+                    const requiredIncorrectCount = verifyOptionsRequiredData.incorrect.length;
+                    const optionalIncorrectCount = verifyOptionsOptionalsData.incorrect.length;
+
                     let content = "";
-                    if (verifyOptionsData.missing.length !== 0 && verifyOptionsData.incorrect.length !== 0) {
-                        content = `${verifyOptionsData.missing.length} required option${verifyOptionsData.missing.length > 1 ? "s are" : " is"} missing, ${verifyOptionsData.incorrect.length} ${verifyOptionsData.incorrect.length > 1 ? "are" : "is"} incorrect.`;
-                    } else if (verifyOptionsData.missing.length !== 0) {
-                        content = `${verifyOptionsData.missing.length} required option${verifyOptionsData.missing.length > 1 ? "s are" : " is"} missing.`;
-                    } else if (verifyOptionsData.incorrect.length === 0) {
+                    if (missingCount !== 0 && incorrectCount !== 0) {
+                        content = `${missingCount} required option${missingCount === 1 ? " is" : "s are"} missing, ${incorrectCount} ${optionalIncorrectCount === 0 ? "" : `option${optionalIncorrectCount > 1 ? "s" : ""} `}${incorrectCount > 1 ? "are" : "is"} incorrect.`;
+                    } else if (missingCount !== 0) {
+                        content = `${missingCount} required option${missingCount === 1 ? " is" : "s are"} missing.`;
+                    } else if (incorrectCount === 0) {
                         content = "An error has occurred while treating your command.";
+                    } else if (requiredIncorrectCount && optionalIncorrectCount !== 0) {
+                        content = `${requiredIncorrectCount} required option${requiredIncorrectCount > 1 ? "s" : ""} and ${optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s" : ""} are incorrect.`;
+                    } else if (optionalIncorrectCount === 0) {
+                        content = `${requiredIncorrectCount} required option${requiredIncorrectCount > 1 ? "s are" : " is"} incorrect.`;
                     } else {
-                        content = `${verifyOptionsData.incorrect.length} required option${verifyOptionsData.incorrect.length > 1 ? "s are" : " is"} incorrect.`;
+                        content = `${optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s are" : " is"} incorrect.`;
                     }
 
                     const totalList = interaction.data.applicationCommand.options ?
                         interaction.data.applicationCommand.options.map(opt => {
-                            if (verifyOptionsData.total.includes(opt.name)) return `**${opt.name}**`;
+                            if (verifyOptionsRequiredData.total.includes(opt.name)) return `**${opt.name}**`;
+                            if (verifyOptionsOptionalsData.incorrect.includes(opt.name)) return `***${opt.name}***`;
                             if (!opt.required) return `*${opt.name}*`;
                             return opt.name;
                         }) : [];
 
+                    let selectedCount = 0;
+                    const choicesList = interaction.data.applicationCommand.options ?
+                        interaction.data.applicationCommand.options.flatMap(opt => {
+                            if ("choices" in opt && opt.choices) {
+                                const choices = opt.choices;
+                                const optionIndex =
+                                  interaction.data.applicationCommand.options ?
+                                      interaction.data.applicationCommand.options.findIndex(cmdOpt =>
+                                          cmdOpt.name === opt.name
+                                      && cmdOpt.type === opt.type
+                                      ) : -1;
+                                if (
+                                    verifyOptionsData.total.includes(opt.name)
+                                  || !opt.required
+                                  && !interaction.data.options.values[optionIndex]
+                                ) {
+                                    return [
+                                        `> \`${opt.name}\`${opt.required ? "" : " *(optional)*"}:`,
+                                        ...choices.map(choice => `> -> ${choice.name}: \`${choice.value}\``)
+                                    ];
+                                } else {
+                                    // we assume it behaves the same way as a string otherwise we can't make the find fn work..
+                                    const selectedChoice =
+                                      (choices as ApplicationCommandOptionsString["choices"])!.find(
+                                          choice => choice.value === interaction.data.options.values[optionIndex]
+                                      );
+
+                                    if (optionIndex === -1 || !selectedChoice)
+                                        content = "An error has occurred while treating your command.";
+
+                                    selectedCount++;
+                                    return [
+                                        `> <:white_check_mark:90002171> \`${opt.name}\`: Selected **${selectedChoice?.name ?? interaction.data.options.values[optionIndex] ?? "??"}**`
+                                    ];
+                                }
+                            }
+                            return [];
+                        }) : [];
+
                     if (content !== "An error has occurred while treating your command.") {
                         content += " (" + totalList.join(", ") + ")";
+                        if (choicesList.length !== 0) {
+                            choicesList.unshift("\n> **Choices**\n> *Select a value from the available choices for each option.*");
+                            choicesList.splice(1 + selectedCount, 0, "\n> ");
+                            content += choicesList.join("\n");
+                        }
                     }
 
                     return void interaction.createMessage({ content, isPrivate: true });

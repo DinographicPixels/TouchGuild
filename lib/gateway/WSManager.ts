@@ -1,13 +1,12 @@
 /** @module WSManager */
 
 //
-// Created by Wade (@pakkographic)
-// Copyright (c) 2024 DinographicPixels. All rights reserved.
+// Copyright (c) 2022-present Dinographic. All rights reserved.
 //
 // Credits:
 // > Oceanic.js:
 // inspired by ShardManager.ts, using erlpack, pako, zlib-sync
-// provide gateway encoding alternatives & more.
+// providing gateway encoding alternatives & more.
 //
 //
 
