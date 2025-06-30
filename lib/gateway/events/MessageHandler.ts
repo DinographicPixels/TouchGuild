@@ -179,16 +179,15 @@ export class MessageHandler extends GatewayEventHandler {
                         interaction.data.applicationCommand.options.flatMap(opt => {
                             if ("choices" in opt && opt.choices) {
                                 const choices = opt.choices;
-                                const optionIndex =
-                                  interaction.data.applicationCommand.options ?
-                                      interaction.data.applicationCommand.options.findIndex(cmdOpt =>
-                                          cmdOpt.name === opt.name
-                                      && cmdOpt.type === opt.type
-                                      ) : -1;
+                                const {
+                                    optionIndex,
+                                    optionValue
+                                } = interaction.data.options.resolveTransposedOption(opt.name, opt.type);
+
                                 if (
                                     verifyOptionsData.total.includes(opt.name)
                                   || !opt.required
-                                  && !interaction.data.options.values[optionIndex]
+                                  && !optionValue
                                 ) {
                                     return [
                                         `> \`${opt.name}\`${opt.required ? "" : " *(optional)*"}:`,
@@ -198,7 +197,7 @@ export class MessageHandler extends GatewayEventHandler {
                                     // we assume it behaves the same way as a string otherwise we can't make the find fn work..
                                     const selectedChoice =
                                       (choices as ApplicationCommandOptionsString["choices"])!.find(
-                                          choice => choice.value === interaction.data.options.values[optionIndex]
+                                          choice => choice.value === optionValue
                                       );
 
                                     if (optionIndex === -1 || !selectedChoice)
@@ -206,7 +205,7 @@ export class MessageHandler extends GatewayEventHandler {
 
                                     selectedCount++;
                                     return [
-                                        `> <:white_check_mark:90002171> \`${opt.name}\`: Selected **${selectedChoice?.name ?? interaction.data.options.values[optionIndex] ?? "??"}**`
+                                        `> <:white_check_mark:90002171> \`${opt.name}\`: Selected **${selectedChoice?.name ?? optionValue ?? "??"}**`
                                     ];
                                 }
                             }

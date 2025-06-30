@@ -11,7 +11,7 @@ import type {
     VerifyOptionsData
 } from "../types";
 import type { Client } from "../structures/Client";
-import { ApplicationCommandOptionTypes } from "../Constants";
+import { ApplicationCommandOptionTypes, ValueTranspositionStates } from "../Constants";
 import { fetch } from "undici";
 import type { APIURLSignature } from "guildedapi-types.ts/v1";
 
@@ -20,11 +20,13 @@ export class InteractionOptionWrapper {
     #data: InteractionOptionWrapperData;
     optionalOptions: Array<ApplicationCommandOption>;
     requiredOptions: Array<ApplicationCommandOption>;
+    valueTranspositionMap: Array<ValueTranspositionStates>;
     values: Array<string | number | boolean>;
     constructor(data: InteractionOptionWrapperData, client: Client) {
         this.#data = data;
         this.#client = client;
         this.values = this.extractValues(data.content);
+        this.valueTranspositionMap = this.getValueTranspositionMap;
         this.requiredOptions =
             data.applicationCommand.options ?
                 data.applicationCommand.options
@@ -56,24 +58,45 @@ export class InteractionOptionWrapper {
                 .replace(/^<@&([\w-]+)>$/, "$1")
             );
 
+        const expandedSegments: Array<string | number> = [];
+        for (const token of segments) {
+            if (/^<a?:\w+:\d+>$/.test(token)) {
+                expandedSegments.push(token);
+                continue;
+            }
+
+            const colonIndex = token.indexOf(":");
+            if (colonIndex > 0 && colonIndex < token.length - 1) {
+                const key = token.slice(0, colonIndex);
+                const rawValue = token.slice(colonIndex + 1);
+
+                const numValue = Number(rawValue);
+                const value = isNaN(numValue) ? rawValue : numValue;
+
+                expandedSegments.push(key + ":", value);
+            } else {
+                expandedSegments.push(token);
+            }
+        }
+
         let result: Array<string | number> = [];
         let segmentIndex = 0;
 
         for (const part of text.split(/("[^"]*")/)) {
             if (part.startsWith('"') && part.endsWith('"')) {
-                result.push(part.slice(1, -1)); // Remove the surrounding quotes
+                result.push(part.slice(1, -1));
             } else {
                 for (const word of part.split(/\s+/)) {
                     if (word.trim() !== "") {
-                        const cleanedWord = segments[segmentIndex++];
-                        if (cleanedWord) result.push(cleanedWord);
+                        const cleanedWord = expandedSegments[segmentIndex++];
+                        if (cleanedWord !== undefined) result.push(cleanedWord);
                     }
                 }
             }
         }
 
-        while (segmentIndex < segments.length) {
-            result.push(segments[segmentIndex++]);
+        while (segmentIndex < expandedSegments.length) {
+            result.push(expandedSegments[segmentIndex++]);
         }
 
         result.shift();
@@ -87,87 +110,91 @@ export class InteractionOptionWrapper {
     private getMentionOptions<T = string | number | boolean>(name: string, type: ApplicationCommandOptionTypes): { name: string; value: T; } | undefined {
         if (!this.#data.applicationCommand) return;
         const appCmdOptions = this.#data.applicationCommand.options;
-        const optionIndex =
-          appCmdOptions?.findIndex(opt =>
-              opt.name === name
-            && opt.type === type
-          );
-
-        if (!optionIndex && optionIndex !== 0 || this.values?.[optionIndex] === undefined) return;
-
+        const {
+            optionIndex,
+            isPositional,
+            positionals,
+            positionalIndex,
+            explicitIndex,
+            optionValue: _optionValue
+        } = this.resolveTransposedOption(name, type);
+        let optionValue = _optionValue;
+        if (!optionIndex && optionIndex !== 0) return;
+        if (isPositional && (positionalIndex === null || positionalIndex === undefined || this.values[positionals[positionalIndex]] === undefined)) return;
+        if (!isPositional && (explicitIndex === null || explicitIndex === undefined || explicitIndex === -1)) return;
         if (type === ApplicationCommandOptionTypes.CHANNEL
-          && !this.#data.mentions?.channels?.map(channel => channel.id).includes(this.values[optionIndex].toString())
+          && !this.#data.mentions?.channels?.map(channel => channel.id).includes(optionValue.toString())
           || type === ApplicationCommandOptionTypes.ROLE
-          && !this.#data.mentions?.roles?.map(channel => channel.id).includes(Number(this.values[optionIndex]))
+          && !this.#data.mentions?.roles?.map(channel => channel.id).includes(Number(optionValue))
           || type === ApplicationCommandOptionTypes.USER
-          && !this.#data.mentions?.users?.map(channel => channel.id).includes(this.values[optionIndex].toString())
+          && !this.#data.mentions?.users?.map(channel => channel.id).includes(optionValue.toString())
           || type === ApplicationCommandOptionTypes.STRING
-          && typeof this.values[optionIndex] !== "string"
+          && typeof optionValue !== "string"
           || type === ApplicationCommandOptionTypes.INTEGER
           && (
-              typeof this.values[optionIndex] !== "number"
-            || !Number.isFinite(this.values[optionIndex])
-            || !Number.isInteger(this.values[optionIndex])
+              typeof optionValue !== "number"
+            || !Number.isFinite(optionValue)
+            || !Number.isInteger(optionValue)
           )
           || type === ApplicationCommandOptionTypes.NUMBER
           && (
-              typeof this.values[optionIndex] !== "number"
-            || !Number.isFinite(this.values[optionIndex])
+              typeof optionValue !== "number"
+            || !Number.isFinite(optionValue)
           )
           || type === ApplicationCommandOptionTypes.FLOAT
           && (
-              typeof this.values[optionIndex] !== "number"
-            || !Number.isFinite(this.values[optionIndex])
-            || Number.isInteger(this.values[optionIndex])
+              typeof optionValue !== "number"
+            || !Number.isFinite(optionValue)
+            || Number.isInteger(optionValue)
           )
           || type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER
           && (
-              typeof this.values[optionIndex] !== "number"
-            || !Number.isFinite(this.values[optionIndex])
-            || !Number.isInteger(this.values[optionIndex])
-            || Number(this.values[optionIndex]) < -2147483648
-            || Number(this.values[optionIndex]) > 2147483647
+              typeof optionValue !== "number"
+            || !Number.isFinite(optionValue)
+            || !Number.isInteger(optionValue)
+            || Number(optionValue) < -2147483648
+            || Number(optionValue) > 2147483647
           )
           || type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT
           && (
-              typeof this.values[optionIndex] !== "string"
-            || !this.values[optionIndex].toString().includes("![](https://cdn.gilcdn.com/")
+              typeof optionValue !== "string"
+            || !optionValue.toString().includes("![](https://cdn.gilcdn.com/")
           )
           || type === ApplicationCommandOptionTypes.BOOLEAN
           && (
-              typeof this.values[optionIndex] === "string"
-            && ((this.values[optionIndex] as string)?.toLowerCase() !== "true"
-              && (this.values[optionIndex] as string)?.toLowerCase() !== "false")
-            || typeof this.values[optionIndex] === "number"
-            && (this.values[optionIndex] !== 1
-              && this.values[optionIndex] !== 0)
+              typeof optionValue === "string"
+            && ((optionValue as string)?.toLowerCase() !== "true"
+              && (optionValue as string)?.toLowerCase() !== "false")
+            || typeof optionValue === "number"
+            && (optionValue !== 1
+              && optionValue !== 0)
           )
           || type === ApplicationCommandOptionTypes.EMOTE
-          && typeof this.values[optionIndex] !== "string"
+          && typeof optionValue !== "string"
           && (
-              typeof this.values[optionIndex] !== "number"
-            || Number(this.values[optionIndex]) > 9999999
-            || Number(this.values[optionIndex]) < 1000000
+              typeof optionValue !== "number"
+            || Number(optionValue) > 9999999
+            || Number(optionValue) < 1000000
           )
         ) return;
         if (type === ApplicationCommandOptionTypes.INTEGER)
-            this.values[optionIndex] = Math.trunc(Number(this.values[optionIndex]));
+            optionValue = Math.trunc(Number(optionValue));
         if (type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT) {
             const regExp = /!\[]\((https:\/\/[^)]+)\)/g;
-            const regExpArray: Array<string> = regExp.exec(this.values[optionIndex].toString()) ?? [];
-            this.values[optionIndex] = regExpArray[0];
+            const regExpArray: Array<string> = regExp.exec(optionValue.toString()) ?? [];
+            optionValue = regExpArray[0];
         }
         if (type === ApplicationCommandOptionTypes.BOOLEAN) {
-            const val = this.values[optionIndex];
-            this.values[optionIndex] =
+            const val = optionValue;
+            optionValue =
               typeof val === "string"
                   ? val.toLowerCase() === "true"
                   : (typeof val === "number" ? val === 1 : Boolean(val));
         }
-        if (type === ApplicationCommandOptionTypes.EMOTE && typeof this.values[optionIndex] !== "number") {
-            const emoteID = Number((this.values[optionIndex] as string)?.match(/<:\w+:(\d+)>/)?.[1]);
+        if (type === ApplicationCommandOptionTypes.EMOTE && typeof optionValue !== "number") {
+            const emoteID = Number((optionValue as string)?.match(/<:\w+:(\d+)>/)?.[1]);
             if (isNaN(emoteID)) return;
-            this.values[optionIndex] = emoteID;
+            optionValue = emoteID;
         }
 
         const appCmdCurrentOpt = appCmdOptions?.[optionIndex];
@@ -176,26 +203,53 @@ export class InteractionOptionWrapper {
                 const choices = appCmdCurrentOpt.choices;
                 if (
                     !choices.map(choice => choice.value)
-                        .includes(this.values[optionIndex] as string | number) // choices cannot be applied to boolean
+                        .includes(optionValue as string | number) // choices cannot be applied to boolean
                 ) return;
             }
 
-            const optValue = this.values[optionIndex];
-            if (typeof optValue === "string" && ("minLength" in appCmdCurrentOpt || "maxLength" in appCmdCurrentOpt) && (
-                (appCmdCurrentOpt.maxLength && optValue.length > appCmdCurrentOpt.maxLength)
-                  || (appCmdCurrentOpt.minLength && optValue.length < appCmdCurrentOpt.minLength)
+            if (typeof optionValue === "string" && ("minLength" in appCmdCurrentOpt || "maxLength" in appCmdCurrentOpt) && (
+                (appCmdCurrentOpt.maxLength && optionValue.length > appCmdCurrentOpt.maxLength)
+                  || (appCmdCurrentOpt.minLength && optionValue.length < appCmdCurrentOpt.minLength)
             )) return;
 
-            if (typeof optValue === "number" && ("minValue" in appCmdCurrentOpt || "maxValue" in appCmdCurrentOpt) && (
-                (appCmdCurrentOpt.maxValue && appCmdCurrentOpt.maxValue !== 0 && optValue > appCmdCurrentOpt.maxValue)
-                || (appCmdCurrentOpt.minValue && optValue < appCmdCurrentOpt.minValue)
+            if (typeof optionValue === "number" && ("minValue" in appCmdCurrentOpt || "maxValue" in appCmdCurrentOpt) && (
+                (appCmdCurrentOpt.maxValue && appCmdCurrentOpt.maxValue !== 0 && optionValue > appCmdCurrentOpt.maxValue)
+                || (appCmdCurrentOpt.minValue && optionValue < appCmdCurrentOpt.minValue)
             )) return;
         }
 
         return {
             name,
-            value: this.values[optionIndex] as T
+            value: optionValue as T
         };
+    }
+
+    private get getValueTranspositionMap(): Array<ValueTranspositionStates> {
+        const valueTranspositionMap: Array<ValueTranspositionStates> = [];
+        for (const [i, val] of this.values.entries()) {
+            const prevIndex = i > 0 ? i - 1 : null;
+            const nextIndex = i < this.values.length - 1 ? i + 1 : null;
+            const isExplicitKey =
+              typeof val === "string" &&
+              val.endsWith(":") &&
+              nextIndex !== null &&
+              (
+                  prevIndex === null ||
+                [ValueTranspositionStates.POSITIONAL, ValueTranspositionStates.EXPLICIT_VALUE]
+                    .includes(valueTranspositionMap[prevIndex])
+              );
+            if (isExplicitKey) {
+                valueTranspositionMap.push(ValueTranspositionStates.EXPLICIT_OPTION);
+            } else if (
+                prevIndex !== null &&
+              valueTranspositionMap[prevIndex] === ValueTranspositionStates.EXPLICIT_OPTION
+            ) {
+                valueTranspositionMap.push(ValueTranspositionStates.EXPLICIT_VALUE);
+            } else {
+                valueTranspositionMap.push(ValueTranspositionStates.POSITIONAL);
+            }
+        }
+        return valueTranspositionMap;
     }
 
     /**
@@ -400,6 +454,51 @@ export class InteractionOptionWrapper {
         };
     }
 
+    resolveTransposedOption(name: string, type: ApplicationCommandOptionTypes): {
+        explicitIndex: number | null;
+        isPositional: boolean;
+        optionIndex?: number;
+        optionValue: string | number | boolean;
+        positionalIndex?: number;
+        positionals: Array<number>;
+    } {
+        const optionIndex =
+          this.#data.applicationCommand.options?.findIndex(opt =>
+              opt.name === name
+            && opt.type === type
+          );
+        const isPositional =
+          !(this.values.filter(val => typeof val === "string") as Array<string>).some(str => str.includes(name));
+        const positionals =
+          this.valueTranspositionMap.flatMap((v, i) => v === ValueTranspositionStates.POSITIONAL ? i : []);
+        const positionalIndex =
+          this.#data.applicationCommand.options
+              ?.slice(0, optionIndex)
+              .filter(opt => {
+                  const valIndex = this.values.findIndex((v, i) =>
+                      typeof v === "string" && v.includes(opt.name) && this.valueTranspositionMap[i] === ValueTranspositionStates.EXPLICIT_OPTION
+                  );
+                  return valIndex === -1;
+              }).length;
+        const explicitIndex =
+          isPositional
+              ? null
+              : this.values.findIndex((v, i) =>
+                  typeof v === "string"
+            && v.includes(name)
+            && this.valueTranspositionMap[i] === ValueTranspositionStates.EXPLICIT_OPTION
+              ) + 1;
+        const optValue = isPositional ? this.values[positionals[positionalIndex as number]] : this.values[explicitIndex as number];
+        return {
+            optionIndex,
+            isPositional,
+            explicitIndex,
+            optionValue: optValue,
+            positionalIndex,
+            positionals
+        };
+    }
+
     verifyOptions(target: "required" | "optionals" | "full" = "required"): VerifyOptionsData {
         const missing = [];
         const incorrect = [];
@@ -410,86 +509,82 @@ export class InteractionOptionWrapper {
               ? fullOptionArr
               : (target === "required" ? this.requiredOptions : this.optionalOptions);
         for (const option of targetOptions) {
-            const optionIndex =
-                fullOptionArr.findIndex(opt =>
-                    opt.name === option.name
-                    && opt.type === option.type
-                );
+            const { optionValue } = this.resolveTransposedOption(option.name, option.type);
             switch (option.type) {
                 case ApplicationCommandOptionTypes.STRING: {
                     const value = this.getStringOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (!value && this.values[optionIndex]) incorrect.push(option.name);
+                    if (!value && !optionValue && option.required) missing.push(option.name);
+                    if (!value && optionValue) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.INTEGER: {
                     const value = this.getIntegerOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.FLOAT: {
                     const value = this.getFloatOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.SIGNED_32_INTEGER: {
                     const value = this.getSigned32IntOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.NUMBER: {
                     const value = this.getNumberOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.ROLE: {
                     const value = this.getRoleOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (!value && this.values[optionIndex]) incorrect.push(option.name);
+                    if (!value && !optionValue && option.required) missing.push(option.name);
+                    if (!value && optionValue) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.USER: {
                     const value = this.getUserOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (!value && this.values[optionIndex]) incorrect.push(option.name);
+                    if (!value && !optionValue && option.required) missing.push(option.name);
+                    if (!value && optionValue) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.CHANNEL: {
                     const value = this.getChannelOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (!value && this.values[optionIndex]) incorrect.push(option.name);
+                    if (!value && !optionValue && option.required) missing.push(option.name);
+                    if (!value && optionValue) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT: {
                     const value = this.getAttachmentOption(option.name)?.value;
-                    if (!value && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (!value && this.values[optionIndex]) incorrect.push(option.name);
+                    if (!value && !optionValue && option.required) missing.push(option.name);
+                    if (!value && optionValue) incorrect.push(option.name);
                     if (!value) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.BOOLEAN: {
                     const value = this.getBooleanOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex]) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }
                 case ApplicationCommandOptionTypes.EMOTE: {
                     const value = this.getEmoteOption(option.name)?.value;
-                    if (value === undefined && !this.values[optionIndex] && option.required) missing.push(option.name);
-                    if (value === undefined && this.values[optionIndex] !== undefined) incorrect.push(option.name);
+                    if (value === undefined && !optionValue && option.required) missing.push(option.name);
+                    if (value === undefined && optionValue !== undefined) incorrect.push(option.name);
                     if (value === undefined) total.push(option.name);
                     break;
                 }

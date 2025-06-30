@@ -91,4 +91,10 @@ export enum Locales {
     KOREAN = "ko",
 }
 
+export enum ValueTranspositionStates {
+    POSITIONAL = 0,
+    EXPLICIT_OPTION = 1,
+    EXPLICIT_VALUE = 2,
+}
+
 export type SocialLinkType = APISocialLinkType;
