@@ -21,7 +21,9 @@ import type {
     JSONCommandInteraction,
     RawMentions,
     CreateMessageOptions,
-    EditMessageOptions
+    EditMessageOptions,
+    ApplicationCommand,
+    PrivateApplicationCommand
 } from "../types";
 import { InteractionOptionWrapper } from "../util/InteractionOptionWrapper";
 
@@ -81,10 +83,15 @@ export class CommandInteraction<T extends AnyTextableChannel = AnyTextableChanne
             options:            new InteractionOptionWrapper({
                 guildID:            data.guildID,
                 applicationCommand: appCmd,
-                content:            data.message.content!,
-                mentions:           data.message.mentions as RawMentions,
-                directReply:        data.directReply,
-                executionType:      data.executionType
+                dynamicallyOrderedAppCmd:
+                  typeof structuredClone === "function"
+                      ? structuredClone(appCmd)
+                  // eslint-disable-next-line unicorn/prefer-structured-clone
+                      : JSON.parse(JSON.stringify(appCmd)) as ApplicationCommand | PrivateApplicationCommand,
+                content:       data.message.content!,
+                mentions:      data.message.mentions as RawMentions,
+                directReply:   data.directReply,
+                executionType: data.executionType
             }, this.client)
         };
 

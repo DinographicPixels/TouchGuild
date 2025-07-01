@@ -28,6 +28,7 @@ export interface InteractionOptionWrapperData {
     applicationCommand: ApplicationCommand | PrivateApplicationCommand;
     content: string;
     directReply: boolean;
+    dynamicallyOrderedAppCmd: ApplicationCommand | PrivateApplicationCommand;
     executionType: "simple" | "full";
     guildID: string;
     mentions: RawMentions | null;

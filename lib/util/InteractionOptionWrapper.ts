@@ -15,6 +15,12 @@ import { ApplicationCommandOptionTypes, ValueTranspositionStates } from "../Cons
 import { fetch } from "undici";
 import type { APIURLSignature } from "guildedapi-types.ts/v1";
 
+/**
+ * Application Command Smart Resolver (ACSR)
+ * Where options, values are extracted, dynamically reordered and resolved.
+ * InteractionOptionWrapper not only handles the core structure of command resolution,
+ * but also provides type-safe methods to access option values.
+ */
 export class InteractionOptionWrapper {
     #client: Client;
     #data: InteractionOptionWrapperData;
@@ -28,88 +34,127 @@ export class InteractionOptionWrapper {
         this.values = this.extractValues(data.content);
         this.valueTranspositionMap = this.getValueTranspositionMap;
         this.requiredOptions =
-            data.applicationCommand.options ?
-                data.applicationCommand.options
+            data.dynamicallyOrderedAppCmd.options ?
+                data.dynamicallyOrderedAppCmd.options
                     .filter(opt => opt.required)
                 : [];
         this.optionalOptions =
-          data.applicationCommand.options ?
-              data.applicationCommand.options
+          data.dynamicallyOrderedAppCmd.options ?
+              data.dynamicallyOrderedAppCmd.options
                   .filter(opt => !opt.required)
               : [];
+        this.dynamicOptionReordering();
+    }
+
+    private dynamicOptionReordering(): void {
+        if (!this.#data.dynamicallyOrderedAppCmd.options) return;
+
+        const optionalTypes = this.#data.dynamicallyOrderedAppCmd.options
+            .filter(opt => !opt.required)
+            .map(opt => opt.type);
+
+        if (optionalTypes.length > new Set(optionalTypes).size) return;
+
+        const positionals = this.valueTranspositionMap.flatMap((v, i) =>
+            v === ValueTranspositionStates.POSITIONAL ? i : []
+        );
+
+        const requiredOptions = this.#data.dynamicallyOrderedAppCmd.options.filter(opt => opt.required);
+        const optionalOptions = this.#data.dynamicallyOrderedAppCmd.options.filter(opt => !opt.required);
+        const optionalPositionals = positionals.slice(requiredOptions.length);
+
+        const userOrderedDefinedOptionals: Array<ApplicationCommandOption> = [];
+        const undefinedOptionals: Array<ApplicationCommandOption> = [];
+
+        for (const valuesIndex of optionalPositionals) {
+            const value = this.values[valuesIndex];
+            let matchedOption: ApplicationCommandOption | null = null;
+
+            for (const option of optionalOptions) {
+                if (userOrderedDefinedOptionals.includes(option))
+                    continue;
+
+                const isValid = this.isValueCompatibleWithOption(value, option);
+
+                if (isValid) {
+                    matchedOption = option;
+                    break;
+                }
+            }
+
+            if (matchedOption)
+                userOrderedDefinedOptionals.push(matchedOption);
+        }
+
+        for (const option of optionalOptions) {
+            if (!userOrderedDefinedOptionals.includes(option))
+                undefinedOptionals.push(option);
+        }
+
+        this.#data.dynamicallyOrderedAppCmd.options = [
+            ...requiredOptions,
+            ...userOrderedDefinedOptionals,
+            ...undefinedOptionals
+        ];
     }
 
     private extractValues(text: string): Array<string | number> {
-        const quotedPattern = /"([^"]*)"/g;
-        const quotedMatches: Array<string> = [];
+        const tokens: Array<string> = [];
+        const tokenPattern = /"[^"]*"|<[#&@][\w-]+>|<@&[\w-]+>|<a?:\w+:\d+>|\S+/g;
         let match: RegExpExecArray | null;
 
-        let textWithoutQuotes = text;
-        while ((match = quotedPattern.exec(text)) !== null) {
-            quotedMatches.push(match[1]);
-            textWithoutQuotes = textWithoutQuotes.replace(match[0], "");
+        while ((match = tokenPattern.exec(text)) !== null) {
+            tokens.push(match[0]);
         }
 
-        const segments = textWithoutQuotes
-            .split(/(\s+)/)
-            .filter(val => val.trim() !== "")
-            .map(val => val
-                .replace(/^<[#&@]([\w-]+)>$/, "$1")
-                .replace(/^<@&([\w-]+)>$/, "$1")
-            );
+        const result: Array<string | number> = [];
 
-        const expandedSegments: Array<string | number> = [];
-        for (const token of segments) {
+        for (const token of tokens) {
+            if (token.startsWith('"') && token.endsWith('"')) {
+                result.push(token.slice(1, -1));
+                continue;
+            }
+
+            if (/^<[#&@][\w-]+>$/.test(token) || /^<@&[\w-]+>$/.test(token)) {
+                const cleaned = token.replace(/^<[#&@]([\w-]+)>$/, "$1").replace(/^<@&([\w-]+)>$/, "$1");
+                result.push(cleaned);
+                continue;
+            }
+
             if (/^<a?:\w+:\d+>$/.test(token)) {
-                expandedSegments.push(token);
+                result.push(token);
                 continue;
             }
 
             const colonIndex = token.indexOf(":");
             if (colonIndex > 0 && colonIndex < token.length - 1) {
                 const key = token.slice(0, colonIndex);
-                const rawValue = token.slice(colonIndex + 1);
+                let rawValue = token.slice(colonIndex + 1);
+
+                if (rawValue.startsWith('"') && rawValue.endsWith('"'))
+                    rawValue = rawValue.slice(1, -1);
 
                 const numValue = Number(rawValue);
                 const value = isNaN(numValue) ? rawValue : numValue;
 
-                expandedSegments.push(key + ":", value);
+                result.push(key + ":", value);
             } else {
-                expandedSegments.push(token);
+                const numValue = Number(token);
+                result.push(isNaN(numValue) ? token : numValue);
             }
-        }
-
-        let result: Array<string | number> = [];
-        let segmentIndex = 0;
-
-        for (const part of text.split(/("[^"]*")/)) {
-            if (part.startsWith('"') && part.endsWith('"')) {
-                result.push(part.slice(1, -1));
-            } else {
-                for (const word of part.split(/\s+/)) {
-                    if (word.trim() !== "") {
-                        const cleanedWord = expandedSegments[segmentIndex++];
-                        if (cleanedWord !== undefined) result.push(cleanedWord);
-                    }
-                }
-            }
-        }
-
-        while (segmentIndex < expandedSegments.length) {
-            result.push(expandedSegments[segmentIndex++]);
         }
 
         result.shift();
-        if (this.#data.executionType === "full")
+        if (this.#data.executionType === "full") {
             result.shift();
-
-        result = result.map(val => isNaN(Number(val)) ? val : Number(val));
+        }
 
         return result;
     }
+
     private getMentionOptions<T = string | number | boolean>(name: string, type: ApplicationCommandOptionTypes): { name: string; value: T; } | undefined {
-        if (!this.#data.applicationCommand) return;
-        const appCmdOptions = this.#data.applicationCommand.options;
+        if (!this.#data.dynamicallyOrderedAppCmd) return;
+        const appCmdOptions = this.#data.dynamicallyOrderedAppCmd.options;
         const {
             optionIndex,
             isPositional,
@@ -122,61 +167,8 @@ export class InteractionOptionWrapper {
         if (!optionIndex && optionIndex !== 0) return;
         if (isPositional && (positionalIndex === null || positionalIndex === undefined || this.values[positionals[positionalIndex]] === undefined)) return;
         if (!isPositional && (explicitIndex === null || explicitIndex === undefined || explicitIndex === -1)) return;
-        if (type === ApplicationCommandOptionTypes.CHANNEL
-          && !this.#data.mentions?.channels?.map(channel => channel.id).includes(optionValue.toString())
-          || type === ApplicationCommandOptionTypes.ROLE
-          && !this.#data.mentions?.roles?.map(channel => channel.id).includes(Number(optionValue))
-          || type === ApplicationCommandOptionTypes.USER
-          && !this.#data.mentions?.users?.map(channel => channel.id).includes(optionValue.toString())
-          || type === ApplicationCommandOptionTypes.STRING
-          && typeof optionValue !== "string"
-          || type === ApplicationCommandOptionTypes.INTEGER
-          && (
-              typeof optionValue !== "number"
-            || !Number.isFinite(optionValue)
-            || !Number.isInteger(optionValue)
-          )
-          || type === ApplicationCommandOptionTypes.NUMBER
-          && (
-              typeof optionValue !== "number"
-            || !Number.isFinite(optionValue)
-          )
-          || type === ApplicationCommandOptionTypes.FLOAT
-          && (
-              typeof optionValue !== "number"
-            || !Number.isFinite(optionValue)
-            || Number.isInteger(optionValue)
-          )
-          || type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER
-          && (
-              typeof optionValue !== "number"
-            || !Number.isFinite(optionValue)
-            || !Number.isInteger(optionValue)
-            || Number(optionValue) < -2147483648
-            || Number(optionValue) > 2147483647
-          )
-          || type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT
-          && (
-              typeof optionValue !== "string"
-            || !optionValue.toString().includes("![](https://cdn.gilcdn.com/")
-          )
-          || type === ApplicationCommandOptionTypes.BOOLEAN
-          && (
-              typeof optionValue === "string"
-            && ((optionValue as string)?.toLowerCase() !== "true"
-              && (optionValue as string)?.toLowerCase() !== "false")
-            || typeof optionValue === "number"
-            && (optionValue !== 1
-              && optionValue !== 0)
-          )
-          || type === ApplicationCommandOptionTypes.EMOTE
-          && typeof optionValue !== "string"
-          && (
-              typeof optionValue !== "number"
-            || Number(optionValue) > 9999999
-            || Number(optionValue) < 1000000
-          )
-        ) return;
+        if (!appCmdOptions || appCmdOptions && !this.isValueCompatibleWithOption(optionValue, appCmdOptions[optionIndex])) return;
+
         if (type === ApplicationCommandOptionTypes.INTEGER)
             optionValue = Math.trunc(Number(optionValue));
         if (type === ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT) {
@@ -185,11 +177,10 @@ export class InteractionOptionWrapper {
             optionValue = regExpArray[0];
         }
         if (type === ApplicationCommandOptionTypes.BOOLEAN) {
-            const val = optionValue;
             optionValue =
-              typeof val === "string"
-                  ? val.toLowerCase() === "true"
-                  : (typeof val === "number" ? val === 1 : Boolean(val));
+              typeof optionValue === "string"
+                  ? optionValue = ["true", "1"].includes(optionValue.toLowerCase())
+                  : (typeof optionValue === "number" ? optionValue === 1 : Boolean(optionValue));
         }
         if (type === ApplicationCommandOptionTypes.EMOTE && typeof optionValue !== "number") {
             const emoteID = Number((optionValue as string)?.match(/<:\w+:(\d+)>/)?.[1]);
@@ -197,31 +188,88 @@ export class InteractionOptionWrapper {
             optionValue = emoteID;
         }
 
-        const appCmdCurrentOpt = appCmdOptions?.[optionIndex];
-        if (appCmdCurrentOpt) {
-            if ("choices" in appCmdCurrentOpt && appCmdCurrentOpt.choices) {
-                const choices = appCmdCurrentOpt.choices;
-                if (
-                    !choices.map(choice => choice.value)
-                        .includes(optionValue as string | number) // choices cannot be applied to boolean
-                ) return;
-            }
-
-            if (typeof optionValue === "string" && ("minLength" in appCmdCurrentOpt || "maxLength" in appCmdCurrentOpt) && (
-                (appCmdCurrentOpt.maxLength && optionValue.length > appCmdCurrentOpt.maxLength)
-                  || (appCmdCurrentOpt.minLength && optionValue.length < appCmdCurrentOpt.minLength)
-            )) return;
-
-            if (typeof optionValue === "number" && ("minValue" in appCmdCurrentOpt || "maxValue" in appCmdCurrentOpt) && (
-                (appCmdCurrentOpt.maxValue && appCmdCurrentOpt.maxValue !== 0 && optionValue > appCmdCurrentOpt.maxValue)
-                || (appCmdCurrentOpt.minValue && optionValue < appCmdCurrentOpt.minValue)
-            )) return;
-        }
-
         return {
             name,
             value: optionValue as T
         };
+    }
+
+    private isValueCompatibleWithOption(value: string | number | boolean, option: ApplicationCommandOption): boolean {
+        switch (option.type) {
+            case ApplicationCommandOptionTypes.STRING:
+                if (typeof value !== "string") return false;
+                break;
+            case ApplicationCommandOptionTypes.INTEGER:
+            case ApplicationCommandOptionTypes.SIGNED_32_INTEGER:
+                if (typeof value === "string") {
+                    const num = Number(value);
+                    if (isNaN(num) || !Number.isInteger(num)) return false;
+                    if (option.type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER && (num < -2147483648 || num > 2147483647)) return false;
+                } else if (typeof value === "number") {
+                    if (!Number.isInteger(value)) return false;
+                    if (option.type === ApplicationCommandOptionTypes.SIGNED_32_INTEGER && (value < -2147483648 || value > 2147483647)) return false;
+                } else {
+                    return false;
+                }
+                break;
+            case ApplicationCommandOptionTypes.NUMBER:
+            case ApplicationCommandOptionTypes.FLOAT:
+                if (typeof value === "string") {
+                    const num = Number(value);
+                    if (isNaN(num)) return false;
+                    if (option.type === ApplicationCommandOptionTypes.FLOAT && Number.isInteger(num)) return false;
+                } else if (typeof value === "number") {
+                    if (option.type === ApplicationCommandOptionTypes.FLOAT && Number.isInteger(value)) return false;
+                } else {
+                    return false;
+                }
+                break;
+            case ApplicationCommandOptionTypes.BOOLEAN:
+                if (typeof value === "boolean") return true;
+                if (typeof value === "string" && ["true", "false", "1", "0"].includes(value.toLowerCase())) return true;
+                if (typeof value === "number" && [0, 1].includes(value)) return true;
+                return false;
+            case ApplicationCommandOptionTypes.USER:
+                return typeof value === "string" &&
+                  this.#data.mentions?.users?.some(u => u.id === value) === true;
+            case ApplicationCommandOptionTypes.CHANNEL:
+                return typeof value === "string" &&
+                  this.#data.mentions?.channels?.some(c => c.id === value) === true;
+            case ApplicationCommandOptionTypes.ROLE:
+                return typeof value === "number" &&
+                  this.#data.mentions?.roles?.some(r => r.id === value) === true;
+            case ApplicationCommandOptionTypes.EMOTE:
+                if (typeof value === "number") {
+                    return value >= 1000000 && value <= 9999999;
+                }
+                if (typeof value === "string") {
+                    return /<a?:\w+:\d+>/.test(value);
+                }
+                return false;
+            case ApplicationCommandOptionTypes.EMBEDDED_ATTACHMENT:
+                return typeof value === "string" && value.includes("![](https://cdn.gilcdn.com/");
+            default:
+                return false;
+        }
+
+        if ("choices" in option && option.choices) {
+            const convertedValue = typeof value === "string" && !isNaN(Number(value)) ? Number(value) : value;
+            if (!option.choices.some(choice => choice.value === convertedValue)) {
+                return false;
+            }
+        }
+
+        if (typeof value === "string" && ("minLength" in option || "maxLength" in option)) {
+            if (option.maxLength && value.length > option.maxLength) return false;
+            if (option.minLength && value.length < option.minLength) return false;
+        }
+
+        if (typeof value === "number" && ("minValue" in option || "maxValue" in option)) {
+            if (option.maxValue !== undefined && option.maxValue !== 0 && value > option.maxValue) return false;
+            if (option.minValue !== undefined && value < option.minValue) return false;
+        }
+
+        return true;
     }
 
     private get getValueTranspositionMap(): Array<ValueTranspositionStates> {
@@ -265,7 +313,6 @@ export class InteractionOptionWrapper {
         if (!attachmentURL && required) throw new Error("Couldn't get attachment.");
         if (!attachmentURL) return;
 
-        // Signing URL
         let signedURL: APIURLSignature | null = null;
         try {
             signedURL = (await this.#client.rest.misc.signURL({
@@ -463,7 +510,7 @@ export class InteractionOptionWrapper {
         positionals: Array<number>;
     } {
         const optionIndex =
-          this.#data.applicationCommand.options?.findIndex(opt =>
+          this.#data.dynamicallyOrderedAppCmd.options?.findIndex(opt =>
               opt.name === name
             && opt.type === type
           );
@@ -472,7 +519,7 @@ export class InteractionOptionWrapper {
         const positionals =
           this.valueTranspositionMap.flatMap((v, i) => v === ValueTranspositionStates.POSITIONAL ? i : []);
         const positionalIndex =
-          this.#data.applicationCommand.options
+          this.#data.dynamicallyOrderedAppCmd.options
               ?.slice(0, optionIndex)
               .filter(opt => {
                   const valIndex = this.values.findIndex((v, i) =>

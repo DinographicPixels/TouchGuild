@@ -66,6 +66,80 @@ export class MessageHandler extends GatewayEventHandler {
                   return message?.memberID === this.client.user?.id;
               }) ?? false;
 
+            // ////////////// /app learn more //////////////////
+            if (
+                data.message.content === "/" + this.client.application.appShortname + " learn more"
+              || isReplyingApp && data.message.content === "/learn more"
+            ) {
+                return void new Message(data.message, this.client).createMessage({
+                    embeds: [
+                        {
+                            title: ":closed_book: Learn more about using Commands",
+                            description:
+                                   "You can use commands with **positional**, **explicit**, or **hybrid** arguments.\n\nThe system also supports **Dynamic Reordering** to help you skip optional arguments — see below 👇",
+                            fields: [
+                                {
+                                    name: ":small_blue_diamond: Positional Options",
+                                    value:
+                                          "Enter values **in order**, without labels:\n" +
+                                            "```/" + this.client.application.appShortname + " create MyTask high 3 true```\n" +
+                                            "Each value is matched based on its position.",
+                                    inline: false
+                                },
+                                {
+                                    name: ":small_blue_diamond: Explicit Options",
+                                    value:
+                                          "Use `name:value` to label values directly:\n" +
+                                            "```/" + this.client.application.appShortname + " create name:MyTask priority:high retries:3 notify:true```\n" +
+                                            "-> **Order doesn’t matter**\n" +
+                                            "-> Lets you skip optional fields safely",
+                                    inline: false
+                                },
+                                {
+                                    name: ":small_blue_diamond: Hybrid Mode",
+                                    value:
+                                          "Mix positional and explicit styles as you wish:\n" +
+                                            "```/" + this.client.application.appShortname + " create MyTask priority:high 3```\n" +
+                                            "-> Unlabeled values are matched by position\n" +
+                                            "-> Labeled ones override position and can appear anywhere",
+                                    inline: false
+                                },
+                                {
+                                    name: ":sparkles: Dynamic Reordering",
+                                    value:
+                                          "If each optional option has a **unique type** (e.g. text, number, boolean..),\n" +
+                                            "you can skip some — the system will **automatically match** values by type.\n" +
+                                            "```/" + this.client.application.appShortname + " schedule WeeklyReport true```\n" +
+                                            "This works if, for example, only one option is a boolean (true/false).",
+                                    inline: false
+                                },
+                                {
+                                    name: ":bulb: Quoted Values",
+                                    value:
+                                          "Wrap values with spaces in quotes:\n" +
+                                            "```/" + this.client.application.appShortname + " set title:\"My Project Plan\"```",
+                                    inline: false
+                                },
+                                {
+                                    name: ":leftwards_arrow_with_hook: Reply Commands",
+                                    value:
+                                          "When replying to a message from the app, you can drop the app name:\n" +
+                                            "```/help```\ninstead of ```/" + this.client.application.appShortname + " help```\n" +
+                                          "-> *That's where things get magical, start using* ***Commands***, *made to be intuitive. :sparkles:*",
+                                    inline: false
+                                }
+                            ],
+                            footer: {
+                                text: "Commands, built simple, intuitive & reliable."
+                            },
+                            color: 0xD9ACFF
+                        }
+                    ]
+                }).catch((err: Error) => this.client.emit("error", err));
+            }
+
+            // ////////////// /app learn more //////////////////
+
             const commandNames = this.client.application.commands.map(command =>
                 [command.name, ...Object.values(command.nameLocalizations ?? {})]
             );
@@ -153,17 +227,17 @@ export class MessageHandler extends GatewayEventHandler {
 
                     let content = "";
                     if (missingCount !== 0 && incorrectCount !== 0) {
-                        content = `${missingCount} required option${missingCount === 1 ? " is" : "s are"} missing, ${incorrectCount} ${optionalIncorrectCount === 0 ? "" : `option${optionalIncorrectCount > 1 ? "s" : ""} `}${incorrectCount > 1 ? "are" : "is"} incorrect.`;
+                        content = `> <:warning:90002078> ${missingCount === 1 ? "One" : missingCount} **required** option${missingCount === 1 ? " is" : "s are"} **missing**, ${incorrectCount === 1 ? "one" : incorrectCount} ${optionalIncorrectCount === 0 ? "" : `option${optionalIncorrectCount > 1 ? "s" : ""} `}${incorrectCount > 1 ? "are" : "is"} **incorrect**.`;
                     } else if (missingCount !== 0) {
-                        content = `${missingCount} required option${missingCount === 1 ? " is" : "s are"} missing.`;
+                        content = `> <:warning:90002078> ${missingCount === 1 ? "One" : missingCount} **required** option${missingCount === 1 ? " is" : "s are"} **missing**.`;
                     } else if (incorrectCount === 0) {
                         content = "An error has occurred while treating your command.";
                     } else if (requiredIncorrectCount && optionalIncorrectCount !== 0) {
-                        content = `${requiredIncorrectCount} required option${requiredIncorrectCount > 1 ? "s" : ""} and ${optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s" : ""} are incorrect.`;
+                        content = `> <:warning:90002078> ${requiredIncorrectCount === 1 ? "One" : requiredIncorrectCount} **required** option${requiredIncorrectCount > 1 ? "s" : ""} and ${optionalIncorrectCount === 1 ? "one" : optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s" : ""} are **incorrect**.`;
                     } else if (optionalIncorrectCount === 0) {
-                        content = `${requiredIncorrectCount} required option${requiredIncorrectCount > 1 ? "s are" : " is"} incorrect.`;
+                        content = `> <:warning:90002078> ${requiredIncorrectCount === 1 ? "One" : requiredIncorrectCount} **required** option${requiredIncorrectCount > 1 ? "s are" : " is"} **incorrect**.`;
                     } else {
-                        content = `${optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s are" : " is"} incorrect.`;
+                        content = `> <:warning:90002078> ${optionalIncorrectCount === 1 ? "One" : optionalIncorrectCount} optional option${optionalIncorrectCount > 1 ? "s are" : " is"} **incorrect**.`;
                     }
 
                     const totalList = interaction.data.applicationCommand.options ?
@@ -214,8 +288,13 @@ export class MessageHandler extends GatewayEventHandler {
 
                     if (content !== "An error has occurred while treating your command.") {
                         content += " (" + totalList.join(", ") + ")";
+                        content +=
+                          "\n>\n> *" +
+                          "Learn more about using commands: " +
+                          "`/" + this.client.application.appShortname + " learn more` " +
+                          "or reply `/learn more`.*";
                         if (choicesList.length !== 0) {
-                            choicesList.unshift("\n> **Choices**\n> *Select a value from the available choices for each option.*");
+                            choicesList.unshift("\n\n‎\n> **Choices**\n> *Select a value from the available choices for each option.*");
                             choicesList.splice(1 + selectedCount, 0, "\n> ");
                             content += choicesList.join("\n");
                         }
