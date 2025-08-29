@@ -39,9 +39,9 @@ export class ChannelHandler extends GatewayEventHandler{
         const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelArchive", ChannelComponent);
     }
-    async channelCategoryRolePermissionCreated(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
+    async channelCategoryRolePermissionCreate(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryRolePermissionCreated",
+            "channelCategoryRolePermissionCreate",
             {
                 permission: (data.channelCategoryRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryRolePermission.createdAt,
@@ -51,9 +51,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 guildID:    data.serverId
             });
     }
-    async channelCategoryRolePermissionDeleted(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
+    async channelCategoryRolePermissionDelete(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryRolePermissionDeleted",
+            "channelCategoryRolePermissionDelete",
             {
                 permission: (data.channelCategoryRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryRolePermission.createdAt,
@@ -63,9 +63,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 guildID:    data.serverId
             });
     }
-    async channelCategoryRolePermissionUpdated(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
+    async channelCategoryRolePermissionUpdate(data: GatewayEvent_ChannelCategoryRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryRolePermissionUpdated",
+            "channelCategoryRolePermissionUpdate",
             {
                 permission: (data.channelCategoryRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryRolePermission.createdAt,
@@ -75,9 +75,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 guildID:    data.serverId
             });
     }
-    async channelCategoryUserPermissionCreated(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
+    async channelCategoryUserPermissionCreate(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryUserPermissionCreated",
+            "channelCategoryUserPermissionCreate",
             {
                 permission: (data.channelCategoryUserPermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryUserPermission.createdAt,
@@ -88,9 +88,9 @@ export class ChannelHandler extends GatewayEventHandler{
             });
     }
 
-    async channelCategoryUserPermissionDeleted(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
+    async channelCategoryUserPermissionDelete(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryUserPermissionDeleted",
+            "channelCategoryUserPermissionDelete",
             {
                 permission: (data.channelCategoryUserPermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryUserPermission.createdAt,
@@ -100,9 +100,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 guildID:    data.serverId
             });
     }
-    async channelCategoryUserPermissionUpdated(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
+    async channelCategoryUserPermissionUpdate(data: GatewayEvent_ChannelCategoryUserPermissionCreated): Promise<void> {
         this.client.emit(
-            "channelCategoryUserPermissionUpdated",
+            "channelCategoryUserPermissionUpdate",
             {
                 permission: (data.channelCategoryUserPermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelCategoryUserPermission.createdAt,
@@ -131,9 +131,9 @@ export class ChannelHandler extends GatewayEventHandler{
         const ChannelComponent = this.client.util.updateChannel(data.channel);
         this.client.emit("channelRestore", ChannelComponent);
     }
-    async channelRolePermissionCreated(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
+    async channelRolePermissionCreate(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelRolePermissionCreated",
+            "channelRolePermissionCreate",
             {
                 permission: (data.channelRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelRolePermission.createdAt,
@@ -144,9 +144,9 @@ export class ChannelHandler extends GatewayEventHandler{
             }
         );
     }
-    async channelRolePermissionDeleted(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
+    async channelRolePermissionDelete(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelRolePermissionDeleted",
+            "channelRolePermissionDelete",
             {
                 permission: (data.channelRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelRolePermission.createdAt,
@@ -156,9 +156,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 guildID:    data.serverId
             });
     }
-    async channelRolePermissionUpdated(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
+    async channelRolePermissionUpdate(data: GatewayEvent_ChannelRolePermissionCreated): Promise<void> {
         this.client.emit(
-            "channelRolePermissionUpdated",
+            "channelRolePermissionUpdate",
             {
                 permission: (data.channelRolePermission.permissions as never as Array<Permissions>),
                 createdAt:  data.channelRolePermission.createdAt,
@@ -180,9 +180,9 @@ export class ChannelHandler extends GatewayEventHandler{
     }
 
 
-    async channelUserPermissionCreated(data: GatewayEvent_ChannelUserPermissionCreated): Promise<void> {
+    async channelUserPermissionCreate(data: GatewayEvent_ChannelUserPermissionCreated): Promise<void> {
         this.client.emit(
-            "channelUserPermissionCreated",
+            "channelUserPermissionCreate",
             {
                 channelID:  data.channelUserPermission.channelId,
                 createdAt:  data.channelUserPermission.createdAt,
@@ -193,9 +193,9 @@ export class ChannelHandler extends GatewayEventHandler{
             });
     }
 
-    async channelUserPermissionDeleted(data: GatewayEvent_ChannelUserPermissionDeleted): Promise<void> {
+    async channelUserPermissionDelete(data: GatewayEvent_ChannelUserPermissionDeleted): Promise<void> {
         this.client.emit(
-            "channelUserPermissionDeleted",
+            "channelUserPermissionDelete",
             {
                 channelID:  data.channelUserPermission.channelId,
                 createdAt:  data.channelUserPermission.createdAt,
@@ -205,9 +205,9 @@ export class ChannelHandler extends GatewayEventHandler{
                 permission: data.channelUserPermission as never as Array<Permissions>
             });
     }
-    async channelUserPermissionUpdated(data: GatewayEvent_ChannelUserPermissionUpdated): Promise<void> {
+    async channelUserPermissionUpdate(data: GatewayEvent_ChannelUserPermissionUpdated): Promise<void> {
         this.client.emit(
-            "channelUserPermissionUpdated",
+            "channelUserPermissionUpdate",
             {
                 channelID:  data.channelUserPermission.channelId,
                 createdAt:  data.channelUserPermission.createdAt,

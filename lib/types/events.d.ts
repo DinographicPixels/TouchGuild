@@ -105,17 +105,17 @@ export interface ClientEvents {
     /** @event Emitted when a guild channel is archived. */
     channelArchive: [channel: AnyChannel];
     /** @event Emitted when a channel category role permission is created. */
-    channelCategoryRolePermissionCreated: [channelCategoryRolePermission: ChannelCategoryRolePermission];
+    channelCategoryRolePermissionCreate: [channelCategoryRolePermission: ChannelCategoryRolePermission];
     /** @event Emitted when a channel category role permission is deleted. */
-    channelCategoryRolePermissionDeleted: [channelCategoryRolePermission: ChannelCategoryRolePermission];
+    channelCategoryRolePermissionDelete: [channelCategoryRolePermission: ChannelCategoryRolePermission];
     /** @event Emitted when a channel category role permission is updated. */
-    channelCategoryRolePermissionUpdated: [channelCategoryRolePermission: ChannelCategoryRolePermission];
+    channelCategoryRolePermissionUpdate: [channelCategoryRolePermission: ChannelCategoryRolePermission];
     /** @event Emitted when a channel category user permission is created. */
-    channelCategoryUserPermissionCreated: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    channelCategoryUserPermissionCreate: [channelCategoryUserPermission: ChannelCategoryUserPermission];
     /** @event Emitted when a channel category user permission is deleted. */
-    channelCategoryUserPermissionDeleted: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    channelCategoryUserPermissionDelete: [channelCategoryUserPermission: ChannelCategoryUserPermission];
     /** @event Emitted when a channel category user permission is updated. */
-    channelCategoryUserPermissionUpdated: [channelCategoryUserPermission: ChannelCategoryUserPermission];
+    channelCategoryUserPermissionUpdate: [channelCategoryUserPermission: ChannelCategoryUserPermission];
     /** @event Emitted when a guild channel is created. */
     channelCreate: [channel: AnyChannel];
     /** @event Emitted when a guild channel is deleted. */
@@ -123,11 +123,11 @@ export interface ClientEvents {
     /** @event Emitted when a guild channel is restored. */
     channelRestore: [channel: AnyChannel];
     /** @event Emitted when a channel role permission is created. */
-    channelRolePermissionCreated: [channelRolePermission: ChannelRolePermission];
+    channelRolePermissionCreate: [channelRolePermission: ChannelRolePermission];
     /** @event Emitted when a channel role permission is deleted. */
-    channelRolePermissionDeleted: [channelRolePermission: ChannelRolePermission];
+    channelRolePermissionDelete: [channelRolePermission: ChannelRolePermission];
     /** @event Emitted when a channel role permission is updated. */
-    channelRolePermissionUpdated: [channelRolePermission: ChannelRolePermission];
+    channelRolePermissionUpdate: [channelRolePermission: ChannelRolePermission];
     /** @event Emitted when a guild channel is updated. */
     channelUpdate: [channel: TextChannel, oldChannel: JSONTextChannel | null]
     | [channel: ForumChannel, oldChannel: JSONForumChannel | null]
@@ -136,11 +136,11 @@ export interface ClientEvents {
     | [channel: GuildChannel, oldChannel: JSONGuildChannel | null]
     | [channel: Channel, oldChannel: JSONChannel | null];
     /** @event Emitted when a channel user permission is created. */
-    channelUserPermissionCreated: [channelUserPermission: ChannelUserPermission];
+    channelUserPermissionCreate: [channelUserPermission: ChannelUserPermission];
     /** @event Emitted when a channel user permission is deleted. */
-    channelUserPermissionDeleted: [channelUserPermission: ChannelUserPermission];
+    channelUserPermissionDelete: [channelUserPermission: ChannelUserPermission];
     /** @event Emitted when a channel user permission is updated. */
-    channelUserPermissionUpdated: [channelUserPermission: ChannelUserPermission];
+    channelUserPermissionUpdate: [channelUserPermission: ChannelUserPermission];
     /** @event Emitted when things needs to be debugged. */
     debug: [message: string | object];
     /** @event Emitted when a doc comment is created. */
